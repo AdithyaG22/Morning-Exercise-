@@ -351,6 +351,7 @@ function setPaused(p) {
   session.paused = p;
   stage.paused = p;
   $('p-pause').textContent = p ? '▶ Resume' : '⏸ Pause';
+  if (!p) $('p-end').hidden = true;
   if (p) $('p-phase').textContent = 'PAUSED';
   else enterPhaseLabel();
 }
@@ -371,6 +372,8 @@ function finish(completed) {
   const done = s.worked.filter((x) => x > 5).length;
   session = null;
   $('player').hidden = true;
+  $('p-end').hidden = true;
+  $('p-pause').textContent = '⏸ Pause';
   if (workSecs >= 60) {
     history.push({ date: new Date().toISOString(), secs, kcal, count: done, focus: settings.focus });
     history = history.slice(-400);
@@ -399,10 +402,12 @@ $('start').addEventListener('click', startWorkout);
 $('p-pause').addEventListener('click', () => setPaused(!session.paused));
 $('p-next').addEventListener('click', () => jump(1));
 $('p-prev').addEventListener('click', () => jump(-1));
+// ✕ pauses and reveals an "End workout" button (in-page confirm instead of a browser dialog)
 $('p-exit').addEventListener('click', () => {
-  if (!session.paused) setPaused(true);
-  if (confirm('End this workout?')) finish(false);
+  setPaused(true);
+  $('p-end').hidden = false;
 });
+$('p-end').addEventListener('click', () => finish(false));
 $('p-sound').addEventListener('click', () => {
   const on = !(sound.voice || sound.beeps);
   sound.voice = on && settings.voice;
