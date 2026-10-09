@@ -1,6 +1,7 @@
 // Procedural 3D trainer built from simple shapes — no model files to download.
 // Every visible muscle is its own mesh grouped by muscle name so it can glow.
 import * as THREE from '../vendor/three.module.min.js';
+import { buildSkinGeometry, makePrim } from './skin.js';
 
 export const MUSCLES = {
   neck: 'Neck',
@@ -107,6 +108,8 @@ export class Avatar {
     this.girthTargets = [];
     this.bellyMeshes = [];
     this.muscleMeshes = [];
+    this.bones = [];
+    this.shapes = [];   // body shapes the skin is generated from
     this.highlight = new Set();
     this.mode = 'active';
 
@@ -120,13 +123,14 @@ export class Avatar {
     }
     this.sphere = new THREE.SphereGeometry(1, 32, 20);
     this.build();
-    this.setBody({ heightCm: 170, weightKg: 65, sex: 'male' });
+    this.setBody({ heightCm: 170, weightKg: 65, sex: 'male' }, false);
   }
 
   joint(parent, x, y, z) {
-    const g = new THREE.Group();
+    const g = new THREE.Bone();
     g.position.set(x, y, z);
     parent.add(g);
+    this.bones.push(g);
     return g;
   }
 
@@ -139,6 +143,7 @@ export class Avatar {
     m.castShadow = true;
     parent.add(m);
     if (girth) this.girthTargets.push({ mesh: m, base: m.scale.clone(), basePos: m.position.clone() });
+    if (mat === this.bodyMat) this.shapes.push({ mesh: m, type: 'ell', bone: parent });
     const group = Object.keys(this.muscleMats).find((k) => this.muscleMats[k] === mat);
     if (group) {
       m.visible = false;
@@ -155,6 +160,7 @@ export class Avatar {
 
   capsule(parent, mat, r, len, y, r2 = r) {
     // Tapered limb: a capsule squashed toward its far end
+    if (mat === this.bodyMat) this.shapes.push({ type: 'cap', bone: parent, r, len, r2 });
     const geo = new THREE.CapsuleGeometry(r, len, 8, 20);
     if (r2 !== r) {
       const pos = geo.attributes.position;
@@ -167,6 +173,7 @@ export class Avatar {
       geo.computeVertexNormals();
     }
     const m = new THREE.Mesh(geo, mat);
+    if (mat === this.bodyMat) this.shapes[this.shapes.length - 1].mesh = m;
     m.position.y = y;
     m.castShadow = true;
     parent.add(m);
@@ -238,10 +245,7 @@ export class Avatar {
 
     // ---- Neck & head ----
     const neck = this.neck = this.joint(chest, 0, 0.26, 0);
-    const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.046, 0.056, 0.13, 24), B);
-    neckMesh.position.y = 0.03;
-    neckMesh.castShadow = true;
-    neck.add(neckMesh);
+    this.capsule(neck, B, 0.046, 0.08, 0.03, 0.056);
     this.blob(neck, M.neck, [0.026, 0.03, 0.028], [0.016, 0.065, 0.016], false, [0.35, 0, -0.3]);
     this.blob(neck, M.neck, [-0.026, 0.03, 0.028], [0.016, 0.065, 0.016], false, [0.35, 0, 0.3]);
     const head = this.head = this.joint(neck, 0, 0.1, 0);
@@ -297,6 +301,7 @@ export class Avatar {
       this.marker(knee, 0, 0, 0.05);
       this.marker(knee, 0, -0.2, -0.06);
       const ankle = this.joint(knee, 0, -0.43, 0);
+      this.blob(ankle, B, [0, -0.012, 0.0], [0.03, 0.045, 0.034], false);    // ankle
       this.blob(ankle, B, [0, -0.04, 0.045], [0.042, 0.034, 0.11], false);   // foot
       this.blob(ankle, B, [0, -0.045, -0.035], [0.035, 0.032, 0.04], false); // heel
       this.blob(ankle, B, [0, -0.06, 0.135], [0.038, 0.016, 0.035], false);  // toes
@@ -308,7 +313,7 @@ export class Avatar {
   }
 
   /** Scale overall size to height; widen/narrow body to match weight (BMI). */
-  setBody({ heightCm, weightKg, sex }) {
+  setBody({ heightCm, weightKg, sex }, skin = true) {
     const h = Math.max(120, Math.min(220, heightCm || 170)) / 100;
     const w = Math.max(30, Math.min(200, weightKg || 65));
     const bmi = w / (h * h);
@@ -333,6 +338,32 @@ export class Avatar {
     this.legs.R.hip.position.x = female ? -0.098 : -0.09;
     for (const s of [this.arms.L.shoulder, this.arms.R.shoulder]) s.position.x *= girth ** 0.5;
     for (const s of [this.legs.L.hip, this.legs.R.hip]) s.position.x *= girth ** 0.6;
+    if (skin) this.buildSkin();
+  }
+
+  /** Replace the separate body shapes with one smooth skin bound to the skeleton. */
+  buildSkin() {
+    if (this.skin) {
+      this.scaled.remove(this.skin);
+      this.skin.geometry.dispose();
+    }
+    // Bind pose: arms out and legs apart so armpits and thighs stay separate.
+    this.applyPose(expandPose({ shAbd: 40, hipAbd: 6, elbow: 5 }));
+    const inv = this.scaled.matrixWorld.clone().invert();
+    const prims = this.shapes.map((s) => {
+      s.mesh.visible = true;
+      const rel = inv.clone().multiply(s.mesh.matrixWorld);
+      return makePrim(s, rel);
+    });
+    const geo = buildSkinGeometry(prims, this.bones);
+    const skin = new THREE.SkinnedMesh(geo, this.bodyMat);
+    skin.castShadow = true;
+    skin.frustumCulled = false;
+    this.scaled.add(skin);
+    skin.updateMatrixWorld(true);
+    skin.bind(new THREE.Skeleton(this.bones), skin.matrixWorld);
+    this.skin = skin;
+    for (const s of this.shapes) s.mesh.visible = false;
   }
 
   setSkin(hex) {

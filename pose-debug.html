@@ -10,5 +10,6 @@ window.EX = EXERCISES.map(e => ({ id: e.id, n: e.frames.length }));
 window.show = (id, f, mir) => stage.snapTo(EXERCISES.find(e => e.id === id), f, mir);
 window.yaw = (y) => { stage.viewYaw = y; stage.camYaw = y; };
 window.stageRef = stage;
+stage.setBody({ heightCm: 170, weightKg: 65, sex: 'male' });
 window.ready = true;
 </script></body></html>

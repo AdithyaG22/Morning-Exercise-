@@ -1,8 +1,8 @@
 // Offline support: cache the whole app on first visit.
-const CACHE = 'morning-move-v5';
+const CACHE = 'morning-move-v6';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',
-  'js/app.js', 'js/stage.js', 'js/avatar.js', 'js/exercises.js', 'js/plan.js', 'js/audio.js',
+  'js/app.js', 'js/stage.js', 'js/avatar.js', 'js/exercises.js', 'js/plan.js', 'js/audio.js', 'js/skin.js',
   'vendor/three.module.min.js', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
 ];
 

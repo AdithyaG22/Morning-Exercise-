@@ -28,7 +28,8 @@ sound.beeps = settings.beeps;
 // ---------- 3D stage ----------
 const canvas = $('stage');
 const stage = new Stage(canvas);
-stage.setBody(profile);
+// Build the smooth skin just after the first paint so the app appears instantly.
+setTimeout(() => stage.setBody(profile), 60);
 function applyTheme() {
   document.documentElement.dataset.theme = settings.theme;
   document.querySelector('meta[name=theme-color]')?.setAttribute('content', settings.theme === 'dark' ? '#0d141c' : '#0f766e');
