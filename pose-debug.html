@@ -1,0 +1,13 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Pose debug</title>
+<style>body{margin:0;background:#eef2f6}canvas{width:400px;height:400px;display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script type="module">
+import { Stage } from './js/stage.js';
+import { EXERCISES } from './js/exercises.js';
+const stage = new Stage(document.getElementById('c'));
+window.EX = EXERCISES.map(e => ({ id: e.id, n: e.frames.length }));
+window.show = (id, f, mir) => stage.snapTo(EXERCISES.find(e => e.id === id), f, mir);
+window.yaw = (y) => { stage.viewYaw = y; stage.camYaw = y; };
+window.ready = true;
+</script></body></html>

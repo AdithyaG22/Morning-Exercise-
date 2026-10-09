@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Morning Move</title>
+  <meta name="description" content="Free, lightweight morning workouts with a 3D trainer that shows which muscles are working.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 3D stage: one canvas, moved between the home hero, the player and the preview sheet -->
+    <canvas id="stage" aria-label="3D trainer"></canvas>
+
+    <!-- HOME -->
+    <section id="view-home" class="view active">
+      <header class="top">
+        <div>
+          <div class="hello" id="hello">Good morning</div>
+          <h1>Morning Move</h1>
+        </div>
+        <div class="streak" id="streak" title="Day streak">🔥 <b>0</b></div>
+      </header>
+
+      <div class="home-left">
+        <div class="hero" id="hero-slot"></div>
+        <div class="hero-caption" id="hero-caption">Drag to rotate the trainer</div>
+      </div>
+      <div class="home-right">
+
+      <div class="card">
+        <div class="row between">
+          <h2>Today's workout</h2>
+          <button class="ghost small" id="shuffle" title="New mix">↻ Shuffle</button>
+        </div>
+
+        <label class="field">
+          <span>Duration <b id="min-label">15 min</b></span>
+          <input type="range" id="minutes" min="5" max="30" step="1" value="15">
+        </label>
+
+        <div class="field">
+          <span>Level</span>
+          <div class="seg" id="level">
+            <button data-v="1">Beginner</button>
+            <button data-v="2">Intermediate</button>
+            <button data-v="3">Advanced</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span>Focus</span>
+          <div class="chips" id="focus"></div>
+        </div>
+
+        <div class="field row gap">
+          <div class="stepper">
+            <span>Exercise</span>
+            <div><button data-step="work" data-d="-5">−</button><b id="work-label">20s</b><button data-step="work" data-d="5">+</button></div>
+          </div>
+          <div class="stepper">
+            <span>Rest</span>
+            <div><button data-step="rest" data-d="-5">−</button><b id="rest-label">10s</b><button data-step="rest" data-d="5">+</button></div>
+          </div>
+        </div>
+
+        <div class="summary" id="plan-summary"></div>
+        <button class="primary big" id="start">▶ Start workout</button>
+      </div>
+
+      <div class="card">
+        <h2>In this workout</h2>
+        <ol class="ex-list" id="plan-list"></ol>
+      </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="view-library" class="view">
+      <header class="top"><h1>Exercises</h1></header>
+      <div class="chips scroll" id="lib-filter"></div>
+      <div class="lib-grid" id="lib-grid"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="view-profile" class="view">
+      <header class="top"><h1>You</h1></header>
+      <div class="card">
+        <h2>Body</h2>
+        <p class="muted">The trainer is sized to match you. Nothing leaves your device.</p>
+        <div class="row gap">
+          <label class="field grow"><span>Height (cm)</span><input type="number" id="height" min="120" max="220" inputmode="numeric"></label>
+          <label class="field grow"><span>Weight (kg)</span><input type="number" id="weight" min="30" max="200" inputmode="numeric"></label>
+        </div>
+        <div class="field">
+          <span>Body type</span>
+          <div class="seg" id="sex"><button data-v="male">Male</button><button data-v="female">Female</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Sound</h2>
+        <label class="toggle"><input type="checkbox" id="opt-voice"> <span>Voice coach</span></label>
+        <label class="toggle"><input type="checkbox" id="opt-beeps"> <span>Countdown beeps</span></label>
+      </div>
+      <div class="card">
+        <h2>Your progress</h2>
+        <div class="stats" id="stats"></div>
+        <div class="week" id="week"></div>
+      </div>
+      <p class="muted center small">Morning Move is free and works offline. Install it from your browser menu: “Add to Home screen”.</p>
+    </section>
+
+    <nav class="tabs" id="tabs">
+      <button data-view="home" class="on"><span>🏃</span>Workout</button>
+      <button data-view="library"><span>📚</span>Exercises</button>
+      <button data-view="profile"><span>👤</span>You</button>
+    </nav>
+
+    <!-- PLAYER -->
+    <section id="player" class="overlay" hidden>
+      <div class="p-top">
+        <button class="icon" id="p-exit" aria-label="End workout">✕</button>
+        <div class="p-progress"><div id="p-bar"></div></div>
+        <button class="icon" id="p-sound" aria-label="Toggle sound">🔊</button>
+      </div>
+      <div class="p-head">
+        <div class="phase" id="p-phase">GET READY</div>
+        <div class="p-name" id="p-name">—</div>
+        <div class="p-count" id="p-count"></div>
+      </div>
+      <div class="p-muscles" id="p-muscles"></div>
+      <div class="stage-slot" id="player-slot"></div>
+      <div class="p-bottom">
+        <div class="p-tip" id="p-tip"></div>
+        <div class="p-controls">
+          <button class="icon big" id="p-prev" aria-label="Previous">⏮</button>
+          <div class="ring" id="p-ring">
+            <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="track"/><circle cx="60" cy="60" r="52" class="fill" id="p-ring-fill"/></svg>
+            <div class="ring-num" id="p-time">20</div>
+          </div>
+          <button class="icon big" id="p-next" aria-label="Skip">⏭</button>
+        </div>
+        <div class="row center gap">
+          <button class="pill" id="p-pause">⏸ Pause</button>
+        </div>
+        <div class="p-next" id="p-nextup"></div>
+      </div>
+    </section>
+
+    <!-- DONE -->
+    <section id="done" class="overlay done" hidden>
+      <div class="done-box">
+        <div class="trophy">🎉</div>
+        <h1>Workout complete!</h1>
+        <p class="muted" id="done-msg">Great way to start the day.</p>
+        <div class="stats" id="done-stats"></div>
+        <button class="primary big" id="done-ok">Done</button>
+      </div>
+    </section>
+
+    <!-- EXERCISE PREVIEW -->
+    <section id="preview" class="sheet" hidden>
+      <div class="sheet-box">
+        <div class="stage-slot small" id="preview-slot"></div>
+        <button class="icon close" id="pv-close" aria-label="Close">✕</button>
+        <div class="pv-body">
+          <div class="tags" id="pv-tags"></div>
+          <h2 id="pv-name"></h2>
+          <p id="pv-tip"></p>
+          <div class="p-muscles static" id="pv-muscles"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
