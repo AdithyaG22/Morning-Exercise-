@@ -79,6 +79,8 @@ h2 { font-size: 1.05rem; margin: 0 0 10px; }
 .view.active { display: block; }
 .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .hello { color: var(--muted); font-size: 0.9rem; }
+.install { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 0.9rem; }
+.install-hint { background: var(--accent-soft); border-radius: 14px; padding: 10px 14px; font-size: 0.88rem; margin-bottom: 12px; }
 .streak { background: var(--card); border-radius: 999px; padding: 6px 12px; box-shadow: var(--shadow); font-size: 0.95rem; }
 
 #stage { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; }
@@ -234,7 +236,7 @@ input[type=number] {
 @media (min-width: 900px) {
   #app { max-width: 1100px; }
   #view-home.active { display: grid; grid-template-columns: 1.2fr 1fr; gap: 0 20px; align-items: start; }
-  #view-home .top { grid-column: 1 / -1; }
+  #view-home .top, #view-home .install-hint { grid-column: 1 / -1; }
   #view-home .home-left { position: sticky; top: 16px; }
   #view-home .hero { height: 560px; }
   .tabs { max-width: 1100px; }

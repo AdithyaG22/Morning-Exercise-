@@ -435,6 +435,27 @@ renderLibrary();
 renderStats();
 rebuild();
 
+// Install to home screen: Android/desktop Chrome fire beforeinstallprompt; iPhone needs Safari's Share menu.
+let installEvent = null;
+const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installEvent = e;
+  $('install').hidden = false;
+});
+$('install').addEventListener('click', async () => {
+  if (!installEvent) return;
+  installEvent.prompt();
+  await installEvent.userChoice.catch(() => {});
+  installEvent = null;
+  $('install').hidden = true;
+});
+window.addEventListener('appinstalled', () => { $('install').hidden = true; });
+if (!standalone && /iphone|ipad|ipod/i.test(navigator.userAgent)) {
+  $('install-hint').hidden = false;
+  $('install-hint').innerHTML = 'To install: open this page in <b>Safari</b>, tap the <b>Share</b> button (square with an arrow), then <b>Add to Home Screen</b>.';
+}
+
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
