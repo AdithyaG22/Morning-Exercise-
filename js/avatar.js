@@ -335,6 +335,11 @@ export class Avatar {
     for (const s of [this.legs.L.hip, this.legs.R.hip]) s.position.x *= girth ** 0.6;
   }
 
+  setSkin(hex) {
+    this.bodyMat.color.setHex(hex);
+    COLORS.muscle = hex;
+  }
+
   /** Muscles to glow. mode: 'active' (red, pulsing) or 'next' (amber preview). */
   setHighlight(muscles, mode = 'active') {
     this.highlight = new Set(muscles || []);

@@ -18,7 +18,7 @@ const store = {
   set(key, v) { try { localStorage.setItem('mm.' + key, JSON.stringify(v)); } catch { /* private mode */ } },
 };
 
-const settings = store.get('settings', { minutes: 15, level: 1, focus: 'full', work: 20, rest: 10, voice: true, beeps: true });
+const settings = store.get('settings', { minutes: 15, level: 1, focus: 'full', work: 20, rest: 10, voice: true, beeps: true, theme: 'light' });
 const profile = store.get('profile', { heightCm: 170, weightKg: 65, sex: 'male' });
 let history = store.list('history');
 let shuffleN = 0;
@@ -29,6 +29,12 @@ sound.beeps = settings.beeps;
 const canvas = $('stage');
 const stage = new Stage(canvas);
 stage.setBody(profile);
+function applyTheme() {
+  document.documentElement.dataset.theme = settings.theme;
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', settings.theme === 'dark' ? '#0d141c' : '#0f766e');
+  stage.setTheme(settings.theme);
+}
+applyTheme();
 function mountStage(slot) {
   slot.appendChild(canvas);
   stage.userYaw = 0;
@@ -212,6 +218,7 @@ function renderProfile() {
   for (const b of $('sex').children) b.classList.toggle('on', b.dataset.v === profile.sex);
   $('opt-voice').checked = settings.voice;
   $('opt-beeps').checked = settings.beeps;
+  for (const b of $('theme').children) b.classList.toggle('on', b.dataset.v === settings.theme);
 }
 function saveProfile() {
   store.set('profile', profile);
@@ -221,6 +228,10 @@ $('height').addEventListener('change', (e) => { profile.heightCm = Math.max(120,
 $('weight').addEventListener('change', (e) => { profile.weightKg = Math.max(30, Math.min(200, +e.target.value || 65)); e.target.value = profile.weightKg; saveProfile(); });
 $('sex').addEventListener('click', (e) => { const v = e.target.dataset?.v; if (v) { profile.sex = v; renderProfile(); saveProfile(); } });
 $('opt-voice').addEventListener('change', (e) => { settings.voice = sound.voice = e.target.checked; save(); });
+$('theme').addEventListener('click', (e) => {
+  const v = e.target.closest('[data-v]')?.dataset.v;
+  if (v) { settings.theme = v; save(); applyTheme(); renderProfile(); }
+});
 $('opt-beeps').addEventListener('change', (e) => { settings.beeps = sound.beeps = e.target.checked; save(); });
 
 // ---------- Calories ----------

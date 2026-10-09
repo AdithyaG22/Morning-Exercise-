@@ -20,7 +20,8 @@ export class Stage {
     this.camera = new THREE.PerspectiveCamera(32, 1, 0.05, 50);
 
     // Studio lighting: soft key from above-front, cool rim lights from behind.
-    this.scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a1f28, 0.9));
+    this.hemi = new THREE.HemisphereLight(0xdfe8ff, 0x1a1f28, 0.9);
+    this.scene.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xffffff, 2.6);
     sun.position.set(1.2, 5, 3.2);
     sun.castShadow = true;
@@ -35,6 +36,7 @@ export class Stage {
     rimR.position.set(3, 2, -3);
     const fill = new THREE.DirectionalLight(0xffffff, 0.5);
     fill.position.set(-2, 1, 3);
+    this.rims = [rimL, rimR];
     this.scene.add(rimL, rimR, fill);
 
     const floor = new THREE.Mesh(
@@ -43,6 +45,7 @@ export class Stage {
     );
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
+    this.floor = floor;
     this.scene.add(floor);
     // Soft pool of light on the floor under the trainer
     const c = document.createElement('canvas');
@@ -122,6 +125,23 @@ export class Stage {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+  }
+
+  /** 'light': bright room like a daytime studio. 'dark': black stage with blue rim lights. */
+  setTheme(theme) {
+    const dark = theme === 'dark';
+    this.renderer.toneMappingExposure = dark ? 1.05 : 1.0;
+    this.hemi.color.setHex(dark ? 0xdfe8ff : 0xffffff);
+    this.hemi.groundColor.setHex(dark ? 0x1a1f28 : 0x8a8f99);
+    this.hemi.intensity = dark ? 0.9 : 1.7;
+    this.sun.intensity = dark ? 2.6 : 2.0;
+    this.rims[0].intensity = dark ? 2.2 : 0.7;
+    this.rims[1].intensity = dark ? 1.6 : 0.3;
+    this.floor.material.opacity = dark ? 0.45 : 0.22;
+    this.spot.visible = dark;
+    this.mat.material.color.setHex(dark ? 0x2a3a52 : 0x3fb59b);
+    this.mat.material.opacity = dark ? 0.6 : 0.35;
+    this.avatar.setSkin(dark ? 0xe8ebef : 0xd2d9e2);
   }
 
   setBody(profile) { this.avatar.setBody(profile); }
