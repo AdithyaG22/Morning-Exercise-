@@ -13,33 +13,57 @@ export class Stage {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.05;
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(32, 1, 0.05, 50);
 
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f99, 1.6));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.9);
-    sun.position.set(2.5, 5, 3.5);
+    // Studio lighting: soft key from above-front, cool rim lights from behind.
+    this.scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a1f28, 0.9));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.6);
+    sun.position.set(1.2, 5, 3.2);
     sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
     Object.assign(sun.shadow.camera, { left: -2, right: 2, top: 2, bottom: -2, near: 0.5, far: 15 });
-    sun.shadow.radius = 4;
+    sun.shadow.radius = 5;
     this.sun = sun;
     this.scene.add(sun, sun.target);
-    const rim = new THREE.DirectionalLight(0xbfd8ff, 0.8);
-    rim.position.set(-3, 3, -4);
-    this.scene.add(rim);
+    const rimL = new THREE.DirectionalLight(0x7fb0ff, 2.2);
+    rimL.position.set(-3, 2.5, -3.5);
+    const rimR = new THREE.DirectionalLight(0x9fc4ff, 1.6);
+    rimR.position.set(3, 2, -3);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.5);
+    fill.position.set(-2, 1, 3);
+    this.scene.add(rimL, rimR, fill);
 
     const floor = new THREE.Mesh(
       new THREE.CircleGeometry(2.4, 64),
-      new THREE.ShadowMaterial({ opacity: 0.22 })
+      new THREE.ShadowMaterial({ opacity: 0.45 })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     this.scene.add(floor);
+    // Soft pool of light on the floor under the trainer
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, 'rgba(150,180,230,0.35)');
+    grad.addColorStop(1, 'rgba(150,180,230,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    const spot = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.6, 2.6),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })
+    );
+    spot.rotation.x = -Math.PI / 2;
+    spot.position.y = 0.001;
+    this.spot = spot;
+    this.scene.add(spot);
     const mat = new THREE.Mesh(
       new THREE.PlaneGeometry(0.75, 1.9),
-      new THREE.MeshStandardMaterial({ color: 0x3fb59b, roughness: 0.9, transparent: true, opacity: 0.35 })
+      new THREE.MeshStandardMaterial({ color: 0x2a3a52, roughness: 0.9, transparent: true, opacity: 0.6 })
     );
     mat.rotation.x = -Math.PI / 2;
     mat.position.y = 0.002;
@@ -190,7 +214,9 @@ export class Stage {
     );
     cam.lookAt(this.camTarget);
     this.sun.target.position.copy(center);
-    this.sun.position.set(center.x + 2.5, 5, center.z + 3.5);
+    this.sun.position.set(center.x + 1.2, 5, center.z + 3.2);
+    this.spot.position.x = center.x;
+    this.spot.position.z = center.z;
     this.mat.position.x = center.x;
     this.mat.position.z = center.z;
     this.renderer.render(this.scene, cam);

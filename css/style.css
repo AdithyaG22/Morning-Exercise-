@@ -15,6 +15,7 @@
   --tag2-bg: #fff1d6; --tag2-fg: #b45309;
   --tag3-bg: #ffe1db; --tag3-fg: #c2410c;
   --next-fg: #b45309;
+  --studio: radial-gradient(90% 70% at 50% 38%, #2c3646 0%, #151b24 55%, #0a0d12 100%);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -88,7 +89,7 @@ h2 { font-size: 1.05rem; margin: 0 0 10px; }
   position: relative;
   height: min(42vh, 340px);
   border-radius: var(--radius);
-  background: radial-gradient(120% 90% at 50% 20%, var(--card), var(--bg2));
+  background: var(--studio);
   overflow: hidden;
 }
 .hero-caption { text-align: center; color: var(--muted); font-size: 0.8rem; margin: 6px 0 12px; }
@@ -178,7 +179,7 @@ input[type=number] {
   display: flex; flex-direction: column;
 }
 .overlay[hidden], .sheet[hidden] { display: none; }
-#player .stage-slot { position: relative; flex: 1; min-height: 0; }
+#player .stage-slot { position: relative; flex: 1; min-height: 0; background: var(--studio); margin: 0 12px; border-radius: 22px; overflow: hidden; }
 .p-top {
   position: relative; display: flex; align-items: center; gap: 10px;
   padding: 12px 14px 0; padding-top: max(12px, env(safe-area-inset-top));
@@ -226,7 +227,7 @@ input[type=number] {
 .sheet { position: fixed; inset: 0; z-index: 30; background: rgba(5, 10, 15, 0.45); display: flex; align-items: flex-end; justify-content: center; }
 .sheet-box { position: relative; background: var(--card); width: 100%; max-width: 560px; border-radius: 22px 22px 0 0; overflow: hidden; padding-bottom: env(safe-area-inset-bottom); animation: up 0.25s ease-out; }
 @keyframes up { from { transform: translateY(40px); opacity: 0; } }
-.stage-slot.small { position: relative; height: min(48vh, 380px); background: radial-gradient(110% 90% at 50% 25%, var(--card), var(--bg2)); }
+.stage-slot.small { position: relative; height: min(48vh, 380px); background: var(--studio); }
 .close { position: absolute; top: 12px; right: 12px; }
 .pv-body { padding: 14px 18px 22px; }
 .pv-body h2 { font-size: 1.3rem; margin: 8px 0 4px; }

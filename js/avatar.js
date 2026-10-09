@@ -62,14 +62,38 @@ export function lerpPose(a, b, t, out = {}) {
 }
 
 const COLORS = {
-  body: 0xc7d0dc,
-  muscle: 0xd99a8c,
-  hair: 0x3b302b,
-  shoe: 0x39424e,
-  active: new THREE.Color(0xff3d1f),
-  activeGlow: new THREE.Color(0xff2200),
+  skin: 0xe8ebef,      // porcelain-white sculpture
+  muscle: 0xeef0f3,    // muscles share the body tone; their shape shows the anatomy
+  active: new THREE.Color(0xff4a26),
+  activeGlow: new THREE.Color(0xff2a00),
+  halo: new THREE.Color(0x4f8dff),
   next: new THREE.Color(0xffa340),
 };
+
+// Additive fresnel shell: a soft halo around a glowing muscle.
+function glowMaterial() {
+  return new THREE.ShaderMaterial({
+    uniforms: { color: { value: COLORS.halo.clone() }, intensity: { value: 0 } },
+    vertexShader: `
+      varying vec3 vN; varying vec3 vV;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vN = normalize(normalMatrix * normal);
+        vV = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform vec3 color; uniform float intensity;
+      varying vec3 vN; varying vec3 vV;
+      void main() {
+        float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 2.2);
+        gl_FragColor = vec4(color * f * intensity, f * intensity);
+      }`,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+}
 
 export class Avatar {
   constructor() {
@@ -78,19 +102,22 @@ export class Avatar {
     this.object.add(this.scaled);
     this.markers = [];
     this.muscleMats = {};
+    this.glowMats = {};
+    this.glowShells = {};
     this.girthTargets = [];
+    this.bellyMeshes = [];
     this.highlight = new Set();
     this.mode = 'active';
 
-    this.bodyMat = new THREE.MeshStandardMaterial({ color: COLORS.body, roughness: 0.55, metalness: 0.05 });
-    this.hairMat = new THREE.MeshStandardMaterial({ color: COLORS.hair, roughness: 0.9 });
-    this.shoeMat = new THREE.MeshStandardMaterial({ color: COLORS.shoe, roughness: 0.7 });
+    this.bodyMat = new THREE.MeshStandardMaterial({ color: COLORS.skin, roughness: 0.42, metalness: 0.02 });
     for (const m of Object.keys(MUSCLES)) {
       this.muscleMats[m] = new THREE.MeshStandardMaterial({
-        color: COLORS.muscle, roughness: 0.5, metalness: 0.0, emissive: 0x000000,
+        color: COLORS.muscle, roughness: 0.38, metalness: 0.02, emissive: 0x000000,
       });
+      this.glowMats[m] = glowMaterial();
+      this.glowShells[m] = [];
     }
-    this.sphere = new THREE.SphereGeometry(1, 24, 16);
+    this.sphere = new THREE.SphereGeometry(1, 32, 20);
     this.build();
     this.setBody({ heightCm: 170, weightKg: 65, sex: 'male' });
   }
@@ -102,18 +129,40 @@ export class Avatar {
     return g;
   }
 
-  blob(parent, mat, [x, y, z], [sx, sy, sz], girth = true) {
+  /** Ellipsoid. rot = optional [rx, ry, rz] radians to angle a muscle along its fibres. */
+  blob(parent, mat, [x, y, z], [sx, sy, sz], girth = true, rot = null) {
     const m = new THREE.Mesh(this.sphere, mat);
     m.position.set(x, y, z);
     m.scale.set(sx, sy, sz);
+    if (rot) m.rotation.set(rot[0], rot[1], rot[2]);
     m.castShadow = true;
     parent.add(m);
     if (girth) this.girthTargets.push({ mesh: m, base: m.scale.clone(), basePos: m.position.clone() });
+    const group = Object.keys(this.muscleMats).find((k) => this.muscleMats[k] === mat);
+    if (group) {
+      const shell = new THREE.Mesh(this.sphere, this.glowMats[group]);
+      shell.scale.setScalar(1.32);
+      shell.visible = false;
+      shell.renderOrder = 2;
+      m.add(shell);
+      this.glowShells[group].push(shell);
+    }
     return m;
   }
 
-  capsule(parent, mat, r, len, y) {
-    const geo = new THREE.CapsuleGeometry(r, len, 6, 16);
+  capsule(parent, mat, r, len, y, r2 = r) {
+    // Tapered limb: a capsule squashed toward its far end
+    const geo = new THREE.CapsuleGeometry(r, len, 8, 20);
+    if (r2 !== r) {
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const t = (pos.getY(i) + len / 2 + r) / (len + 2 * r); // 0 bottom → 1 top
+        const k = (r2 + (r - r2) * t) / r;
+        pos.setX(i, pos.getX(i) * k);
+        pos.setZ(i, pos.getZ(i) * k);
+      }
+      geo.computeVertexNormals();
+    }
     const m = new THREE.Mesh(geo, mat);
     m.position.y = y;
     m.castShadow = true;
@@ -134,93 +183,110 @@ export class Avatar {
     const M = this.muscleMats, B = this.bodyMat;
     const pelvis = this.pelvis = this.joint(this.scaled, 0, 1.0, 0);
 
-    // Pelvis
-    this.blob(pelvis, B, [0, 0, 0], [0.165, 0.11, 0.11]);
-    this.blob(pelvis, M.glutes, [0.068, -0.035, -0.055], [0.085, 0.09, 0.075]);
-    this.blob(pelvis, M.glutes, [-0.068, -0.035, -0.055], [0.085, 0.09, 0.075]);
-    this.blob(pelvis, M.hipFlexors, [0.075, 0.0, 0.07], [0.045, 0.06, 0.04]);
-    this.blob(pelvis, M.hipFlexors, [-0.075, 0.0, 0.07], [0.045, 0.06, 0.04]);
+    // ---- Pelvis ----
+    this.blob(pelvis, B, [0, 0, 0], [0.158, 0.11, 0.105]);
+    this.blob(pelvis, M.glutes, [0.066, -0.03, -0.058], [0.082, 0.092, 0.07]);
+    this.blob(pelvis, M.glutes, [-0.066, -0.03, -0.058], [0.082, 0.092, 0.07]);
+    this.blob(pelvis, M.hipFlexors, [0.072, 0.0, 0.066], [0.04, 0.065, 0.036], true, [0, 0, -0.35]);
+    this.blob(pelvis, M.hipFlexors, [-0.072, 0.0, 0.066], [0.04, 0.065, 0.036], true, [0, 0, 0.35]);
     this.marker(pelvis, 0, -0.1, -0.1);
     this.marker(pelvis, 0.1, -0.06, -0.1);
     this.marker(pelvis, -0.1, -0.06, -0.1);
     this.marker(pelvis, 0, -0.04, 0.1);
 
-    // Lower torso
+    // ---- Lower torso: six-pack, obliques, spinal erectors ----
     const spine = this.spine = this.joint(pelvis, 0, 0.08, 0);
-    this.blob(spine, B, [0, 0.08, 0], [0.145, 0.14, 0.1]);
-    this.blob(spine, M.abs, [0, 0.08, 0.068], [0.085, 0.13, 0.045]);
-    this.blob(spine, M.obliques, [0.112, 0.07, 0.02], [0.045, 0.11, 0.07]);
-    this.blob(spine, M.obliques, [-0.112, 0.07, 0.02], [0.045, 0.11, 0.07]);
-    this.blob(spine, M.lowerBack, [0.04, 0.07, -0.065], [0.045, 0.12, 0.045]);
-    this.blob(spine, M.lowerBack, [-0.04, 0.07, -0.065], [0.045, 0.12, 0.045]);
+    this.bellyMeshes.push(this.blob(spine, B, [0, 0.08, 0], [0.132, 0.14, 0.092]));
+    for (const y of [0.025, 0.085, 0.145]) {
+      for (const s of [1, -1]) {
+        this.bellyMeshes.push(this.blob(spine, M.abs, [0.03 * s, y, 0.07 - (y - 0.08) * 0.08], [0.03, 0.027, 0.024]));
+      }
+    }
+    this.bellyMeshes.push(this.blob(spine, M.abs, [0, -0.03, 0.066], [0.05, 0.035, 0.024]));
+    this.blob(spine, M.obliques, [0.108, 0.06, 0.022], [0.038, 0.11, 0.062], true, [0, 0, 0.12]);
+    this.blob(spine, M.obliques, [-0.108, 0.06, 0.022], [0.038, 0.11, 0.062], true, [0, 0, -0.12]);
+    this.blob(spine, M.lowerBack, [0.036, 0.07, -0.062], [0.035, 0.13, 0.04]);
+    this.blob(spine, M.lowerBack, [-0.036, 0.07, -0.062], [0.035, 0.13, 0.04]);
     this.marker(spine, 0, 0.08, -0.1);
     this.marker(spine, 0, 0.08, 0.11);
 
-    // Chest
+    // ---- Chest: pecs, lats (V-taper), traps ----
     const chest = this.chest = this.joint(spine, 0, 0.18, 0);
-    this.blob(chest, B, [0, 0.11, 0], [0.17, 0.17, 0.11]);
-    this.blob(chest, M.chest, [0.072, 0.15, 0.08], [0.085, 0.07, 0.045]);
-    this.blob(chest, M.chest, [-0.072, 0.15, 0.08], [0.085, 0.07, 0.045]);
-    this.blob(chest, M.back, [0.08, 0.1, -0.07], [0.08, 0.14, 0.05]);
-    this.blob(chest, M.back, [-0.08, 0.1, -0.07], [0.08, 0.14, 0.05]);
-    this.blob(chest, M.traps, [0, 0.235, -0.035], [0.12, 0.055, 0.06]);
+    this.blob(chest, B, [0, 0.11, 0], [0.16, 0.17, 0.1]);
+    this.blob(chest, M.chest, [0.068, 0.158, 0.07], [0.082, 0.058, 0.04], true, [0, 0.25, -0.22]);
+    this.blob(chest, M.chest, [-0.068, 0.158, 0.07], [0.082, 0.058, 0.04], true, [0, -0.25, 0.22]);
+    this.blob(chest, M.back, [0.098, 0.07, -0.045], [0.055, 0.15, 0.05], true, [0, 0, 0.32]);
+    this.blob(chest, M.back, [-0.098, 0.07, -0.045], [0.055, 0.15, 0.05], true, [0, 0, -0.32]);
+    this.blob(chest, M.back, [0.05, 0.16, -0.072], [0.055, 0.075, 0.035]);
+    this.blob(chest, M.back, [-0.05, 0.16, -0.072], [0.055, 0.075, 0.035]);
+    this.blob(chest, M.traps, [0.07, 0.238, -0.018], [0.085, 0.032, 0.05], true, [0, 0, -0.42]);
+    this.blob(chest, M.traps, [-0.07, 0.238, -0.018], [0.085, 0.032, 0.05], true, [0, 0, 0.42]);
+    this.blob(chest, M.traps, [0, 0.19, -0.075], [0.05, 0.09, 0.03]);
     this.marker(chest, 0, 0.14, -0.12);
     this.marker(chest, 0, 0.14, 0.13);
     this.marker(chest, 0.17, 0.2, 0);
     this.marker(chest, -0.17, 0.2, 0);
 
-    // Neck & head
+    // ---- Neck & faceless head ----
     const neck = this.neck = this.joint(chest, 0, 0.26, 0);
-    const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.048, 0.055, 0.12, 14), M.neck);
+    const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.044, 0.054, 0.13, 20), B);
     neckMesh.position.y = 0.03;
     neckMesh.castShadow = true;
     neck.add(neckMesh);
+    this.blob(neck, M.neck, [0.024, 0.03, 0.026], [0.016, 0.065, 0.016], false, [0.35, 0, -0.3]);
+    this.blob(neck, M.neck, [-0.024, 0.03, 0.026], [0.016, 0.065, 0.016], false, [0.35, 0, 0.3]);
     const head = this.head = this.joint(neck, 0, 0.1, 0);
-    this.blob(head, B, [0, 0.1, 0.005], [0.093, 0.115, 0.105], false);
-    this.blob(head, this.hairMat, [0, 0.135, -0.018], [0.098, 0.095, 0.1], false);
-    this.blob(head, B, [0, 0.085, 0.104], [0.016, 0.024, 0.02], false); // nose
-    this.blob(head, B, [0.092, 0.09, 0], [0.014, 0.028, 0.02], false);  // ears
-    this.blob(head, B, [-0.092, 0.09, 0], [0.014, 0.028, 0.02], false);
+    this.blob(head, B, [0, 0.105, 0], [0.086, 0.112, 0.098], false);
+    this.blob(head, B, [0, 0.05, 0.022], [0.06, 0.055, 0.07], false);   // jaw
+    this.blob(head, B, [0, 0.09, 0.093], [0.009, 0.018, 0.01], false);   // nose
     this.marker(head, 0, 0.22, 0);
     this.marker(head, 0, 0.1, -0.11);
     this.marker(head, 0, 0.1, 0.12);
     this.marker(head, 0, -0.01, 0.07);
 
-    // Arms
+    // ---- Arms ----
     this.arms = {};
     for (const [side, s] of [['L', 1], ['R', -1]]) {
       const shoulder = this.joint(chest, 0.2 * s, 0.215, -0.005);
-      this.blob(shoulder, M.shoulders, [0.012 * s, -0.025, 0], [0.065, 0.075, 0.065]);
-      this.capsule(shoulder, B, 0.04, 0.22, -0.15);
-      this.blob(shoulder, M.biceps, [0, -0.145, 0.022], [0.041, 0.095, 0.042]);
-      this.blob(shoulder, M.triceps, [0, -0.13, -0.022], [0.043, 0.11, 0.04]);
+      this.blob(shoulder, M.shoulders, [0.014 * s, -0.035, 0], [0.066, 0.088, 0.066]);
+      this.capsule(shoulder, B, 0.04, 0.22, -0.15, 0.032);
+      this.blob(shoulder, M.biceps, [0, -0.15, 0.022], [0.04, 0.088, 0.04]);
+      this.blob(shoulder, M.triceps, [0, -0.13, -0.022], [0.042, 0.11, 0.038]);
       this.marker(shoulder, 0, -0.29, -0.04);
       const elbow = this.joint(shoulder, 0, -0.29, 0);
-      this.capsule(elbow, B, 0.03, 0.2, -0.125);
-      this.blob(elbow, M.forearms, [0, -0.085, 0.004], [0.04, 0.11, 0.039]);
+      this.capsule(elbow, B, 0.031, 0.2, -0.125, 0.022);
+      this.blob(elbow, M.forearms, [0, -0.075, 0.004], [0.041, 0.1, 0.036]);
       const wrist = this.joint(elbow, 0, -0.25, 0);
-      this.blob(wrist, B, [0, -0.07, 0], [0.024, 0.072, 0.042], false);
+      this.blob(wrist, B, [0, -0.05, 0], [0.02, 0.05, 0.04], false);       // palm
+      this.blob(wrist, B, [0, -0.11, 0.004], [0.016, 0.048, 0.035], false); // fingers
+      this.blob(wrist, B, [0, -0.05, 0.036], [0.012, 0.032, 0.012], false, [0.4, 0, 0]); // thumb
       this.marker(wrist, 0, -0.15, 0);
       this.marker(wrist, 0, -0.04, 0);
       this.arms[side] = { shoulder, elbow, wrist };
     }
 
-    // Legs
+    // ---- Legs ----
     this.legs = {};
     for (const [side, s] of [['L', 1], ['R', -1]]) {
       const hip = this.joint(pelvis, 0.09 * s, -0.05, 0);
-      this.capsule(hip, B, 0.068, 0.3, -0.21);
-      this.blob(hip, M.quads, [0.004 * s, -0.2, 0.035], [0.064, 0.17, 0.05]);
-      this.blob(hip, M.hamstrings, [0, -0.21, -0.034], [0.06, 0.16, 0.045]);
-      this.blob(hip, M.adductors, [-0.035 * s, -0.12, 0.002], [0.035, 0.12, 0.048]);
+      this.capsule(hip, B, 0.068, 0.3, -0.21, 0.045);
+      this.blob(hip, M.quads, [0.004 * s, -0.19, 0.046], [0.042, 0.16, 0.036]);                  // rectus femoris
+      this.blob(hip, M.quads, [0.04 * s, -0.2, 0.018], [0.038, 0.16, 0.044], true, [0, 0, 0.08 * s]); // vastus lateralis
+      this.blob(hip, M.quads, [-0.03 * s, -0.33, 0.03], [0.036, 0.065, 0.038]);                // vastus medialis
+      this.blob(hip, M.hamstrings, [0, -0.21, -0.036], [0.056, 0.16, 0.044]);
+      this.blob(hip, M.adductors, [-0.036 * s, -0.12, 0.002], [0.034, 0.12, 0.046]);
       this.marker(hip, 0, -0.43, 0.06);
       const knee = this.joint(hip, 0, -0.43, 0);
-      this.capsule(knee, B, 0.043, 0.33, -0.2);
-      this.blob(knee, M.calves, [0, -0.13, -0.03], [0.05, 0.12, 0.048]);
+      this.blob(knee, B, [0, 0.0, 0.04], [0.028, 0.032, 0.018], false); // kneecap
+      this.capsule(knee, B, 0.043, 0.33, -0.2, 0.028);
+      this.blob(knee, M.calves, [0.016, -0.12, -0.03], [0.032, 0.1, 0.042]);
+      this.blob(knee, M.calves, [-0.016, -0.11, -0.03], [0.032, 0.1, 0.042]);
       this.marker(knee, 0, 0, 0.05);
       this.marker(knee, 0, -0.2, -0.06);
       const ankle = this.joint(knee, 0, -0.43, 0);
-      this.blob(ankle, this.shoeMat, [0, -0.038, 0.05], [0.048, 0.04, 0.125], false);
+      this.blob(ankle, B, [0, -0.04, 0.045], [0.042, 0.034, 0.11], false);   // foot
+      this.blob(ankle, B, [0, -0.045, -0.035], [0.035, 0.032, 0.04], false); // heel
+      this.blob(ankle, B, [0, -0.06, 0.135], [0.038, 0.016, 0.035], false);  // toes
       this.marker(ankle, 0, -0.075, -0.06);
       this.marker(ankle, 0, -0.075, 0.17);
       this.marker(ankle, 0, -0.01, 0.17);
@@ -241,9 +307,11 @@ export class Avatar {
       t.mesh.scale.set(t.base.x * girth, t.base.y, t.base.z * girth);
       t.mesh.position.set(t.basePos.x, t.basePos.y, t.basePos.z * girth);
     }
-    // Softer belly for higher BMI
-    const abs = this.spine.children.slice(0, 2);
-    for (const m of abs) m.scale.z *= belly;
+    // Rounder belly for higher BMI: push the front of the waist forward
+    for (const m of this.bellyMeshes) {
+      if (m.position.z > 0.01) m.position.z *= belly;
+      else m.scale.z *= belly;
+    }
     const female = sex === 'female';
     this.arms.L.shoulder.position.x = female ? 0.185 : 0.2;
     this.arms.R.shoulder.position.x = female ? -0.185 : -0.2;
@@ -295,18 +363,23 @@ export class Avatar {
   }
 
   update(time) {
-    const pulse = 0.5 + 0.5 * Math.sin(time * 5);
+    const pulse = 0.5 + 0.5 * Math.sin(time * 4.5);
     for (const [name, mat] of Object.entries(this.muscleMats)) {
-      if (this.highlight.has(name)) {
-        if (this.mode === 'active') {
-          mat.color.copy(COLORS.active);
-          mat.emissive.copy(COLORS.activeGlow);
-          mat.emissiveIntensity = 0.25 + 0.45 * pulse;
-        } else {
-          mat.color.copy(COLORS.next);
-          mat.emissive.copy(COLORS.next);
-          mat.emissiveIntensity = 0.15;
-        }
+      const on = this.highlight.has(name);
+      const glow = this.glowMats[name].uniforms;
+      for (const s of this.glowShells[name]) s.visible = on;
+      if (on && this.mode === 'active') {
+        mat.color.copy(COLORS.active);
+        mat.emissive.copy(COLORS.activeGlow);
+        mat.emissiveIntensity = 0.35 + 0.5 * pulse;
+        glow.color.value.copy(COLORS.halo);
+        glow.intensity.value = 1.3 + 0.9 * pulse;
+      } else if (on) {
+        mat.color.copy(COLORS.next);
+        mat.emissive.copy(COLORS.next);
+        mat.emissiveIntensity = 0.2;
+        glow.color.value.copy(COLORS.next);
+        glow.intensity.value = 0.5;
       } else {
         mat.color.setHex(COLORS.muscle);
         mat.emissive.setHex(0x000000);
