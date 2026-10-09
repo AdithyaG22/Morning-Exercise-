@@ -64,7 +64,6 @@ export function lerpPose(a, b, t, out = {}) {
 
 const COLORS = {
   skin: 0xe8ebef,      // porcelain-white sculpture
-  muscle: 0xeef0f3,
   active: new THREE.Color(0xff4a26),
   activeGlow: new THREE.Color(0xff2a00),
   halo: new THREE.Color(0x4f8dff),
@@ -111,12 +110,14 @@ export class Avatar {
     this.bones = [];
     this.shapes = [];   // body shapes the skin is generated from
     this.highlight = new Set();
+    this.skinColor = COLORS.skin;
+    this._v = new THREE.Vector3();
     this.mode = 'active';
 
     this.bodyMat = new THREE.MeshStandardMaterial({ color: COLORS.skin, roughness: 0.42, metalness: 0.02 });
     for (const m of Object.keys(MUSCLES)) {
       this.muscleMats[m] = new THREE.MeshStandardMaterial({
-        color: COLORS.muscle, roughness: 0.38, metalness: 0.02, emissive: 0x000000,
+        color: COLORS.skin, roughness: 0.38, metalness: 0.02, emissive: 0x000000,
       });
       this.glowMats[m] = glowMaterial();
       this.glowShells[m] = [];
@@ -126,8 +127,9 @@ export class Avatar {
     this.setBody({ heightCm: 170, weightKg: 65, sex: 'male' }, false);
   }
 
-  joint(parent, x, y, z) {
+  joint(parent, x, y, z, name = '') {
     const g = new THREE.Bone();
+    g.name = name;
     g.position.set(x, y, z);
     parent.add(g);
     this.bones.push(g);
@@ -181,9 +183,11 @@ export class Avatar {
     return m;
   }
 
-  marker(parent, x, y, z) {
+  /** Named reference point used to keep the body on the floor and by the pose checker. */
+  marker(parent, x, y, z, name) {
     const o = new THREE.Object3D();
     o.position.set(x, y, z);
+    o.name = name;
     parent.add(o);
     this.markers.push(o);
     return o;
@@ -191,7 +195,7 @@ export class Avatar {
 
   build() {
     const M = this.muscleMats, B = this.bodyMat;
-    const pelvis = this.pelvis = this.joint(this.scaled, 0, 1.0, 0);
+    const pelvis = this.pelvis = this.joint(this.scaled, 0, 1.0, 0, 'pelvis');
     // Smooth skin shapes form the body. Muscle shapes sit just under the skin and
     // only appear (glowing) while they are being worked.
 
@@ -203,13 +207,15 @@ export class Avatar {
     this.blob(pelvis, M.glutes, [-0.066, -0.035, -0.06], [0.082, 0.088, 0.07]);
     this.blob(pelvis, M.hipFlexors, [0.072, 0.0, 0.072], [0.04, 0.065, 0.036], true, [0, 0, -0.35]);
     this.blob(pelvis, M.hipFlexors, [-0.072, 0.0, 0.072], [0.04, 0.065, 0.036], true, [0, 0, 0.35]);
-    this.marker(pelvis, 0, -0.1, -0.1);
-    this.marker(pelvis, 0.1, -0.06, -0.1);
-    this.marker(pelvis, -0.1, -0.06, -0.1);
-    this.marker(pelvis, 0, -0.04, 0.1);
+    this.marker(pelvis, 0, -0.1, -0.1, 'seat');
+    this.marker(pelvis, 0.1, -0.06, -0.1, 'seat');
+    this.marker(pelvis, -0.1, -0.06, -0.1, 'seat');
+    this.marker(pelvis, 0, -0.04, 0.1, 'hips-front');
+    this.marker(pelvis, 0.06, -0.11, -0.02, 'sit-bones');
+    this.marker(pelvis, -0.06, -0.11, -0.02, 'sit-bones');
 
     // ---- Waist ----
-    const spine = this.spine = this.joint(pelvis, 0, 0.08, 0);
+    const spine = this.spine = this.joint(pelvis, 0, 0.08, 0, 'waist');
     this.bellyMeshes.push(this.blob(spine, B, [0, 0.07, 0], [0.145, 0.175, 0.1]));
     for (const y of [0.025, 0.085, 0.145]) {
       for (const s of [1, -1]) {
@@ -221,11 +227,11 @@ export class Avatar {
     this.blob(spine, M.obliques, [-0.112, 0.06, 0.022], [0.038, 0.11, 0.062], true, [0, 0, -0.12]);
     this.blob(spine, M.lowerBack, [0.036, 0.07, -0.07], [0.035, 0.13, 0.04]);
     this.blob(spine, M.lowerBack, [-0.036, 0.07, -0.07], [0.035, 0.13, 0.04]);
-    this.marker(spine, 0, 0.08, -0.1);
-    this.marker(spine, 0, 0.08, 0.11);
+    this.marker(spine, 0, 0.08, -0.1, 'back');
+    this.marker(spine, 0, 0.08, 0.11, 'belly');
 
     // ---- Chest & upper back ----
-    const chest = this.chest = this.joint(spine, 0, 0.18, 0);
+    const chest = this.chest = this.joint(spine, 0, 0.18, 0, 'chest');
     this.blob(chest, B, [0, 0.1, 0], [0.166, 0.19, 0.104]);
     this.blob(chest, B, [0, 0.15, 0.025], [0.15, 0.085, 0.085]);
     this.blob(chest, B, [0, 0.21, -0.01], [0.16, 0.06, 0.08]);
@@ -238,52 +244,53 @@ export class Avatar {
     this.blob(chest, M.traps, [0.07, 0.24, -0.018], [0.085, 0.034, 0.05], true, [0, 0, -0.42]);
     this.blob(chest, M.traps, [-0.07, 0.24, -0.018], [0.085, 0.034, 0.05], true, [0, 0, 0.42]);
     this.blob(chest, M.traps, [0, 0.19, -0.08], [0.05, 0.09, 0.03]);
-    this.marker(chest, 0, 0.14, -0.12);
-    this.marker(chest, 0, 0.14, 0.13);
-    this.marker(chest, 0.17, 0.2, 0);
-    this.marker(chest, -0.17, 0.2, 0);
+    this.marker(chest, 0, 0.14, -0.12, 'back');
+    this.marker(chest, 0, 0.14, 0.13, 'chest');
+    this.marker(chest, 0.17, 0.2, 0, 'shoulder_L');
+    this.marker(chest, -0.17, 0.2, 0, 'shoulder_R');
 
     // ---- Neck & head ----
-    const neck = this.neck = this.joint(chest, 0, 0.26, 0);
+    const neck = this.neck = this.joint(chest, 0, 0.26, 0, 'neck');
     this.capsule(neck, B, 0.046, 0.08, 0.03, 0.056);
     this.blob(neck, M.neck, [0.026, 0.03, 0.028], [0.016, 0.065, 0.016], false, [0.35, 0, -0.3]);
     this.blob(neck, M.neck, [-0.026, 0.03, 0.028], [0.016, 0.065, 0.016], false, [0.35, 0, 0.3]);
-    const head = this.head = this.joint(neck, 0, 0.1, 0);
+    const head = this.head = this.joint(neck, 0, 0.1, 0, 'head');
     this.blob(head, B, [0, 0.105, 0], [0.086, 0.112, 0.098], false);
     this.blob(head, B, [0, 0.05, 0.022], [0.06, 0.055, 0.07], false);   // jaw
     this.blob(head, B, [0, 0.09, 0.093], [0.009, 0.018, 0.01], false);   // nose
-    this.marker(head, 0, 0.22, 0);
-    this.marker(head, 0, 0.1, -0.11);
-    this.marker(head, 0, 0.1, 0.12);
-    this.marker(head, 0, -0.01, 0.07);
+    this.marker(head, 0, 0.22, 0, 'head');
+    this.marker(head, 0, 0.1, -0.11, 'head-back');
+    this.marker(head, 0, 0.1, 0.12, 'face');
+    this.marker(head, 0, -0.01, 0.07, 'chin');
 
     // ---- Arms ----
     this.arms = {};
     for (const [side, s] of [['L', 1], ['R', -1]]) {
-      const shoulder = this.joint(chest, 0.2 * s, 0.215, -0.005);
+      const shoulder = this.joint(chest, 0.2 * s, 0.215, -0.005, 'upper-arm_' + side);
       this.blob(shoulder, B, [0.01 * s, -0.03, 0], [0.064, 0.078, 0.064]);
       this.capsule(shoulder, B, 0.046, 0.21, -0.15, 0.034);
       this.blob(shoulder, M.shoulders, [0.016 * s, -0.035, 0], [0.066, 0.086, 0.066]);
       this.blob(shoulder, M.biceps, [0, -0.15, 0.024], [0.04, 0.088, 0.04]);
       this.blob(shoulder, M.triceps, [0, -0.13, -0.024], [0.042, 0.11, 0.038]);
-      this.marker(shoulder, 0, -0.29, -0.04);
-      const elbow = this.joint(shoulder, 0, -0.29, 0);
+      this.marker(shoulder, 0, -0.29, -0.04, 'elbow_' + side);
+      const elbow = this.joint(shoulder, 0, -0.29, 0, 'forearm_' + side);
       this.blob(elbow, B, [0, 0, 0], [0.036, 0.036, 0.036], true);
       this.capsule(elbow, B, 0.038, 0.19, -0.12, 0.024);
       this.blob(elbow, M.forearms, [0, -0.075, 0.006], [0.041, 0.1, 0.036]);
-      const wrist = this.joint(elbow, 0, -0.25, 0);
+      this.marker(elbow, 0, -0.13, -0.034, 'forearm_' + side);
+      const wrist = this.joint(elbow, 0, -0.25, 0, 'hand_' + side);
       this.blob(wrist, B, [0, -0.05, 0], [0.02, 0.05, 0.04], false);       // palm
       this.blob(wrist, B, [0, -0.11, 0.004], [0.016, 0.048, 0.035], false); // fingers
       this.blob(wrist, B, [0, -0.05, 0.036], [0.012, 0.032, 0.012], false, [0.4, 0, 0]); // thumb
-      this.marker(wrist, 0, -0.15, 0);
-      this.marker(wrist, 0, -0.04, 0);
+      this.marker(wrist, 0, -0.15, 0, 'hand_' + side);
+      this.marker(wrist, 0, -0.04, 0, 'hand_' + side);
       this.arms[side] = { shoulder, elbow, wrist };
     }
 
     // ---- Legs ----
     this.legs = {};
     for (const [side, s] of [['L', 1], ['R', -1]]) {
-      const hip = this.joint(pelvis, 0.09 * s, -0.05, 0);
+      const hip = this.joint(pelvis, 0.09 * s, -0.05, 0, 'thigh_' + side);
       this.blob(hip, B, [0.01 * s, -0.02, 0], [0.085, 0.09, 0.085]);
       this.capsule(hip, B, 0.08, 0.28, -0.21, 0.05);
       this.blob(hip, M.quads, [0.004 * s, -0.19, 0.058], [0.044, 0.16, 0.036]);
@@ -291,23 +298,25 @@ export class Avatar {
       this.blob(hip, M.quads, [-0.032 * s, -0.33, 0.032], [0.036, 0.065, 0.038]);
       this.blob(hip, M.hamstrings, [0, -0.21, -0.05], [0.056, 0.16, 0.044]);
       this.blob(hip, M.adductors, [-0.04 * s, -0.12, 0.002], [0.034, 0.12, 0.046]);
-      this.marker(hip, 0, -0.43, 0.06);
-      const knee = this.joint(hip, 0, -0.43, 0);
+      this.marker(hip, 0, -0.43, 0.06, 'knee_' + side);
+      const knee = this.joint(hip, 0, -0.43, 0, 'shin_' + side);
       this.blob(knee, B, [0, 0, 0.004], [0.05, 0.052, 0.05]);
       this.capsule(knee, B, 0.046, 0.32, -0.2, 0.03);
       this.blob(knee, B, [0, -0.12, -0.02], [0.046, 0.11, 0.048]); // calf shape
       this.blob(knee, M.calves, [0.016, -0.12, -0.034], [0.032, 0.1, 0.042]);
       this.blob(knee, M.calves, [-0.016, -0.11, -0.034], [0.032, 0.1, 0.042]);
-      this.marker(knee, 0, 0, 0.05);
-      this.marker(knee, 0, -0.2, -0.06);
-      const ankle = this.joint(knee, 0, -0.43, 0);
+      this.marker(knee, 0, 0, 0.05, 'knee_' + side);
+      this.marker(knee, 0, -0.22, 0.042, 'shin_' + side);
+      this.marker(knee, 0, -0.2, -0.06, 'calf_' + side);
+      const ankle = this.joint(knee, 0, -0.43, 0, 'foot_' + side);
       this.blob(ankle, B, [0, -0.012, 0.0], [0.03, 0.045, 0.034], false);    // ankle
       this.blob(ankle, B, [0, -0.04, 0.045], [0.042, 0.034, 0.11], false);   // foot
       this.blob(ankle, B, [0, -0.045, -0.035], [0.035, 0.032, 0.04], false); // heel
       this.blob(ankle, B, [0, -0.06, 0.135], [0.038, 0.016, 0.035], false);  // toes
-      this.marker(ankle, 0, -0.075, -0.06);
-      this.marker(ankle, 0, -0.075, 0.17);
-      this.marker(ankle, 0, -0.01, 0.17);
+      this.marker(ankle, 0, -0.075, -0.06, 'heel_' + side);
+      this.marker(ankle, 0, -0.075, 0.17, 'toes_' + side);
+      this.marker(ankle, 0, -0.01, 0.17, 'foot-top_' + side);
+      this.marker(ankle, 0, -0.004, 0.08, 'foot-top_' + side);
       this.legs[side] = { hip, knee, ankle };
     }
   }
@@ -368,7 +377,7 @@ export class Avatar {
 
   setSkin(hex) {
     this.bodyMat.color.setHex(hex);
-    COLORS.muscle = hex;
+    this.skinColor = hex;
   }
 
   /** Muscles to glow. mode: 'active' (red, pulsing) or 'next' (amber preview). */
@@ -397,7 +406,7 @@ export class Avatar {
     // Ground the body: lowest contact point touches the floor.
     this.object.position.y = 0;
     this.object.updateMatrixWorld(true);
-    const v = new THREE.Vector3();
+    const v = this._v;
     let minY = Infinity;
     const box = this.bounds || (this.bounds = new THREE.Box3());
     box.makeEmpty();
@@ -436,7 +445,7 @@ export class Avatar {
         glow.color.value.copy(COLORS.next);
         glow.intensity.value = 0.5;
       } else {
-        mat.color.setHex(COLORS.muscle);
+        mat.color.setHex(this.skinColor);
         mat.emissive.setHex(0x000000);
         mat.emissiveIntensity = 0;
       }

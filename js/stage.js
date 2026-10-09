@@ -210,11 +210,11 @@ export class Stage {
 
     // Auto-frame the body
     const box = this.avatar.bounds;
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(this._center || (this._center = new THREE.Vector3()));
+    const size = box.getSize(this._size || (this._size = new THREE.Vector3()));
     const k = this.snapCam ? 1 : 1 - Math.exp(-dt * 3);
     this.snapCam = false;
-    const wantTarget = new THREE.Vector3(center.x, Math.max(center.y, 0.35), center.z);
+    const wantTarget = (this._want || (this._want = new THREE.Vector3())).set(center.x, Math.max(center.y, 0.35), center.z);
     this.camTarget.lerp(wantTarget, k);
     const vFov = THREE.MathUtils.degToRad(this.camera.fov);
     const fitH = (Math.max(size.y, 0.9) * 1.25) / (2 * Math.tan(vFov / 2));

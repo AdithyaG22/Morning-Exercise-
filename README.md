@@ -42,32 +42,28 @@ Because this is a PWA, you can wrap it into an Android app for free with
 ## Project structure
 ```
 index.html            App shell (home, exercise library, profile, player)
-css/style.css         Styles (light and dark mode, phone and laptop layouts)
-js/app.js             UI, workout timer and history
-js/stage.js           Three.js scene, auto-framing camera, animation blending
-js/avatar.js          Procedural 3D body: skeleton, muscle groups, sizing, posing
-js/exercises.js       Exercise library: keyframe poses, muscles, level, tips
+css/style.css         Styles (light/dark themes, phone and laptop layouts)
+js/app.js             UI, workout timer, history, settings
+js/stage.js           Three.js scene, theme lighting, auto-framing camera, animation blending
+js/avatar.js          Skeleton, body shapes, muscle groups, sizing, posing, floor contact
+js/skin.js            Builds one smooth skin over the body shapes and binds it to the skeleton
+js/exercises.js       Exercise library: joint-angle keyframes, muscles, level, tips
 js/plan.js            Builds warm-up → main → cool-down for the chosen duration
 js/audio.js           Beeps (Web Audio) and voice (speech synthesis)
 sw.js                 Offline cache
-pose-debug.html       Developer tool to view any exercise keyframe
 vendor/three.module.min.js   Three.js r160 (MIT)
+
+tools/check-poses.mjs Checks every pose with numbers (joint ranges, floor contact, balance,
+                      limbs passing through the body) and fits poses that fail
+tools/motion.js       Joint-angle conventions and normal ranges of motion
+tools/build-preview.py  Bundles the app into one HTML page for previews
+pose-debug.html       Shows any exercise keyframe in 3D
+docs/EXERCISES.md     How poses are described, checked and added
 ```
 
 ## Adding an exercise
-Add an entry in `js/exercises.js`. A pose is a set of joint angles in degrees, for example:
-
-```js
-{
-  id: 'squats', name: 'Bodyweight Squats', cat: 'strength', level: 1, met: 5,
-  cycle: 2.6,            // seconds per repetition
-  view: 'side',          // camera: front | threeq | side
-  muscles: ['quads', 'glutes', 'hamstrings'],
-  tips: 'Chest up, push hips back.',
-  frames: [ {}, { pitch: 35, hipF: 112, knee: 112, ankle: -35, shF: 125 } ],
-}
-```
-The body is grounded automatically, so whichever point is lowest touches the floor. To check a pose, open
-`pose-debug.html` and run `show('squats', 1)` in the browser console.
+Add one entry to `js/exercises.js` and run `node tools/check-poses.mjs`. The planner, library, timer,
+voice and muscle glow pick it up automatically. See **[docs/EXERCISES.md](docs/EXERCISES.md)** for the joint-angle
+system, the floor-contact rules, and the pose fitter.
 
 > ⚠️ This app gives general fitness guidance, not medical advice. If you have an injury or a health condition, check with a doctor first, and stop any exercise that causes pain.

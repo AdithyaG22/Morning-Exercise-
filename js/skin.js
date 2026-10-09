@@ -75,7 +75,6 @@ export function buildSkinGeometry(prims, bones) {
   const N = nx * ny * nz;
   const field = new Float32Array(N).fill(1);
   const owner = new Int16Array(N).fill(-1);
-  const idx = (i, j, k) => i + nx * (j + ny * k);
 
   prims.forEach((p, pi) => {
     const i0 = Math.max(0, Math.floor((p.box.min.x - ox) / CELL)), i1 = Math.min(nx - 1, Math.ceil((p.box.max.x - ox) / CELL));
@@ -86,7 +85,7 @@ export function buildSkinGeometry(prims, bones) {
       for (let j = j0; j <= j1; j++) {
         const y = oy + j * CELL;
         for (let i = i0; i <= i1; i++) {
-          const n = idx(i, j, k);
+          const n = i + nx * (j + ny * k);
           const d = p.dist(ox + i * CELL, y, z);
           const cur = field[n], o = owner[n];
           if (o < 0) { field[n] = d; owner[n] = pi; continue; }
@@ -100,32 +99,38 @@ export function buildSkinGeometry(prims, bones) {
   });
 
   // ---- 2. Surface nets ----
+  const inside = new Uint8Array(N);
+  for (let n = 0; n < N; n++) inside[n] = field[n] < 0 ? 1 : 0;
+  const sx = 1, sy = nx, sz = nx * ny;                 // sample strides
   const cx = nx - 1, cy = ny - 1, cz = nz - 1;
+  const csy = cx, csz = cx * cy;                       // cell strides
   const cellVert = new Int32Array(cx * cy * cz).fill(-1);
-  const cidx = (i, j, k) => i + cx * (j + cy * k);
   const verts = [];
+  const cornerOff = [0, sx, sy, sx + sy, sz, sx + sz, sy + sz, sx + sy + sz];
   const corners = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]];
   const edges = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
   const val = new Float32Array(8);
-  for (let k = 0; k < cz; k++) for (let j = 0; j < cy; j++) for (let i = 0; i < cx; i++) {
-    let inside = 0;
-    for (let c = 0; c < 8; c++) {
-      val[c] = field[idx(i + corners[c][0], j + corners[c][1], k + corners[c][2])];
-      if (val[c] < 0) inside++;
+  for (let k = 0; k < cz; k++) for (let j = 0; j < cy; j++) {
+    const row = sy * j + sz * k;
+    for (let i = 0; i < cx; i++) {
+      const base = row + i;
+      let cnt = 0;
+      for (let c = 0; c < 8; c++) cnt += inside[base + cornerOff[c]];
+      if (cnt === 0 || cnt === 8) continue;
+      for (let c = 0; c < 8; c++) val[c] = field[base + cornerOff[c]];
+      let px = 0, py = 0, pz = 0, m = 0;
+      for (const [ea, eb] of edges) {
+        const va = val[ea], vb = val[eb];
+        if ((va < 0) === (vb < 0)) continue;
+        const t = va / (va - vb);
+        px += corners[ea][0] + (corners[eb][0] - corners[ea][0]) * t;
+        py += corners[ea][1] + (corners[eb][1] - corners[ea][1]) * t;
+        pz += corners[ea][2] + (corners[eb][2] - corners[ea][2]) * t;
+        m++;
+      }
+      cellVert[i + csy * j + csz * k] = verts.length / 3;
+      verts.push(ox + (i + px / m) * CELL, oy + (j + py / m) * CELL, oz + (k + pz / m) * CELL);
     }
-    if (inside === 0 || inside === 8) continue;
-    let sx = 0, sy = 0, sz = 0, cnt = 0;
-    for (const [a, b] of edges) {
-      const va = val[a], vb = val[b];
-      if ((va < 0) === (vb < 0)) continue;
-      const t = va / (va - vb);
-      sx += corners[a][0] + (corners[b][0] - corners[a][0]) * t;
-      sy += corners[a][1] + (corners[b][1] - corners[a][1]) * t;
-      sz += corners[a][2] + (corners[b][2] - corners[a][2]) * t;
-      cnt++;
-    }
-    cellVert[cidx(i, j, k)] = verts.length / 3;
-    verts.push(ox + (i + sx / cnt) * CELL, oy + (j + sy / cnt) * CELL, oz + (k + sz / cnt) * CELL);
   }
 
   const index = [];
@@ -139,28 +144,36 @@ export function buildSkinGeometry(prims, bones) {
     else index.push(a, d, c, a, c, b);
   };
   for (let k = 1; k < cz; k++) for (let j = 1; j < cy; j++) for (let i = 1; i < cx; i++) {
-    const v0 = field[idx(i, j, k)] < 0;
-    // edge along x
-    if (v0 !== (field[idx(i + 1, j, k)] < 0)) {
+    const n = i + sy * j + sz * k;
+    const v0 = inside[n];
+    const c = i + csy * j + csz * k;                  // cell (i, j, k)
+    if (v0 !== inside[n + sx]) {
       const s = v0 ? 1 : -1;
-      quad(cellVert[cidx(i, j - 1, k - 1)], cellVert[cidx(i, j, k - 1)], cellVert[cidx(i, j, k)], cellVert[cidx(i, j - 1, k)], s, 0, 0);
+      quad(cellVert[c - csy - csz], cellVert[c - csz], cellVert[c], cellVert[c - csy], s, 0, 0);
     }
-    if (v0 !== (field[idx(i, j + 1, k)] < 0)) {
+    if (v0 !== inside[n + sy]) {
       const s = v0 ? 1 : -1;
-      quad(cellVert[cidx(i - 1, j, k - 1)], cellVert[cidx(i, j, k - 1)], cellVert[cidx(i, j, k)], cellVert[cidx(i - 1, j, k)], 0, s, 0);
+      quad(cellVert[c - 1 - csz], cellVert[c - csz], cellVert[c], cellVert[c - 1], 0, s, 0);
     }
-    if (v0 !== (field[idx(i, j, k + 1)] < 0)) {
+    if (v0 !== inside[n + sz]) {
       const s = v0 ? 1 : -1;
-      quad(cellVert[cidx(i - 1, j - 1, k)], cellVert[cidx(i, j - 1, k)], cellVert[cidx(i, j, k)], cellVert[cidx(i - 1, j, k)], 0, 0, s);
+      quad(cellVert[c - 1 - csy], cellVert[c - csy], cellVert[c], cellVert[c - 1], 0, 0, s);
     }
   }
 
   // ---- Light Taubin smoothing (smooths without shrinking) ----
   const nv = verts.length / 3;
-  const nbr = Array.from({ length: nv }, () => new Set());
+  // Neighbour lists in flat arrays (each triangle edge, both directions; duplicates are harmless)
+  const deg = new Uint32Array(nv + 1);
+  for (let t = 0; t < index.length; t++) deg[index[t] + 1] += 2;
+  for (let v = 0; v < nv; v++) deg[v + 1] += deg[v];
+  const nbr = new Uint32Array(deg[nv]);
+  const fillPos = deg.slice(0, nv);
   for (let t = 0; t < index.length; t += 3) {
-    const [a, b, c] = [index[t], index[t + 1], index[t + 2]];
-    nbr[a].add(b); nbr[a].add(c); nbr[b].add(a); nbr[b].add(c); nbr[c].add(a); nbr[c].add(b);
+    const a = index[t], b = index[t + 1], c = index[t + 2];
+    nbr[fillPos[a]++] = b; nbr[fillPos[a]++] = c;
+    nbr[fillPos[b]++] = c; nbr[fillPos[b]++] = a;
+    nbr[fillPos[c]++] = a; nbr[fillPos[c]++] = b;
   }
   const P = Float32Array.from(verts);
   const tmp = new Float32Array(P.length);
@@ -168,11 +181,12 @@ export function buildSkinGeometry(prims, bones) {
     for (const f of [0.5, -0.53]) {
       for (let v = 0; v < nv; v++) {
         let ax = 0, ay = 0, az = 0;
-        for (const n of nbr[v]) { ax += P[n * 3]; ay += P[n * 3 + 1]; az += P[n * 3 + 2]; }
-        const c = nbr[v].size || 1;
-        tmp[v * 3] = P[v * 3] + f * (ax / c - P[v * 3]);
-        tmp[v * 3 + 1] = P[v * 3 + 1] + f * (ay / c - P[v * 3 + 1]);
-        tmp[v * 3 + 2] = P[v * 3 + 2] + f * (az / c - P[v * 3 + 2]);
+        const e0 = deg[v], e1 = deg[v + 1];
+        for (let e = e0; e < e1; e++) { const n = nbr[e] * 3; ax += P[n]; ay += P[n + 1]; az += P[n + 2]; }
+        const c = (e1 - e0) || 1, o = v * 3;
+        tmp[o] = P[o] + f * (ax / c - P[o]);
+        tmp[o + 1] = P[o + 1] + f * (ay / c - P[o + 1]);
+        tmp[o + 2] = P[o + 2] + f * (az / c - P[o + 2]);
       }
       P.set(tmp);
     }
@@ -198,9 +212,16 @@ export function buildSkinGeometry(prims, bones) {
       acc[boneIndex.get(prims[p].bone)] += Math.exp(-(dists[p] - dmin) / FALLOFF);
     }
     // keep the 4 strongest bones
-    const top = [...acc.keys()].sort((a, b) => acc[b] - acc[a]).slice(0, 4);
-    const sum = top.reduce((s, b) => s + acc[b], 0) || 1;
-    top.forEach((b, n) => { skinIndex[v * 4 + n] = b; skinWeight[v * 4 + n] = acc[b] / sum; });
+    let sum = 0;
+    for (let n = 0; n < 4; n++) {
+      let best = 0;
+      for (let b = 1; b < acc.length; b++) if (acc[b] > acc[best]) best = b;
+      skinIndex[v * 4 + n] = best;
+      skinWeight[v * 4 + n] = acc[best];
+      sum += Math.max(0, acc[best]);
+      acc[best] = -1;
+    }
+    for (let n = 0; n < 4; n++) skinWeight[v * 4 + n] = Math.max(0, skinWeight[v * 4 + n]) / (sum || 1);
   }
 
   const geo = new THREE.BufferGeometry();
