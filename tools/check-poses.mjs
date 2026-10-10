@@ -149,7 +149,7 @@ function checkFrame(ex, frame, fi, mirrored) {
     for (const side of ['', '_L', '_R']) {
       const v = pose[key + side];
       if (v === undefined) continue;
-      if (v < lo - 0.5 || v > hi + 0.5) problems.push(`ROM ${key}${side}=${Math.round(v)}° (normal ${lo}…${hi})`);
+      if (romExcess(key, v, pose, side) > 0.5) problems.push(`ROM ${key}${side}=${Math.round(v)}° (normal ${lo}…${hi})`);
     }
   }
 
@@ -204,7 +204,7 @@ function cost(ex, frame) {
   for (const [key, [lo, hi]] of Object.entries(ROM)) {
     for (const side of ['', '_L', '_R']) {
       const v = pose[key + side];
-      if (v !== undefined) c += (Math.max(0, lo - v) + Math.max(0, v - hi)) ** 2 * 1e-4;
+      if (v !== undefined) c += romExcess(key, v, pose, side) ** 2 * 1e-4;
     }
   }
   const marks = markersByName();
@@ -273,6 +273,16 @@ if (process.argv[2] === '--fit') {
   console.log('  ' + [...keys].map((key) => `${key}: ${r.frame[key]}`).join(', '));
   console.log('  ' + checkFrame(ex, r.frame, +fi, false).join(' | ') || '  ✓ passes');
   process.exit(0);
+}
+
+/** Degrees outside the normal range. Angles wrap at 360° (a full arm circle ends where it began), and
+ *  an arm that is out to the side (abduction ≥ 60°) may also move behind the body. */
+function romExcess(key, v, pose, side) {
+  let a = ((v + 180) % 360 + 360) % 360 - 180;
+  if (Math.abs(v) <= 180) a = v;
+  const [lo, hi] = ROM[key];
+  if (key === 'shF' && a < lo && (pose['shAbd' + side] ?? 0) >= 60) return 0;
+  return Math.max(0, lo - a) + Math.max(0, a - hi);
 }
 
 let total = 0, bad = 0;

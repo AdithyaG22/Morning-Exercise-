@@ -7,6 +7,7 @@
 // cat: warmup | cardio | strength | core | yoga | stretch
 // sides: hold one side for the first half, mirror for the second half
 // props: ['dumbbells'] shows dumbbells in the hands (water bottles work too)
+// ease: 'linear' keeps a constant speed between keyframes (use for circles); default eases in and out
 // met: metabolic equivalent, used for the calorie estimate
 
 // ---- Reusable poses ----
@@ -399,12 +400,17 @@ export const EXERCISES = [
 
   // ---------------- Added for the Beginner Full Body routine ----------------
   {
-    id: 'arm-swings', on: 'feet', name: 'Arm Swings', cat: 'warmup', level: 1, met: 3, cycle: 1.4, view: 'front',
-    muscles: ['chest', 'shoulders', 'back'],
-    tips: 'Swing your arms open wide, then cross them in front of your chest. Keep it loose.',
+    id: 'arm-swings', on: 'feet', name: 'Arm Swings', cat: 'warmup', level: 1, met: 3.5, cycle: 2, view: 'threeq', ease: 'linear',
+    muscles: ['shoulders', 'chest', 'back', 'traps'],
+    tips: 'Swing both arms in big full circles: forward, up past your ears, back and down. Keep arms long and relaxed.',
+    // One continuous circle: shoulder flexion runs 0° → 360°. Behind the body the arm opens out to the
+    // side (abduction), because no shoulder can swing straight back past 60°.
     frames: [
-      { shAbd: 85, shF: 10, elbow: 5, hipAbd: 8 },
-      { shF: 90, shAbd: -25, elbow: 10, hipAbd: 8 },
+      { shF: 0, shAbd: 15, elbow: 5, hipAbd: 8 },
+      { shF: 90, shAbd: 15, elbow: 5, hipAbd: 8 },
+      { shF: 180, shAbd: 20, elbow: 5, hipAbd: 8 },
+      { shF: 270, shAbd: 70, elbow: 5, hipAbd: 8 },
+      { shF: 360, shAbd: 15, elbow: 5, hipAbd: 8, d: 0.001 },   // same as the first frame: loops seamlessly
     ],
   },
   {

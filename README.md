@@ -12,7 +12,7 @@ It is built for people who sit at a laptop all day and want to stay fit and heal
 - 🗣️ **Voice coach and countdown beeps**, so you do not have to watch the screen.
 - 🔥 Streak, weekly calendar, minutes and estimated calories.
 - 📴 **Works offline** and installs to your home screen. No account, no ads, and no data leaves your device.
-- 🪶 **Tiny**: about 800 KB total. The 3D trainer is built from code, so there are no heavy model files.
+- 🪶 **Tiny**: about 0.9 MB total. The 3D trainer is built from code, so there are no heavy model files.
 
 ## Using it
 

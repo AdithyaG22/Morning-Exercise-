@@ -192,7 +192,8 @@ export class Stage {
     let i = 0;
     while (u > this.weights[i] && i < frames.length - 1) { u -= this.weights[i]; i++; }
     const a = frames[i], b = frames[(i + 1) % frames.length];
-    const k = ease(Math.min(1, u / this.weights[i]));
+    const f = Math.min(1, u / this.weights[i]);
+    const k = this.exercise?.ease === 'linear' ? f : ease(f);
     return lerpPose(a, b, k);
   }
 
