@@ -61,6 +61,8 @@ tools/motion.js       Joint-angle conventions and normal ranges of motion
 tools/build-preview.py  Bundles the app into one HTML page for previews
 pose-debug.html       Shows any exercise keyframe in 3D
 docs/EXERCISES.md     How poses are described, checked and added
+docs/EXERCISE-TECHNIQUE.md  Correct form for every exercise, with sources
+CLAUDE.md             Project guide for new Claude sessions
 ```
 
 ## Adding an exercise

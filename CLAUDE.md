@@ -1,8 +1,9 @@
 # Morning Move: project guide for Claude
 
 Read this first. It explains what the app is, the decisions already made, how the code fits
-together, and how to change it safely. `README.md` (user-facing) and `docs/EXERCISES.md`
-(movement system) hold more detail.
+together, and how to change it safely. `README.md` (user-facing), `docs/EXERCISES.md`
+(movement system) and `docs/EXERCISE-TECHNIQUE.md` (sourced correct form for every exercise)
+hold more detail.
 
 ## 1. What this is and who it's for
 
@@ -121,7 +122,7 @@ stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`, `cardio
 Keep these keys and shapes backward-compatible; `store.get` merges saved values over defaults.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v10`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v11`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system
@@ -164,7 +165,8 @@ at visually at least once (see section 6).
 
 ## 5. Adding an exercise or a routine
 
-Follow `docs/EXERCISES.md` §5–6. In short:
+Follow `docs/EXERCISES.md` §5–6, and check the movement against a reputable source first
+(see `docs/EXERCISE-TECHNIQUE.md` for the format and sources used so far). In short:
 - **Exercise:** add one object to `EXERCISES` in `js/exercises.js` (`id, name, cat, level, met,
   view, on, muscles, tips, frames`, optional `cycle`, `sides`, `mat`, `props`, `touch`).
   Muscle ids must be keys of `MUSCLES` in avatar.js. Run the checker, fit failures, then view it.
