@@ -1,7 +1,7 @@
 import { Stage } from './stage.js';
 import { MUSCLES } from './avatar.js';
 import { EXERCISES, CATEGORIES, LEVELS } from './exercises.js';
-import { buildPlan, buildRoutinePlan, FOCUS, todaySeed } from './plan.js';
+import { buildPlan, buildBreakPlan, buildRoutinePlan, isJumping, FOCUS, todaySeed } from './plan.js';
 import { ROUTINES } from './routines.js';
 import { beep, say, sound, unlockAudio } from './audio.js';
 
@@ -19,8 +19,18 @@ const store = {
   set(key, v) { try { localStorage.setItem('mm.' + key, JSON.stringify(v)); } catch { /* private mode */ } },
 };
 
-const settings = store.get('settings', { minutes: 15, level: 1, focus: 'full', work: 20, rest: 10, voice: true, beeps: true, theme: 'light' });
-const profile = store.get('profile', { heightCm: 170, weightKg: 65, sex: 'male' });
+// Defaults. Newer fields (weeklyGoal, lowImpact, breakMinutes, tipSeen) are optional: store.get fills them in
+// for people who saved settings with an older version.
+const DEFAULT_SETTINGS = {
+  minutes: 15, level: 1, focus: 'full', work: 20, rest: 10, voice: true, beeps: true, theme: 'light',
+  weeklyGoal: 3, lowImpact: false, breakMinutes: 3, tipSeen: '',
+};
+const DEFAULT_PROFILE = { heightCm: 170, weightKg: 65, sex: 'male' };
+const hasSaved = (key) => { try { return localStorage.getItem('mm.' + key) !== null; } catch { return true; } };
+// First run = nothing saved at all, so people who already use the app never see the setup screens.
+const firstRun = !hasSaved('settings') && !hasSaved('profile') && !hasSaved('history');
+const settings = store.get('settings', { ...DEFAULT_SETTINGS });
+const profile = store.get('profile', { ...DEFAULT_PROFILE });
 let history = store.list('history');
 let shuffleN = 0;
 sound.voice = settings.voice;
@@ -70,13 +80,17 @@ function renderSettings() {
   for (const b of $('level').children) b.classList.toggle('on', +b.dataset.v === settings.level);
   $('focus').innerHTML = Object.entries(FOCUS)
     .map(([k, f]) => `<button class="chip ${k === settings.focus ? 'on' : ''}" data-v="${k}">${f.name}</button>`).join('');
+  $('low-impact').checked = settings.lowImpact;
+  for (const b of $('break-min').children) b.classList.toggle('on', +b.dataset.v === settings.breakMinutes);
+  $('break-sub').textContent = `${settings.breakMinutes} min · standing, no mat, no jumping`;
 }
 
 function rebuild() {
   plan = buildPlan({ ...settings, seed: todaySeed() + shuffleN * 997 });
   const kcal = estimateKcal(plan.items.map((i) => ({ ex: i.ex, secs: plan.work })), plan.rest * (plan.rounds - 1));
   $('plan-summary').textContent =
-    `${plan.rounds} exercises · ${plan.work}s on / ${plan.rest}s rest · ${fmtTime(plan.seconds)} · ~${kcal} kcal`;
+    `${plan.rounds} exercises · ${plan.work}s on / ${plan.rest}s rest · ${fmtTime(plan.seconds)} · ~${kcal} kcal` +
+    (settings.lowImpact ? ' · no jumping' : '');
   const nWarm = plan.items.findIndex((i) => i.ex.cat !== 'warmup');
   let html = '';
   plan.items.forEach((it, i) => {
@@ -101,6 +115,22 @@ $('level').addEventListener('click', (e) => {
 $('focus').addEventListener('click', (e) => {
   const v = e.target.dataset?.v; if (!v) return;
   settings.focus = v; save(); renderSettings(); rebuild();
+});
+// "No jumping" lives on Home and in the You tab; both switches stay in step.
+function setLowImpact(on) {
+  settings.lowImpact = on; save(); renderSettings(); renderProfile(); rebuild(); renderSuggest();
+}
+$('low-impact').addEventListener('change', (e) => setLowImpact(e.target.checked));
+
+// ---------- Desk break ----------
+let breakN = 0;
+$('break-min').addEventListener('click', (e) => {
+  const v = e.target.dataset?.v; if (!v) return;
+  settings.breakMinutes = +v; save(); renderSettings();
+});
+$('break-start').addEventListener('click', () => {
+  // A new mix each time, so several breaks in one day do not feel the same.
+  startWorkout(buildBreakPlan({ minutes: settings.breakMinutes, work: settings.work, rest: settings.rest, seed: todaySeed() + ++breakN * 131 }));
 });
 document.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
   const k = b.dataset.step, d = +b.dataset.d;
@@ -162,36 +192,134 @@ $('routine-list').addEventListener('click', (e) => {
 // ---------- Greeting & stats ----------
 function greet() {
   const h = new Date().getHours();
-  $('hello').textContent = h < 12 ? 'Good morning ☀️' : h < 17 ? 'Good afternoon' : 'Good evening';
+  // After a few days away, a warm welcome instead of anything about a lost streak.
+  $('hello').textContent = history.length && daysSinceLast() >= 3 ? 'Welcome back 👋'
+    : h < 12 ? 'Good morning ☀️' : h < 17 ? 'Good afternoon' : 'Good evening';
 }
 
-function streak() {
-  const days = new Set(history.map((h) => dayKey(new Date(h.date))));
-  const d = new Date();
-  if (!days.has(dayKey(d))) d.setDate(d.getDate() - 1);
+// ---------- Weekly goal ----------
+// Progress is counted per week (Monday to Sunday) in days with at least one workout or break.
+// Missing a day never resets anything; only the weekly total matters.
+const workoutDays = () => new Set(history.map((h) => dayKey(new Date(h.date))));
+function weekStart(d = new Date()) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+  return x;
+}
+function daysInWeek(start, days = workoutDays()) {
   let n = 0;
-  while (days.has(dayKey(d))) { n++; d.setDate(d.getDate() - 1); }
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(d.getDate() + i);
+    if (days.has(dayKey(d))) n++;
+  }
   return n;
+}
+/** Weeks in a row that reached the goal. The current week adds to the run once it is reached, but never breaks it. */
+function weeksOnGoal() {
+  const days = workoutDays(), goal = settings.weeklyGoal;
+  const w = weekStart();
+  let n = daysInWeek(w, days) >= goal ? 1 : 0;
+  for (;;) {
+    w.setDate(w.getDate() - 7);
+    if (daysInWeek(w, days) < goal) return n;
+    n++;
+  }
+}
+/** Whole days since the last saved workout (Infinity if there is none). */
+function daysSinceLast(list = history) {
+  if (!list.length) return Infinity;
+  const last = new Date(list[list.length - 1].date), today = new Date();
+  last.setHours(0, 0, 0, 0); today.setHours(0, 0, 0, 0);
+  return Math.round((today - last) / 864e5);
 }
 
 function renderStats() {
-  const s = streak();
-  $('streak').innerHTML = `🔥 <b>${s}</b>`;
+  const days = workoutDays(), goal = settings.weeklyGoal;
+  const start = weekStart(), n = daysInWeek(start, days);
+  $('streak').innerHTML = `🎯 <b>${n}/${goal}</b> this week`;
+  $('streak').classList.toggle('met', n >= goal);
   const mins = Math.round(history.reduce((a, h) => a + h.secs, 0) / 60);
   const kcal = history.reduce((a, h) => a + h.kcal, 0);
   $('stats').innerHTML = `
     <div class="stat"><b>${history.length}</b><span>workouts</span></div>
     <div class="stat"><b>${mins}</b><span>minutes</span></div>
-    <div class="stat"><b>${s}</b><span>day streak</span></div>`;
-  const days = new Set(history.map((h) => dayKey(new Date(h.date))));
-  let week = '';
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    week += `<div class="day ${days.has(dayKey(d)) ? 'on' : ''}"><i></i>${d.toLocaleDateString(undefined, { weekday: 'narrow' })}</div>`;
+    <div class="stat"><b>${weeksOnGoal()}</b><span>weeks in a row on goal</span></div>`;
+  // This week, Monday to Sunday.
+  const today = dayKey(new Date());
+  let week = '', past = true;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(d.getDate() + i);
+    const k = dayKey(d);
+    week += `<div class="day ${days.has(k) ? 'on' : ''} ${k === today ? 'today' : ''} ${past ? '' : 'future'}"><i></i>${d.toLocaleDateString(undefined, { weekday: 'narrow' })}</div>`;
+    if (k === today) past = false;
   }
   $('week').innerHTML = week;
+  $('week-note').textContent = n >= goal
+    ? 'Goal reached this week 🎯 Extra sessions are a bonus, and rest is fine too.'
+    : `${n} of ${goal} days this week. Any workout or desk break counts.`;
   $('stats').title = `${kcal} kcal total`;
+  for (const b of $('goal').children) b.classList.toggle('on', +b.dataset.v === goal);
+  $('goal-label').textContent = goal === 1 ? '1 day a week' : `${goal} days a week`;
 }
+$('goal').addEventListener('click', (e) => {
+  const v = e.target.dataset?.v; if (!v) return;
+  settings.weeklyGoal = +v; save(); renderStats();
+});
+
+// ---------- "How did that feel?" suggestion ----------
+// When 2 of the last 3 rated workouts felt too hard (or too easy), offer a one-tap change.
+// Nothing changes unless the user taps; "No thanks" hides it until the next rating.
+let suggestNow = null;
+function suggestion() {
+  const rated = history.filter((h) => h.feel).slice(-3);
+  if (!rated.length) return null;
+  const key = rated[rated.length - 1].date;
+  if (settings.tipSeen === key) return null;
+  const count = (v) => rated.filter((h) => h.feel === v).length;
+  if (count('hard') >= 2) {
+    const ch = {}, parts = [];
+    if (settings.rest < 15) { ch.rest = 15; parts.push('Rest 15 s'); }
+    if (!settings.lowImpact) { ch.lowImpact = true; parts.push('No jumping'); }
+    if (!parts.length && settings.level > 1) { ch.level = settings.level - 1; parts.push(`Switch to ${LEVELS[ch.level]}`); }
+    if (!parts.length && settings.minutes > 5) { ch.minutes = Math.max(5, settings.minutes - 5); parts.push(`${ch.minutes} min workouts`); }
+    if (!parts.length) return null;
+    return { key, title: 'Make it easier?', text: 'Your last workouts felt too hard. Easier sessions you enjoy beat hard ones you skip.', options: [{ label: parts.join(' + '), ch }] };
+  }
+  if (count('easy') >= 2) {
+    const options = [];
+    if (settings.work < 30) options.push({ label: 'Work 30 s', ch: { work: 30 } });
+    if (settings.level < 3) options.push({ label: `Try ${LEVELS[settings.level + 1]}`, ch: { level: settings.level + 1 } });
+    if (!options.length && settings.minutes < 30) {
+      const m = Math.min(30, settings.minutes + 5);
+      options.push({ label: `${m} min workouts`, ch: { minutes: m } });
+    }
+    if (!options.length) return null;
+    return { key, title: 'Ready for more?', text: 'Your last workouts felt too easy. Want a small step up?', options };
+  }
+  return null;
+}
+function renderSuggest() {
+  suggestNow = suggestion();
+  $('suggest').hidden = !suggestNow;
+  if (!suggestNow) return;
+  $('suggest').innerHTML = `
+    <div class="row between"><h2>${suggestNow.title}</h2><button class="x" data-dismiss aria-label="Dismiss">✕</button></div>
+    <p class="small muted">${suggestNow.text}</p>
+    <div class="row gap wrap">
+      ${suggestNow.options.map((o, i) => `<button class="primary" data-opt="${i}">${o.label}</button>`).join('')}
+      <button class="chip" data-dismiss>No thanks</button>
+    </div>`;
+}
+$('suggest').addEventListener('click', (e) => {
+  if (!suggestNow) return;
+  const opt = e.target.closest('[data-opt]');
+  if (!opt && !e.target.closest('[data-dismiss]')) return;
+  if (opt) Object.assign(settings, suggestNow.options[+opt.dataset.opt].ch);
+  settings.tipSeen = suggestNow.key;
+  save(); renderSettings(); renderProfile(); renderSuggest();
+  if (opt) rebuild();
+});
 
 // ---------- Tabs ----------
 $('tabs').addEventListener('click', (e) => {
@@ -210,7 +338,7 @@ function renderLibrary() {
   $('lib-grid').innerHTML = EXERCISES.filter((e) => libCat === 'all' || e.cat === libCat).map((e) => `
     <button class="lib-item" data-id="${e.id}">
       <b>${e.name}</b>
-      <div class="tags"><span class="tag">${CATEGORIES[e.cat]}</span>${levelTag(e.level)}${e.props ? '<span class="tag">Dumbbells</span>' : ''}</div>
+      <div class="tags"><span class="tag">${CATEGORIES[e.cat]}</span>${levelTag(e.level)}${e.props ? '<span class="tag">Dumbbells</span>' : ''}${e.cat === 'cardio' && !isJumping(e) ? '<span class="tag">No-jump</span>' : ''}</div>
       <small>${muscleNames(e).join(', ')}</small>
     </button>`).join('');
 }
@@ -254,8 +382,10 @@ function renderProfile() {
   for (const b of $('sex').children) b.classList.toggle('on', b.dataset.v === profile.sex);
   $('opt-voice').checked = settings.voice;
   $('opt-beeps').checked = settings.beeps;
+  $('opt-low-impact').checked = settings.lowImpact;
   for (const b of $('theme').children) b.classList.toggle('on', b.dataset.v === settings.theme);
 }
+$('opt-low-impact').addEventListener('change', (e) => setLowImpact(e.target.checked));
 function saveProfile() {
   store.set('profile', profile);
   stage.setBody(profile);
@@ -269,6 +399,81 @@ $('theme').addEventListener('click', (e) => {
   if (v) { settings.theme = v; save(); applyTheme(); renderProfile(); }
 });
 $('opt-beeps').addEventListener('change', (e) => { settings.beeps = sound.beeps = e.target.checked; save(); });
+
+// ---------- Backup & restore ----------
+// A small JSON file with settings, body and history. It is made and read on the device; nothing is uploaded.
+$('backup').addEventListener('click', () => {
+  const data = { app: 'morning-move', version: 1, saved: new Date().toISOString(), settings, profile, history };
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `morning-move-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  $('data-msg').textContent = `Backup saved (${history.length} workouts). Keep the file somewhere safe.`;
+});
+$('restore').addEventListener('click', () => $('restore-file').click());
+$('restore-file').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const added = restoreBackup(JSON.parse(await file.text()));
+    $('data-msg').textContent = `Restored. ${added === 1 ? '1 workout' : `${added} workouts`} added, and your settings are back.`;
+  } catch {
+    $('data-msg').textContent = 'That file does not look like a Morning Move backup. Nothing was changed.';
+  }
+});
+
+/** Keep only known keys with the right type, and clamp numbers to the ranges the app uses. */
+function cleanSettings(src) {
+  const out = {};
+  for (const [k, v] of Object.entries(src || {})) if (k in DEFAULT_SETTINGS && typeof v === typeof DEFAULT_SETTINGS[k]) out[k] = v;
+  const clamp = (k, lo, hi) => { if (k in out) out[k] = Math.max(lo, Math.min(hi, Math.round(out[k]) || DEFAULT_SETTINGS[k])); };
+  clamp('minutes', 5, 30); clamp('level', 1, 3); clamp('work', 10, 90); clamp('rest', 5, 60); clamp('weeklyGoal', 1, 7);
+  if ('breakMinutes' in out && ![2, 3, 5].includes(out.breakMinutes)) delete out.breakMinutes;
+  if ('focus' in out && !FOCUS[out.focus]) delete out.focus;
+  if ('theme' in out && !['light', 'dark'].includes(out.theme)) delete out.theme;
+  return out;
+}
+function cleanProfile(src) {
+  const out = {};
+  const p = src || {};
+  if (typeof p.heightCm === 'number') out.heightCm = Math.max(120, Math.min(220, p.heightCm));
+  if (typeof p.weightKg === 'number') out.weightKg = Math.max(30, Math.min(200, p.weightKg));
+  if (['male', 'female'].includes(p.sex)) out.sex = p.sex;
+  return out;
+}
+function restoreBackup(d) {
+  if (!d || typeof d !== 'object' || Array.isArray(d)) throw new Error('not an object');
+  const rows = Array.isArray(d.history) ? d.history : [];
+  if (!rows.length && !d.settings && !d.profile) throw new Error('empty');
+  // Merge history by date so restoring twice does not double anything.
+  const byDate = new Map(history.map((h) => [h.date, h]));
+  let added = 0;
+  for (const h of rows) {
+    if (!h || typeof h.date !== 'string' || isNaN(Date.parse(h.date)) || typeof h.secs !== 'number') continue;
+    if (byDate.has(h.date)) continue;
+    const row = { date: h.date, secs: h.secs, kcal: +h.kcal || 0, count: +h.count || 0, focus: String(h.focus || 'full') };
+    if (['hard', 'right', 'easy'].includes(h.feel)) row.feel = h.feel;
+    byDate.set(h.date, row);
+    added++;
+  }
+  history = [...byDate.values()].sort((a, b) => Date.parse(a.date) - Date.parse(b.date)).slice(-400);
+  Object.assign(settings, cleanSettings(d.settings));
+  Object.assign(profile, cleanProfile(d.profile));
+  store.set('history', history);
+  save();
+  store.set('profile', profile);
+  sound.voice = settings.voice;
+  sound.beeps = settings.beeps;
+  applyTheme();
+  stage.setBody(profile);
+  greet(); renderSettings(); renderProfile(); renderStats(); renderSuggest(); rebuild();
+  return added;
+}
 
 // ---------- Calories ----------
 function estimateKcal(workParts, restSecs) {
@@ -430,27 +635,72 @@ function finish(completed) {
   $('player').hidden = true;
   $('p-end').hidden = true;
   $('p-pause').textContent = '⏸ Pause';
-  if (workSecs >= 60) {
-    history.push({ date: new Date().toISOString(), secs, kcal, count: done, focus: s.plan.routine?.id || settings.focus });
+  const isBreak = s.plan.kind === 'break';
+  const minWork = isBreak ? 30 : 60;   // a desk break counts after 30 s of moving, a workout after 60 s
+  const gap = daysSinceLast();
+  const today = dayKey(new Date());
+  const newDay = !history.some((h) => dayKey(new Date(h.date)) === today);
+  savedEntry = null;
+  if (workSecs >= minWork) {
+    savedEntry = { date: new Date().toISOString(), secs, kcal, count: done, focus: isBreak ? 'break' : s.plan.routine?.id || settings.focus };
+    history.push(savedEntry);
     history = history.slice(-400);
     store.set('history', history);
   }
-  if (!completed && workSecs < 60) { backHome(); return; }
-  say(completed ? 'Workout complete. Great job!' : 'Nice effort!');
+  if (!completed && workSecs < minWork) { backHome(); return; }
+  say(isBreak ? 'Break done. Back to it!' : completed ? 'Workout complete. Great job!' : 'Nice effort!');
   $('done').hidden = false;
-  $('done').querySelector('h1').textContent = completed ? 'Workout complete!' : 'Good effort!';
-  const st = streak();
-  $('done-msg').textContent = st > 1 ? `${st} days in a row. Keep the streak alive tomorrow!` : 'Great way to start the day. See you tomorrow!';
+  $('done').querySelector('h1').textContent = isBreak ? 'Break done!' : completed ? 'Workout complete!' : 'Good effort!';
+  $('done-msg').textContent = doneMessage(savedEntry, gap, newDay, isBreak);
+  $('done-feel').hidden = !savedEntry;
+  $('feel-thanks').hidden = true;
+  for (const b of $('feel').children) b.classList.remove('on');
   $('done-stats').innerHTML = `
     <div class="stat"><b>${Math.round(secs / 60)}</b><span>minutes</span></div>
     <div class="stat"><b>${done}</b><span>exercises</span></div>
     <div class="stat"><b>${kcal}</b><span>kcal (est.)</span></div>`;
 }
 
+/** Done-screen message: progress toward the weekly goal, never anything about a lost streak. */
+function doneMessage(entry, gap, newDay, isBreak) {
+  if (!entry) return isBreak ? 'Short and sweet. Move for 30 seconds or more to count it toward your week.'
+    : 'Every bit helps. Move for a minute or more to count it toward your week.';
+  const n = daysInWeek(weekStart()), goal = settings.weeklyGoal;
+  const hello = gap === Infinity ? 'Your first one is done! ' : gap >= 3 ? 'Welcome back! ' : isBreak ? 'Back to it, a bit looser. ' : '';
+  if (n < goal) {
+    const left = goal - n;
+    return `${hello}${n} of ${goal} this week — ${left === 1 ? 'one more' : `${left} more`} to hit your goal.`;
+  }
+  if (n === goal && newDay) {
+    const w = weeksOnGoal();
+    return `${hello}Weekly goal reached! 🎯 ${w > 1 ? `That's ${w} weeks in a row.` : 'Great week.'}`;
+  }
+  return `${hello}You already hit your goal this week (${n} of ${goal}). This one is a bonus!`;
+}
+
+// "How did that feel?" is saved on the workout that was just recorded.
+let savedEntry = null;
+const FEEL_THANKS = {
+  hard: 'Thanks. If it keeps feeling hard, we will suggest easier settings.',
+  right: 'Great, that is the sweet spot.',
+  easy: 'Nice! If it keeps feeling easy, we will suggest a step up.',
+};
+$('feel').addEventListener('click', (e) => {
+  const v = e.target.closest('[data-v]')?.dataset.v;
+  if (!v || !savedEntry) return;
+  savedEntry.feel = v;
+  store.set('history', history);
+  for (const b of $('feel').children) b.classList.toggle('on', b.dataset.v === v);
+  $('feel-thanks').textContent = FEEL_THANKS[v];
+  $('feel-thanks').hidden = false;
+});
+
 function backHome() {
   $('done').hidden = true;
   mountStage($('hero-slot'));
+  greet();
   renderStats();
+  renderSuggest();
   heroShow();
 }
 
@@ -483,6 +733,59 @@ document.addEventListener('visibilitychange', () => {
   if (session && document.visibilityState === 'visible') keepAwake(true);
 });
 
+// ---------- First-run setup ----------
+// Three short, skippable screens. Choices go into a draft and are saved when the user finishes or skips.
+let obStep = 0, draft = null;
+function openWelcome() {
+  draft = { focus: settings.focus, weeklyGoal: settings.weeklyGoal, level: settings.level, lowImpact: settings.lowImpact };
+  $('ob-height').value = profile.heightCm;
+  $('ob-weight').value = profile.weightKg;
+  draft.sex = profile.sex;
+  obStep = 0;
+  $('welcome').hidden = false;
+  renderWelcome();
+}
+function renderWelcome() {
+  document.querySelectorAll('#welcome .ob-step').forEach((el) => { el.hidden = +el.dataset.page !== obStep; });
+  [...$('ob-dots').children].forEach((d, i) => d.classList.toggle('on', i === obStep));
+  for (const b of $('ob-goal').children) b.classList.toggle('on', b.dataset.v === draft.focus);
+  for (const b of $('ob-days').children) b.classList.toggle('on', +b.dataset.v === draft.weeklyGoal);
+  $('ob-days-label').textContent = draft.weeklyGoal === 1 ? '1 day' : `${draft.weeklyGoal} days`;
+  for (const b of $('ob-level').children) b.classList.toggle('on', +b.dataset.v === draft.level);
+  for (const b of $('ob-sex').children) b.classList.toggle('on', b.dataset.v === draft.sex);
+  $('ob-low').checked = draft.lowImpact;
+  $('ob-back').style.visibility = obStep ? 'visible' : 'hidden';
+  $('ob-next').textContent = obStep === 2 ? "Let's go ▶" : 'Next →';
+}
+function closeWelcome() {
+  const { sex, ...picked } = draft;
+  Object.assign(settings, picked);
+  save();
+  const h = Math.max(120, Math.min(220, +$('ob-height').value || profile.heightCm));
+  const w = Math.max(30, Math.min(200, +$('ob-weight').value || profile.weightKg));
+  const changed = h !== profile.heightCm || w !== profile.weightKg || sex !== profile.sex;
+  Object.assign(profile, { heightCm: h, weightKg: w, sex });
+  store.set('profile', profile);
+  if (changed) stage.setBody(profile);
+  $('welcome').hidden = true;
+  renderSettings(); renderProfile(); renderStats(); rebuild();
+}
+const pick = (id, key, num) => $(id).addEventListener('click', (e) => {
+  const v = e.target.closest('[data-v]')?.dataset.v; if (!v) return;
+  draft[key] = num ? +v : v; renderWelcome();
+});
+pick('ob-goal', 'focus');
+pick('ob-days', 'weeklyGoal', true);
+pick('ob-level', 'level', true);
+pick('ob-sex', 'sex');
+$('ob-low').addEventListener('change', (e) => { draft.lowImpact = e.target.checked; });
+$('ob-skip').addEventListener('click', closeWelcome);
+$('ob-back').addEventListener('click', () => { obStep = Math.max(0, obStep - 1); renderWelcome(); });
+$('ob-next').addEventListener('click', () => {
+  if (obStep === 2) return closeWelcome();
+  obStep++; renderWelcome();
+});
+
 // ---------- Init ----------
 greet();
 renderSettings();
@@ -490,7 +793,9 @@ renderProfile();
 renderLibrary();
 renderRoutines();
 renderStats();
+renderSuggest();
 rebuild();
+if (firstRun) openWelcome();
 
 // Install to home screen: Android/desktop Chrome fire beforeinstallprompt; iPhone needs Safari's Share menu.
 let installEvent = null;

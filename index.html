@@ -25,7 +25,7 @@
         </div>
         <div class="row gap">
           <button class="install" id="install" hidden>⬇ Install app</button>
-          <div class="streak" id="streak" title="Day streak">🔥 <b>0</b></div>
+          <div class="streak" id="streak" title="Days you worked out this week / your weekly goal">🎯 <b>0/3</b> this week</div>
         </div>
       </header>
 
@@ -35,6 +35,9 @@
         <div class="hero-caption" id="hero-caption">Drag to rotate the trainer</div>
       </div>
       <div class="home-right">
+
+      <!-- One-tap suggestion after "How did that feel?" answers (filled by app.js) -->
+      <div class="card suggest" id="suggest" hidden></div>
 
       <div class="card">
         <div class="row between">
@@ -54,6 +57,7 @@
             <button data-v="2">Intermediate</button>
             <button data-v="3">Advanced</button>
           </div>
+          <label class="toggle"><input type="checkbox" id="low-impact"> <span>No jumping <small class="muted">· quieter, easier on joints</small></span></label>
         </div>
 
         <div class="field">
@@ -74,6 +78,20 @@
 
         <div class="summary" id="plan-summary"></div>
         <button class="primary big" id="start">▶ Start workout</button>
+      </div>
+
+      <div class="card break-card">
+        <div class="row between gap">
+          <div>
+            <h2>☕ Desk break</h2>
+            <div class="muted small" id="break-sub">3 min · standing, no mat, no jumping</div>
+          </div>
+          <button class="primary" id="break-start">▶ Start</button>
+        </div>
+        <div class="chips" id="break-min">
+          <button class="chip" data-v="2">2 min</button><button class="chip" data-v="3">3 min</button><button class="chip" data-v="5">5 min</button>
+        </div>
+        <p class="small muted">A short stretch for your neck, shoulders and back. Good every hour or so when you sit a lot.</p>
       </div>
 
       <div class="card">
@@ -115,14 +133,36 @@
         <div class="seg" id="theme"><button data-v="light">☀️ Light</button><button data-v="dark">🌙 Dark</button></div>
       </div>
       <div class="card">
+        <h2>Your progress</h2>
+        <div class="field">
+          <span>Weekly goal <b id="goal-label">3 days a week</b></span>
+          <div class="seg" id="goal">
+            <button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button>
+            <button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="week" id="week"></div>
+        <p class="small muted" id="week-note"></p>
+      </div>
+      <div class="card">
+        <h2>Workouts</h2>
+        <label class="toggle"><input type="checkbox" id="opt-low-impact"> <span>No jumping <small class="muted">· quieter, easier on joints</small></span></label>
+      </div>
+      <div class="card">
         <h2>Sound</h2>
         <label class="toggle"><input type="checkbox" id="opt-voice"> <span>Voice coach</span></label>
         <label class="toggle"><input type="checkbox" id="opt-beeps"> <span>Countdown beeps</span></label>
       </div>
       <div class="card">
-        <h2>Your progress</h2>
-        <div class="stats" id="stats"></div>
-        <div class="week" id="week"></div>
+        <h2>Your data</h2>
+        <p class="muted small">Your progress lives only on this device, and phones can clear browser data. Save a backup file now and then.</p>
+        <div class="row gap wrap">
+          <button class="primary" id="backup">⬇ Save a backup</button>
+          <button class="chip" id="restore">↑ Restore</button>
+          <input type="file" id="restore-file" accept="application/json,.json" hidden>
+        </div>
+        <p class="small" id="data-msg" role="status"></p>
       </div>
       <p class="muted center small">Morning Move is free and works offline. Your data stays on this device. <a href="privacy.html">Privacy policy</a></p>
     </section>
@@ -172,6 +212,13 @@
         <h1>Workout complete!</h1>
         <p class="muted" id="done-msg">Great way to start the day.</p>
         <div class="stats" id="done-stats"></div>
+        <div class="feel" id="done-feel">
+          <p class="small muted">How did that feel?</p>
+          <div class="seg" id="feel">
+            <button data-v="hard">😮‍💨 Too hard</button><button data-v="right">🙂 Just right</button><button data-v="easy">💪 Too easy</button>
+          </div>
+          <p class="small muted" id="feel-thanks" hidden></p>
+        </div>
         <button class="primary big" id="done-ok">Done</button>
       </div>
     </section>
@@ -186,6 +233,66 @@
           <h2 id="pv-name"></h2>
           <p id="pv-tip"></p>
           <div class="p-muscles static" id="pv-muscles"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FIRST-RUN SETUP: shown once, only when nothing has been saved yet -->
+    <section id="welcome" class="sheet" hidden>
+      <div class="sheet-box ob-box" role="dialog" aria-modal="true" aria-labelledby="ob-title">
+        <div class="row between">
+          <div class="ob-dots" id="ob-dots"><i class="on"></i><i></i><i></i></div>
+          <button class="ghost small" id="ob-skip">Skip</button>
+        </div>
+
+        <div class="ob-step" data-page="0">
+          <h2 id="ob-title">Welcome to Morning Move 👋</h2>
+          <p class="muted">What do you want most?</p>
+          <div class="ob-options" id="ob-goal">
+            <button data-v="desk">🪑 Feel less stiff from sitting</button>
+            <button data-v="full">⚡ Get fitter and more energetic</button>
+            <button data-v="cardio">🔥 Lose weight / more cardio</button>
+            <button data-v="core">💪 Stronger core and back</button>
+            <button data-v="yoga">🧘 Calm and flexible</button>
+          </div>
+          <div class="safety">⚠️ Check with a doctor first if you have a heart condition, chest pain, dizziness or an injury. Stop any move that hurts.</div>
+        </div>
+
+        <div class="ob-step" data-page="1" hidden>
+          <h2>How often?</h2>
+          <div class="field">
+            <span>Days a week that feel realistic <b id="ob-days-label">3</b></span>
+            <div class="seg" id="ob-days">
+              <button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button>
+              <button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button>
+            </div>
+          </div>
+          <p class="small muted">Missing a day is fine. We count your week, not a daily streak.</p>
+          <div class="field">
+            <span>Your level</span>
+            <div class="seg" id="ob-level">
+              <button data-v="1">Beginner</button><button data-v="2">Intermediate</button><button data-v="3">Advanced</button>
+            </div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="ob-low"> <span>No jumping <small class="muted">· quieter, easier on joints</small></span></label>
+        </div>
+
+        <div class="ob-step" data-page="2" hidden>
+          <h2>Size your trainer</h2>
+          <p class="muted small">Optional. The 3D trainer matches your height and build. Nothing leaves your device.</p>
+          <div class="row gap">
+            <label class="field grow"><span>Height (cm)</span><input type="number" id="ob-height" min="120" max="220" inputmode="numeric"></label>
+            <label class="field grow"><span>Weight (kg)</span><input type="number" id="ob-weight" min="30" max="200" inputmode="numeric"></label>
+          </div>
+          <div class="field">
+            <span>Body type</span>
+            <div class="seg" id="ob-sex"><button data-v="male">Male</button><button data-v="female">Female</button></div>
+          </div>
+        </div>
+
+        <div class="row between gap ob-nav">
+          <button class="chip" id="ob-back">← Back</button>
+          <button class="primary" id="ob-next">Next →</button>
         </div>
       </div>
     </section>

@@ -39,6 +39,15 @@ what you changed and why in plain language, describe what they will see in the a
   daily mix (`buildPlan` filters out anything with `props`). They still show in the library.
 - Ending a workout uses an in-page "End workout" button, not `confirm()` (dialogs do not work in
   the claude.ai preview).
+- **Weekly goal, not a daily streak** (research: broken daily streaks make people quit; weekly volume
+  is what matters for health). The header chip shows "N/goal this week" (days with any saved workout or
+  desk break, Monday–Sunday). Stats show "weeks in a row on goal"; the current week adds to that run
+  once reached but never breaks it. After 3+ days away the greeting and done screen say "Welcome back",
+  never anything negative. Do not reintroduce "streak lost" style messages.
+- **Suggestions, never silent changes:** "How did that feel?" answers only produce a dismissible
+  one-tap card on Home; settings change only when the user taps it.
+- **First-run setup** shows only when nothing at all is saved (`mm.settings`, `mm.profile` and
+  `mm.history` all absent), so existing users never see it. Every screen has Skip.
 
 ## 3. Architecture
 
@@ -56,14 +65,14 @@ tools/check-poses.mjs ──► avatar.js, skin.js, exercises.js, routines.js, t
 
 | File | Role |
 |---|---|
-| `index.html` | App shell: home (hero, today's workout, routines, plan list), library, profile, player overlay, done screen, preview sheet. One `<canvas id="stage">` is moved between `hero-slot`, `player-slot` and `preview-slot` (`mountStage()` in app.js). |
+| `index.html` | App shell: home (hero, suggestion card `#suggest`, today's workout with "No jumping", desk break card, routines, plan list), library, profile (weekly goal + stats + calendar, No jumping, sound, backup/restore), player overlay, done screen (with "How did that feel?"), preview sheet, first-run setup sheet `#welcome`. One `<canvas id="stage">` is moved between `hero-slot`, `player-slot` and `preview-slot` (`mountStage()` in app.js). |
 | `css/style.css` | Styles. Colour tokens on `:root`; dark via `:root[data-theme="dark"]` (and `prefers-color-scheme` when no theme is set). Phone and laptop layouts. |
-| `js/app.js` | UI, settings, storage, workout player/timer, history, stats, install button, service worker registration. |
+| `js/app.js` | UI, settings, storage, workout player/timer, history, weekly goal (`weekStart`, `daysInWeek`, `weeksOnGoal`, `daysSinceLast`), feel suggestions (`suggestion`, `renderSuggest`), first-run setup (`openWelcome`), backup/restore (`restoreBackup`, `cleanSettings`, `cleanProfile`), install button, service worker registration. |
 | `js/stage.js` | `Stage` class: renderer, lights, floor/shadow/mat, theme lighting (`setTheme`), drag-to-orbit, animation sampling and blending, camera auto-framing, render loop. |
 | `js/avatar.js` | `Avatar` class: skeleton, body shapes, muscle meshes + glow shells, markers, dumbbells, `setBody` sizing, `applyPose`, grounding, highlight colours. Exports `MUSCLES`, `NEUTRAL`, `expandPose`, `mirrorPose`, `lerpPose`. |
 | `js/skin.js` | `buildSkinGeometry(prims, bones)` and `makePrim(shape, matrix)`: builds the smooth skinned body. |
 | `js/exercises.js` | `EXERCISES` (59 exercises), `CATEGORIES`, `LEVELS`, `byId`. |
-| `js/plan.js` | `FOCUS`, `buildPlan`, `buildRoutinePlan`, `todaySeed`. |
+| `js/plan.js` | `FOCUS`, `buildPlan`, `buildBreakPlan`, `buildRoutinePlan`, `isJumping`, `todaySeed`. |
 | `js/routines.js` | `ROUTINES`. |
 | `js/audio.js` | `sound` flags, `unlockAudio`, `beep` (Web Audio), `say` (speech synthesis, en-US). |
 | `sw.js` | Service worker: pre-caches `FILES`, network-first with cache fallback. |
@@ -112,7 +121,12 @@ length is `item.restAfter ?? plan.rest`; a rest after a circuit's last item has 
 ("BREATHE DEEPLY", announces the next circuit). `tick()` runs every 100 ms; 3-2-1 beeps; for
 `sides: true` exercises it mirrors the pose at half time and says "Switch sides". Prev/next skip
 rests. Space / ← / → work on the keyboard. Wake lock keeps the screen on. A workout is saved to
-history only if at least 60 s of work was done. Calories = MET × kg × hours (rest at MET 2).
+history only if at least 60 s of work was done (30 s for a desk break, `plan.kind === 'break'`,
+saved with `focus: 'break'`). Calories = MET × kg × hours (rest at MET 2). The done screen shows
+weekly-goal progress (`doneMessage`) and "How did that feel?" (Too hard / Just right / Too easy →
+`feel` on the entry just saved). When 2 of the last 3 rated workouts are `hard` (or `easy`), Home
+shows a one-tap card (e.g. "Rest 15 s + No jumping" / "Work 30 s", "Try Intermediate");
+tapping or "No thanks" stores that rating's date in `settings.tipSeen` so it stays hidden until a new rating.
 
 **Plan builder** (`buildPlan`): rounds = `max(4, round((minutes·60 + rest)/(work + rest)))`;
 ~15 % warm-up, ~12 % cool-down, rest main. Pools filter by `cat`, `level <= chosen level` and no
@@ -121,15 +135,38 @@ before mat moves; no exercise repeats back-to-back. Seeded by date (`todaySeed`)
 stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`, `cardio`, `core`, `yoga`,
 `desk`. `buildRoutinePlan(r)` flattens circuits in order with circuit metadata.
 
-**Storage keys** (via `store` in app.js, JSON in `localStorage`):
-- `mm.settings` – `{minutes, level, focus, work, rest, voice, beeps, theme}`
-- `mm.profile` – `{heightCm, weightKg, sex}`
-- `mm.history` – array of `{date, secs, kcal, count, focus}` (last 400 kept)
+**No jumping** (`settings.lowImpact`): `isJumping(e)` is true when any frame has `lift > 0` or the id
+is in `JUMPY` in plan.js (currently `plank-jacks`, which hops without lift). Do not add flags to
+exercises.js for this; extend `JUMPY` instead. `buildPlan({lowImpact})` drops jumping moves and, if the
+main pool falls under 6 moves (Cardio), tops it up with brisk standing warm-ups (MET ≥ 3.5) and
+standing strength moves. Routines are not filtered. The library tags non-jumping cardio "No-jump".
 
-Keep these keys and shapes backward-compatible; `store.get` merges saved values over defaults.
+**Desk break** (`buildBreakPlan({minutes = 3, work, rest, seed})`): standing only (no `mat`), no
+`props`, no jumping, Beginner level, from warmup/stretch/yoga plus calf raises. rounds =
+`max(3, round((minutes·60 + rest)/(work + rest)))` (no 4-round minimum, no warm-up/cool-down split).
+Neck tilts and shoulder stretch lead, then the other `RELIEF` moves, then the rest; ends with Deep
+Breathing when there are 4+ rounds. Home card offers 2 / 3 / 5 min (`settings.breakMinutes`);
+each Start uses a new seed.
+
+**Storage keys** (via `store` in app.js, JSON in `localStorage`):
+- `mm.settings` – `{minutes, level, focus, work, rest, voice, beeps, theme, weeklyGoal, lowImpact,
+  breakMinutes, tipSeen}` (defaults in `DEFAULT_SETTINGS`: weeklyGoal 3 (1–7), lowImpact false,
+  breakMinutes 3, tipSeen '')
+- `mm.profile` – `{heightCm, weightKg, sex}`
+- `mm.history` – array of `{date, secs, kcal, count, focus, feel?}` (last 400 kept; `focus` may be
+  `'break'` or a routine id; `feel` is `'hard' | 'right' | 'easy'` when rated)
+
+Keep these keys and shapes backward-compatible; `store.get` merges saved values over defaults, so
+new settings fields must be optional with a default in `DEFAULT_SETTINGS`.
+
+**Backup / restore** (You tab → Your data): "Save a backup" downloads
+`{app: 'morning-move', version: 1, saved, settings, profile, history}` as JSON (Blob + `<a download>`).
+"Restore" reads a chosen file, keeps only known settings keys with the right types and clamps ranges
+(`cleanSettings`, `cleanProfile`), merges history by `date` (no duplicates), then re-renders and
+rebuilds the skin. Invalid files change nothing and show an in-page message.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v13`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v14`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system
@@ -199,8 +236,10 @@ Follow `docs/EXERCISES.md` §5–6, and check the movement against a reputable s
    `show(id, frame, mirrored?)`, optionally `yaw(deg)` to set the camera angle, and
    `window.stageRef` for direct access to the `Stage`. `window.EX` lists ids and frame counts.
 5. For UI changes, click through: home → start workout (ready/work/rest/breather, switch sides,
-   pause/end), library preview, profile (height/weight rebuilds the skin, theme switch), both themes,
-   phone and laptop widths.
+   pause/end), desk break, "How did that feel?", library preview, profile (height/weight rebuilds the
+   skin, theme switch, weekly goal, backup/restore), first-run setup from empty storage, both themes,
+   phone and laptop widths. Downloads need `browser.newContext({ acceptDownloads: true })`; restore
+   can be tested with `page.setInputFiles('#restore-file', path)`.
 
 ## 7. Deployment
 
