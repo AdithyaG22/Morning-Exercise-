@@ -1353,3 +1353,239 @@ https://www.onepeloton.com/blog/what-is-shadowboxing
 
 **App check:** New, Level 1 low-impact cardio. Feet are square rather than in a staggered boxing
 stance (simpler for the planner's "standing" moves; own choice).
+
+---
+
+## Technique research, batch 4 (added yoga & stretching)
+
+**Web access:** WebSearch worked; pages could not be opened, so each note is based on the search
+engine's excerpts of the cited page. Every URL below is a page that search returned. Notes marked
+"(own knowledge)" are standard technique without a direct excerpt.
+
+These 14 exercises were added for people who sit at a laptop all day (hips, upper back, chest,
+neck, wrists, hamstrings). Every keyframe passes `node tools/check-poses.mjs` and each pose was
+viewed once in `pose-debug.html`.
+
+---
+
+### Half Sun Salutation (`sun-salutation-half`)
+**How to do it**
+1. Stand tall in Mountain pose, feet together or hip-width, arms by your sides.
+2. Inhale and sweep your arms up overhead (Upward Salute).
+3. Exhale and fold forward from the hips, knees soft (Standing Forward Bend).
+4. Inhale and lift halfway: long flat back, hands on shins or thighs, gaze slightly forward (Half Standing Forward Bend).
+5. Exhale and fold again; inhale and rise up with the arms overhead; exhale arms down. Repeat with the breath.
+
+**Key positions:**
+- Arms up: shF ≈ 170–180, elbow 0, slight neck extension.
+- Fold: pitch + spineF ≈ 110, hipF ≈ 80, knees soft.
+- Half lift: spine flat (spineF ≈ 0 to −5), torso about 10° above horizontal, hands to knees/shins, neckF ≈ −20.
+
+**Sources:** https://www.ekhartyoga.com/blog/sun-salutation-a-sequence-with-breath ; https://www.healthline.com/health/fitness/sun-salutation-sequence ; https://www.yogajournal.com/article/poses/ray-of-light/?scope=anon
+
+**App check:** 6 keyframes, 16 s per round: stand → arms up → fold → half lift → fold → arms up.
+Half lift uses pitch 82, spineF −5, hands within 16 cm of the knees (`touch`). Hands reach the knees
+rather than the shins, which is the common beginner variation.
+
+---
+
+### Low Lunge (`low-lunge`)
+**How to do it**
+1. From hands and knees or Downward Dog, step one foot forward between your hands, knee over the heel.
+2. Lower the back knee to the mat (pad it if needed) and slide the back leg back until you feel a stretch at the front of the back hip.
+3. Keep the hips level, lift the torso upright and sweep the arms overhead.
+4. Hold for several breaths, then step back and switch sides.
+
+**Key positions:** front hipF ≈ 90, knee ≈ 90–100, shin vertical; back hip extended (hipF ≈ −15 to −25), back knee on the floor, top of the back foot down (ankle ≈ 50); torso upright; arms shF ≈ 170.
+
+**Sources:** https://www.yogajournal.com/poses/low-lunge?scope=anon ; https://liforme.com/blogs/blog/low-crescent-lunge-pose ; https://olaben.com/blogs/olaben-blog/how-to-do-low-lunge-pose-anjaneyasana
+
+**App check:** Matches (front knee 95, back hipF −20.6, knee on the mat, arms 170). `on: 'foot_L knee_R'`, sides.
+
+---
+
+### Thread the Needle (`thread-needle`)
+*(Replaces the planned Extended Side Angle, see "Not modelled" below.)*
+**How to do it**
+1. Start on hands and knees, hips over knees.
+2. Optionally reach one arm up to open the chest on an inhale.
+3. Exhale and slide that arm under the other arm, palm up, until the shoulder and the side of the head rest on the mat.
+4. The other hand stays pressed into the mat (or reaches forward). Breathe for 5–10 breaths, then unwind and switch.
+
+**Key positions:** thighs vertical (hipF ≈ pitch); upper back rotated (spineTwist ≈ 40); threading arm across under the chest (shF ≈ 85, shAbd ≈ −35 to −45, elbow 0); head side-down (neckSide ≈ 25–30).
+
+**Sources:** https://www.yogamatters.com/blogs/pose-library/thread-the-needle-pose-parsva-balasana ; https://liforme.com/blogs/blog/how-to-do-thread-the-needle-stretch ; https://dimensions.com/element/threading-the-needle-pose
+
+**App check:** Mostly matches: hips over knees (pitch = hipF 119.7), spineTwist −40, threading arm across, head on the mat. The threading shoulder stays about 10 cm above the mat, because the rig's spine twist stops at 45°.
+
+---
+
+### Seated Spinal Twist (`seated-twist`)
+**How to do it** (Mayo Clinic version)
+1. Sit on the floor, legs straight out in front, hands on the floor behind you, fingers pointing away.
+2. Place one foot flat on the floor on the outside of the opposite knee.
+3. Place the opposite elbow on the outside of the bent knee.
+4. Turn your chest, head and eyes toward the bent knee and hold about a minute, breathing. Return head then chest to centre, and switch.
+
+**Key positions:** straight leg on the floor (knee 0); bent leg hipF ≈ 120–130, knee ≈ 110–130, foot flat; spineTwist ≈ 40–45 toward the bent knee; back hand on the floor behind (shF ≈ −35); hugging elbow against the outside of the knee.
+
+**Sources:** https://www.mayoclinic.org/healthy-lifestyle/stress-management/multimedia/seated-spinal-twist/vid-20453586 ; https://www.mymlc.com/health-information/videos/lifestyle/stress-management/stress-relief/seated-spinal-twist/
+
+**App check:** Matches (`on: 'seat heels hand_L'`, spineTwist 40, right elbow within 17 cm of the left knee, left hand behind on the floor). The pelvis leans back 20° and the spine flexes 12° to keep the chest upright.
+
+---
+
+### Butterfly Stretch (`butterfly`)
+**How to do it**
+1. Sit on the floor with the soles of your feet together and let your knees fall out to the sides.
+2. Hold your feet and draw the heels toward you (farther away is easier on the knees).
+3. Sit tall, then lean forward from the hips without rounding the lower back or hunching the shoulders.
+4. Breathe and hold 15–30 s; repeat about 3 times.
+
+**Key positions:** hipAbd ≈ 45, hipRot ≈ 50, knee ≈ 130–140, soles together; hands on the feet; slight forward lean.
+
+**Sources:** https://www.healthline.com/health/exercise-fitness/how-to-stretch-inner-thigh ; https://www.hingehealth.com/resources/articles/butterfly-stretch ; https://dummies.com/health/exercise/how-to-do-the-butterfly-stretch
+
+**App check:** Matches (hipAbd 45, hipRot 50, knee 135, hands within 10 cm of the toes). The forward lean comes partly from the spine (spineF 35), so the back is a little rounder than the "lean from the hips" cue.
+
+---
+
+### Knees to Chest (`knees-to-chest`)
+**How to do it**
+1. Lie on your back with knees bent and feet flat.
+2. Bring one knee, then both, toward your chest, holding the shins or the backs of the thighs.
+3. Keep your head and shoulders relaxed on the mat and your lower back pressed down.
+4. Hold 15–30 s (Mayo: 5 s holds, 2–3 repeats, morning and evening).
+
+**Key positions:** pitch −90 (on the back); hipF ≈ 125–130, knee ≈ 130–140; arms around the shins (elbow ≈ 50–90).
+
+**Sources:** https://www.mayoclinic.org/healthy-lifestyle/adult-health/multimedia/lower-back-stretches/vid-20084700 ; https://mayoclinic.org/healthy-lifestyle/adult-health/in-depth/back-pain/art-20546859?p=1 ; https://uofmhealth.org/health-library/abk4460
+
+**App check:** Matches the double-knee version (hipF 129.5, knee 140, hands within 10 cm of the shins). The upper back curls slightly (spineF 15) so the hands can reach.
+
+---
+
+### Lying Spinal Twist (`supine-twist`)
+**How to do it**
+1. Lie on your back with knees bent and feet flat, arms out in a T.
+2. Exhale and lower both knees to one side.
+3. Keep both shoulder blades on the floor; turn your head the other way if comfortable. A block or cushion under the knees is fine.
+4. Hold 5–10 breaths, then switch.
+
+**Key positions:** hipF ≈ 90, knee ≈ 90; pelvis rolled 45–90° to the side; chest flat; arms out at shoulder height; neckTurn away from the knees.
+
+**Sources:** https://yogainternational.com/article/view/reclining-abdominal-twist ; https://ca.liforme.com/blogs/blog/how-to-do-supine-spinal-twist-pose-supta-matsyendrasana ; https://www.motra.com/exercises/supineSpinalTwistPose ; https://beyogi.com/poses/supine-spinal-twist/
+
+**App check:** Partly matches. The chest and both arms stay on the mat, but the pelvis rolls only about 45°, so the knees hover just above the floor (like the "rest the knee on a block" option). The arms make a wide V (shAbd 60) rather than a T so the hands reach the mat. Pelvis roll is expressed as `pitch −45, yaw 90, roll −90` (a roll about the body's long axis).
+
+---
+
+### Puppy Pose (`puppy-pose`)
+**How to do it**
+1. Come onto all fours, shoulders over wrists, hips over knees.
+2. Walk your hands forward a few inches.
+3. Exhale and let your chest sink toward the floor; keep the arms active with the elbows off the floor.
+4. Rest your forehead on the mat (or a block) and keep a slight curve in the lower back.
+
+**Key positions:** thighs near vertical (hipF ≈ pitch); chest low (pitch ≈ 120–130); arms overhead shF ≈ 170–180, elbow 0; forehead down; spineF slightly negative.
+
+**Sources:** https://www.yogajournal.com/pose/extended-puppy-pose?scope=anon ; https://liforme.com/blogs/blog/puppy-pose-uttana-shishosana ; https://www.yogamatters.com/blogs/pose-library/puppy-pose-uttana-shishosana
+
+**App check:** Matches (pitch 125, hipF 114, spineF −16, arms 175, forehead and hands on the mat, elbows up).
+
+---
+
+### Sphinx Pose (`sphinx`)
+**How to do it**
+1. Lie on your belly, legs extended, tops of the feet down.
+2. Set your elbows under your shoulders with forearms flat and parallel.
+3. Inhale and lift your upper torso and head into a mild backbend, pressing through the forearms so the shoulders stay away from the ears.
+4. Keep the neck long; press the pubic bone and feet down.
+
+**Key positions:** pitch ≈ 90; spineF ≈ −25 to −35; upper arms near vertical; elbow ≈ 90; neckF ≈ −10; ankle ≈ 60.
+
+**Sources:** https://www.yogajournal.com/pose/sphinx-pose?scope=anon ; https://liforme.com/blogs/blog/how-to-practice-sphinx-pose-salamba-bhujangasana
+
+**App check:** Matches (spineF −34.5, elbow 90, forearms, hips and knees on the mat). Elbows sit slightly ahead of the shoulders (upper arm about 17° forward of vertical), which is common in practice.
+
+---
+
+### Boat Pose (`boat-pose`, Intermediate)
+**How to do it**
+1. Sit with knees bent and feet flat, hands beside your thighs.
+2. Lean back slightly with a long, straight spine and lift your feet so your shins are parallel to the floor (half boat).
+3. Reach your arms forward, parallel to the floor, beside the legs.
+4. Keep the chest lifted; don't let the back round. Straighten the legs for the full pose.
+
+**Key positions:** pitch ≈ −35 to −45; hipF ≈ 100–115; knee ≈ 80–90 (shins level); arms horizontal (shF ≈ 90 + pitch ≈ 50); spine straight.
+
+**Sources:** https://yogainternational.com/article/view/connecting-to-your-core-4-ways-to-practice-boat-pose ; https://yogauonline.com/yoga-health-benefits/yoga-wellness/how-to-do-boat-pose-in-yoga-navasana-free-online-yoga-video-with-natasha-rizopoulos/ ; https://pranayoga.co.in/asana/navasana-boat-posture/
+
+**App check:** Matches half boat (pitch −40, hipF 110, knee 85, arms forward at shF 50). Category `yoga`; muscles abs, hip flexors, obliques, lower back. No ACE entry was found.
+
+---
+
+### Standing Chest Opener (`chest-opener`)
+**How to do it**
+1. Stand with feet hip-width apart.
+2. Clasp your hands behind your back (or hold a towel).
+3. Straighten your arms, draw the shoulder blades down and back and lift the chest; lift the hands slightly away from the back.
+4. Don't arch the lower back or push the hips forward. Hold 15–30 s, breathing.
+
+**Key positions:** shF ≈ −40 to −50, arms slightly in (shAbd ≈ −10 to −15), elbow 0, hands together; spine neutral; slight chin lift.
+
+**Sources:** https://www.acefitness.org/education-and-resources/lifestyle/exercise-library/209/standing-chest-stretch/ ; https://us.physitrack.com/home-exercise-video/chest-and-upper-back-stretch ; https://motra.com/exercises/claspedHandsChestStretch
+
+**App check:** Matches (shF −45, shAbd −14.5, hands within 6 cm of each other, no back arch). The rig has no shoulder-blade movement, so "draw the shoulder blades back" is only in the tip.
+
+---
+
+### Neck Rolls (`neck-rolls`)
+**How to do it**
+1. Sit or stand tall with shoulders relaxed.
+2. Tilt one ear toward its shoulder.
+3. Roll the chin slowly down across the chest to the other side, then back. Use half circles; do not drop the head backward.
+4. Move slowly and stop before any pain.
+
+**Key positions:** neckSide ≈ ±30–35; chin down neckF ≈ 30–40; no neck extension.
+
+**Sources:** https://www.colorado.edu/ehs/media/329 ; https://www.wsh.nhs.uk/covid-staff-zone/Your-wellbeing/docs/New-neck-and-shoulders-loosening.pdf
+
+**App check:** Matches: 4 keyframes (ear left, chin down, ear right, chin down), 8 s per cycle. Shoulder rolls (also in the NHS leaflet) could not be shown because the rig has no shoulder-blade/collarbone joint. Note: this is close to the existing `neck-tilt`, but adds the chin-down part of the arc.
+
+---
+
+### Wrist & Forearm Stretch (`wrist-stretch`)
+**How to do it**
+1. Hold one arm straight out in front, elbow straight.
+2. **Flexor stretch:** palm facing forward, fingers up; with the other hand gently pull the fingers back toward you.
+3. **Extensor stretch:** turn the palm down and gently press the back of the hand so the fingers point down.
+4. Hold each 15–30 s, 2–4 times, then switch arms. Ease off if it hurts.
+
+**Key positions:** stretched arm shF ≈ 90, elbow 0; wrist ≈ +70 (fingers back) then ≈ −70 (hand down); helping hand on the fingers.
+
+**Sources:** https://www.healthlinkbc.ca/healthwise/stretches-ease-wrist-and-arm-aches-and-fatigue ; https://uofmhealth.org/health-library/zm2290 ; https://healthy.kaiserpermanente.org/health-wellness/health-encyclopedia/he.wrist-exercises.ad1518
+
+**App check:** Matches: 4 keyframes over 12 s (flexor stretch held, then extensor stretch held), helping hand within 9 cm of the stretched hand, sides. The hands are simple blobs, so the finger pull is suggested rather than shown.
+
+---
+
+### Standing Hamstring Stretch (`hamstring-stretch`)
+**How to do it**
+1. Stand tall, then put one foot forward on its heel with the toes up and that knee straight (or nearly).
+2. Bend the back knee slightly.
+3. Keeping the back flat, hinge forward at the hips (hands on hips or the back thigh) until you feel a stretch in the back of the front leg.
+4. Hold 15–30 s, 2–4 times each leg. No rounding, no bouncing.
+
+**Key positions:** front leg knee 0, ankle ≈ −20 to −30 (toes up), heel on the floor; back knee ≈ 15–25; hip hinge pitch ≈ 40–45 with spineF ≈ 0.
+
+**Sources:** https://www.columbiadoctors.org/health-library/multimedia/hamstring-stretch-standing/ ; https://fitwill.app/en/exercise/1909/standing-toe-up-hamstring-stretch ; https://www.concordhospital.org/patients-visitors/health-library/viewer/?id=acl0420
+
+**App check:** Matches (front knee 0, ankle −25, back knee 21.6, hinge pitch 44 with a flat back, hands on hips, balanced). The front foot is only about 19° ahead of the body, a short stance.
+
+---
+
+### Not modelled
+- **Extended Side Angle:** with the rig's hip-abduction limit (50°), a bent front knee with a horizontal thigh plus a 60° side tilt could not balance with both feet flat. The fitter only "passed" by lifting the heels or exceeding the ROM, so it was swapped for Thread the Needle (upper-back relief for desk workers).
+- **Mountain pose with breathing:** skipped, because `deep-breath` and `tadasana-reach` already cover it.
+- **Shoulder rolls:** the rig has no shoulder-blade joint, so only neck rolls were added.

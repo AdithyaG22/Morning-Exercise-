@@ -30,7 +30,7 @@ FOR EVERY LEVEL
 • Beginner, Intermediate and Advanced plans.
 • Focus on Full body, Cardio, Core & back, Yoga, or Desk relief (stretches for people who sit all day).
 • Ready-made routines, like the Beginner Full Body routine: 4 circuits with breathing breaks.
-• Nearly 60 exercises and yoga poses, from jumping jacks and squats to cobra and downward dog.
+• 90 exercises and yoga poses, from jumping jacks and squats to cobra and downward dog.
 
 TRACK YOUR HABIT
 • Daily streak, weekly calendar, minutes trained and estimated calories.

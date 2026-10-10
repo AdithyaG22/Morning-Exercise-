@@ -62,7 +62,7 @@ tools/check-poses.mjs ──► avatar.js, skin.js, exercises.js, routines.js, t
 | `js/stage.js` | `Stage` class: renderer, lights, floor/shadow/mat, theme lighting (`setTheme`), drag-to-orbit, animation sampling and blending, camera auto-framing, render loop. |
 | `js/avatar.js` | `Avatar` class: skeleton, body shapes, muscle meshes + glow shells, markers, dumbbells, `setBody` sizing, `applyPose`, grounding, highlight colours. Exports `MUSCLES`, `NEUTRAL`, `expandPose`, `mirrorPose`, `lerpPose`. |
 | `js/skin.js` | `buildSkinGeometry(prims, bones)` and `makePrim(shape, matrix)`: builds the smooth skinned body. |
-| `js/exercises.js` | `EXERCISES` (76+ exercises), `CATEGORIES`, `LEVELS`, `byId`. |
+| `js/exercises.js` | `EXERCISES` (90 exercises), `CATEGORIES`, `LEVELS`, `byId`. |
 | `js/plan.js` | `FOCUS`, `buildPlan`, `buildRoutinePlan`, `todaySeed`. |
 | `js/routines.js` | `ROUTINES`. |
 | `js/audio.js` | `sound` flags, `unlockAudio`, `beep` (Web Audio), `say` (speech synthesis, en-US). |
