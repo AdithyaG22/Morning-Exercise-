@@ -30,9 +30,9 @@ python3 -m http.server 8000
 ```
 (Opening `index.html` directly with `file://` will not work, because browsers block ES modules from local files.)
 
-### Want a real Play Store APK later?
-Because this is a PWA, you can wrap it into an Android app for free with
-[PWABuilder](https://www.pwabuilder.com/): paste your GitHub Pages URL and download the Android package.
+### Publishing on Google Play
+Follow **[docs/PLAY-STORE.md](docs/PLAY-STORE.md)**. The store graphics and texts are ready in `store/`.
+The app is wrapped into an Android app for free with [PWABuilder](https://www.pwabuilder.com/).
 
 ## Tips during a workout
 - **Drag** on the trainer to rotate the camera. **Double-tap** resets the view.
@@ -62,6 +62,9 @@ tools/build-preview.py  Bundles the app into one HTML page for previews
 pose-debug.html       Shows any exercise keyframe in 3D
 docs/EXERCISES.md     How poses are described, checked and added
 docs/EXERCISE-TECHNIQUE.md  Correct form for every exercise, with sources
+docs/PLAY-STORE.md    Step-by-step guide to publishing on Google Play
+store/                Play Store screenshots, feature graphic and listing text
+privacy.html          Privacy policy (needed for the Play Store)
 CLAUDE.md             Project guide for new Claude sessions
 ```
 

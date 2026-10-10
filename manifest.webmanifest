@@ -1,16 +1,25 @@
 {
+  "id": "./",
   "name": "Morning Move",
   "short_name": "Morning Move",
   "description": "Free, lightweight morning workouts with a 3D trainer that shows which muscles are working.",
+  "lang": "en",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "background_color": "#eef2f6",
   "theme_color": "#0f766e",
+  "categories": ["health", "fitness", "lifestyle"],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "screenshots": [
+    { "src": "store/screenshot-1-home.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Today's workout with your 3D trainer" },
+    { "src": "store/screenshot-2-workout.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Follow along while the working muscles glow" },
+    { "src": "store/screenshot-3-routine.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Ready-made routines in circuits" }
   ]
 }

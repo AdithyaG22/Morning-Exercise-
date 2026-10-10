@@ -122,7 +122,7 @@ stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`, `cardio
 Keep these keys and shapes backward-compatible; `store.get` merges saved values over defaults.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v11`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v12`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system
@@ -211,6 +211,13 @@ Follow `docs/EXERCISES.md` §5–6, and check the movement against a reputable s
   proxy. To test the preview bundle, route the CDN URL to the local vendor file, e.g.
   `page.route('**/cdn.jsdelivr.net/**', r => r.fulfill({ path: 'vendor/three.module.min.js',
   contentType: 'text/javascript' }))`. You cannot check the live Pages site from the sandbox.
+
+**Google Play:** the plan is a Trusted Web Activity built by the owner with PWABuilder
+(package `io.github.adithyag22.morningmove`), which loads the live Pages site. The step-by-step
+owner guide is `docs/PLAY-STORE.md`; store assets and listing text are in `store/`; the privacy
+policy is `privacy.html`. Digital Asset Links must be served from the domain root, i.e. a separate
+`adithyag22.github.io` repository with `.nojekyll` and `.well-known/assetlinks.json`. If store
+screenshots go stale after UI changes, regenerate them at 360×640 @3x (1080×1920).
 
 ## 8. Known limitations and ideas not yet done
 
