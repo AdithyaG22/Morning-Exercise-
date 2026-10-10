@@ -1,5 +1,5 @@
 // Builds a workout: warm-up → main block → cool-down, filled to the chosen duration.
-import { EXERCISES } from './exercises.js';
+import { EXERCISES, byId } from './exercises.js';
 
 export const FOCUS = {
   full: { name: 'Full body', main: ['strength', 'cardio', 'core'], extra: ['yoga'] },
@@ -53,7 +53,7 @@ export function buildPlan({ minutes = 15, level = 1, focus = 'full', work = 20, 
   const rand = rng(seed * 31 + level * 7 + focus.length);
   const rounds = Math.max(4, Math.round((minutes * 60 + rest) / (work + rest)));
   const f = FOCUS[focus] || FOCUS.full;
-  const ok = (e) => e.level <= level;
+  const ok = (e) => e.level <= level && !e.props;   // equipment moves only appear in routines
   // Weight exercises at the chosen level higher so harder plans feel harder.
   const weighted = (list) => list.flatMap((e) => (e.level === level && level > 1 ? [e, e] : [e]));
 
@@ -99,4 +99,18 @@ function fixRepeats(list) {
     }
   }
   return a;
+}
+
+/** Turn a ready-made routine into a plan: circuits in order, a longer breathing break between circuits. */
+export function buildRoutinePlan(r) {
+  const items = [];
+  r.circuits.forEach((c, ci) => c.ids.forEach((id, i) => {
+    const last = i === c.ids.length - 1;
+    items.push({
+      ex: byId(id), circuit: ci, circuitName: c.name, circuitSize: c.ids.length, indexInCircuit: i,
+      restAfter: last ? r.circuitRest : r.rest, circuitEnd: last && ci < r.circuits.length - 1,
+    });
+  }));
+  const seconds = items.reduce((t, it, i) => t + r.work + (i < items.length - 1 ? it.restAfter : 0), 0);
+  return { items, work: r.work, rest: r.rest, rounds: items.length, seconds, routine: r };
 }

@@ -16,6 +16,7 @@ import * as THREE from '../vendor/three.module.min.js';
 import { Avatar, expandPose, mirrorPose } from '../js/avatar.js';
 import { makePrim } from '../js/skin.js';
 import { EXERCISES } from '../js/exercises.js';
+import { ROUTINES } from '../js/routines.js';
 import { ROM, SUPPORT_TERMS } from './motion.js';
 
 const FLOOR = 0.03;      // a marker within 3 cm of the floor counts as touching
@@ -285,5 +286,12 @@ for (const ex of EXERCISES) {
   });
   if (lines.length || only) console.log(`${lines.length ? '✗' : '✓'} ${ex.id}\n${lines.join('\n')}`);
 }
+// Every exercise a routine names must exist
+for (const r of ROUTINES) {
+  for (const c of r.circuits) for (const id of c.ids) {
+    if (!EXERCISES.some((e) => e.id === id)) { bad++; console.log(`✗ routine ${r.id}: unknown exercise "${id}"`); }
+  }
+}
+
 console.log(`\n${total - bad}/${total} keyframes pass`);
 process.exitCode = bad ? 1 : 0;

@@ -104,3 +104,23 @@ might pass a triangle pose by not tilting. If that happens, add a `touch` goal t
 
 Nothing else needs changing. The workout planner, library, timer, voice coach and muscle glow pick
 it up automatically.
+
+## 6. Ready-made routines
+
+Fixed workouts (like the 20-minute *Beginner Full Body*) live in [`js/routines.js`](../js/routines.js):
+
+```js
+{
+  id: 'beginner-full-body', name: 'Beginner Full Body', level: 1,
+  work: 20, rest: 10, circuitRest: 30,          // seconds; circuitRest = "breathe deeply" break
+  circuits: [
+    { name: 'Warm-up', ids: ['arm-swings', 'torso-twist', ...] },
+    ...
+  ],
+}
+```
+
+A routine is a list of exercise ids grouped into circuits. It appears on the home screen under
+**Routines**. `node tools/check-poses.mjs` also confirms that every id in a routine exists.
+Exercises that need equipment (`props: ['dumbbells']`) only appear in routines, never in the
+automatic daily mix.

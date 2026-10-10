@@ -1,7 +1,8 @@
 import { Stage } from './stage.js';
 import { MUSCLES } from './avatar.js';
 import { EXERCISES, CATEGORIES, LEVELS } from './exercises.js';
-import { buildPlan, FOCUS, todaySeed } from './plan.js';
+import { buildPlan, buildRoutinePlan, FOCUS, todaySeed } from './plan.js';
+import { ROUTINES } from './routines.js';
 import { beep, say, sound, unlockAudio } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
@@ -124,6 +125,39 @@ function heroShow() {
   heroTimer = setTimeout(() => { heroIndex++; heroShow(); }, 6000);
 }
 
+// ---------- Routines ----------
+function renderRoutines() {
+  $('routine-list').innerHTML = ROUTINES.map((r) => {
+    const p = buildRoutinePlan(r);
+    const circuits = r.circuits.map((c, ci) => `
+      <li class="sec-h">Circuit ${ci + 1} · ${c.name}</li>
+      ${c.ids.map((id) => {
+        const ex = p.items.find((it) => it.ex.id === id).ex;
+        return `<li data-id="${id}"><span class="nm">${ex.name}<span class="sub">${muscleNames(ex).slice(0, 3).join(' · ')}</span></span>${ex.props ? '<span class="tag">Dumbbells</span>' : ''}</li>`;
+      }).join('')}`).join('');
+    return `
+      <div class="routine">
+        <div class="row between gap">
+          <div>
+            <b>${r.name}</b>
+            <div class="muted small">${fmtTime(p.seconds)} · ${r.circuits.length} circuits · ${p.items.length} exercises · ${r.work}s on / ${r.rest}s rest</div>
+          </div>
+          ${levelTag(r.level)}
+        </div>
+        <p class="small">${r.description}</p>
+        ${r.note ? `<p class="small note">🧴 ${r.note}</p>` : ''}
+        <details><summary>See all exercises</summary><ol class="ex-list plain">${circuits}</ol></details>
+        <button class="primary big" data-routine="${r.id}">▶ Start ${r.name}</button>
+      </div>`;
+  }).join('');
+}
+$('routine-list').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-routine]');
+  if (b) return startWorkout(buildRoutinePlan(ROUTINES.find((r) => r.id === b.dataset.routine)));
+  const li = e.target.closest('li[data-id]');
+  if (li) openPreview(EXERCISES.find((x) => x.id === li.dataset.id));
+});
+
 // ---------- Greeting & stats ----------
 function greet() {
   const h = new Date().getHours();
@@ -175,7 +209,7 @@ function renderLibrary() {
   $('lib-grid').innerHTML = EXERCISES.filter((e) => libCat === 'all' || e.cat === libCat).map((e) => `
     <button class="lib-item" data-id="${e.id}">
       <b>${e.name}</b>
-      <div class="tags"><span class="tag">${CATEGORIES[e.cat]}</span>${levelTag(e.level)}</div>
+      <div class="tags"><span class="tag">${CATEGORIES[e.cat]}</span>${levelTag(e.level)}${e.props ? '<span class="tag">Dumbbells</span>' : ''}</div>
       <small>${muscleNames(e).join(', ')}</small>
     </button>`).join('');
 }
@@ -195,7 +229,7 @@ function openPreview(ex) {
   stage.play(ex);
   $('pv-name').textContent = ex.name;
   $('pv-tip').textContent = ex.tips + (ex.sides ? ' Do both sides.' : '');
-  $('pv-tags').innerHTML = `<span class="tag">${CATEGORIES[ex.cat]}</span>${levelTag(ex.level)}`;
+  $('pv-tags').innerHTML = `<span class="tag">${CATEGORIES[ex.cat]}</span>${levelTag(ex.level)}${ex.props ? '<span class="tag">Dumbbells</span>' : ''}`;
   $('pv-muscles').innerHTML = chipsHTML(muscleNames(ex));
   clearInterval(previewTimer);
   if (ex.sides) {
@@ -251,7 +285,8 @@ function buildSegments(p) {
   const segs = [{ type: 'ready', dur: READY_SECS, i: 0 }];
   p.items.forEach((_, i) => {
     segs.push({ type: 'work', dur: p.work, i });
-    if (i < p.items.length - 1) segs.push({ type: 'rest', dur: p.rest, i: i + 1 });
+    const it = p.items[i];
+    if (i < p.items.length - 1) segs.push({ type: 'rest', dur: it.restAfter ?? p.rest, i: i + 1, breather: !!it.circuitEnd });
   });
   return segs;
 }
@@ -263,11 +298,11 @@ async function keepAwake(on) {
   } catch { /* not supported */ }
 }
 
-function startWorkout() {
+function startWorkout(p = plan) {
   unlockAudio();
   clearTimeout(heroTimer);
   session = {
-    plan, segs: buildSegments(plan), seg: 0, left: READY_SECS, last: performance.now(),
+    plan: p, segs: buildSegments(p), seg: 0, left: READY_SECS, last: performance.now(),
     paused: false, worked: [], restSecs: 0, lastBeep: null, switched: false, start: Date.now(),
   };
   $('player').hidden = false;
@@ -287,7 +322,9 @@ function enterSegment() {
   ph.className = 'phase ' + (seg.type === 'work' ? '' : seg.type);
   ring.className = 'ring ' + (seg.type === 'work' ? '' : seg.type);
   $('p-name').textContent = ex.name;
-  $('p-count').textContent = `Exercise ${seg.i + 1} of ${total}`;
+  $('p-count').textContent = item.circuitName
+    ? `Circuit ${item.circuit + 1} of ${s.plan.routine.circuits.length} · ${item.circuitName} · ${item.indexInCircuit + 1}/${item.circuitSize}`
+    : `Exercise ${seg.i + 1} of ${total}`;
   $('p-tip').textContent = ex.tips + (ex.sides ? ' Switch sides halfway.' : '');
   $('p-muscles').innerHTML = chipsHTML(muscleNames(ex));
   $('p-muscles').classList.toggle('next', seg.type !== 'work');
@@ -302,10 +339,13 @@ function enterSegment() {
     beep(1320, 380, 0.3);
     if (seg.i === Math.floor(total / 2) && total > 6) setTimeout(() => say('Halfway there. Keep going!'), 500);
   } else {
-    ph.textContent = seg.type === 'rest' ? 'REST' : 'GET READY';
+    ph.textContent = phaseLabel(seg);
     stage.speed = 0.6;
     stage.play(ex, { highlight: 'next' });
-    say(seg.type === 'rest' ? `Rest. Next: ${ex.name}` : `Get ready. First: ${ex.name}`);
+    if (seg.breather) {
+      $('p-nextup').textContent = `Next: Circuit ${item.circuit + 1} · ${item.circuitName}`;
+      say(`Circuit ${item.circuit} done. Breathe deeply. Next: ${item.circuitName}, starting with ${ex.name}`);
+    } else say(seg.type === 'rest' ? `Rest. Next: ${ex.name}` : `Get ready. First: ${ex.name}`);
   }
   renderTime();
 }
@@ -367,9 +407,13 @@ function setPaused(p) {
   if (p) $('p-phase').textContent = 'PAUSED';
   else enterPhaseLabel();
 }
+function phaseLabel(seg) {
+  if (seg.type === 'work') return 'GO!';
+  if (seg.breather) return 'BREATHE DEEPLY';
+  return seg.type === 'rest' ? 'REST' : 'GET READY';
+}
 function enterPhaseLabel() {
-  const seg = session.segs[session.seg];
-  $('p-phase').textContent = seg.type === 'work' ? 'GO!' : seg.type === 'rest' ? 'REST' : 'GET READY';
+  $('p-phase').textContent = phaseLabel(session.segs[session.seg]);
 }
 
 function finish(completed) {
@@ -387,7 +431,7 @@ function finish(completed) {
   $('p-end').hidden = true;
   $('p-pause').textContent = '⏸ Pause';
   if (workSecs >= 60) {
-    history.push({ date: new Date().toISOString(), secs, kcal, count: done, focus: settings.focus });
+    history.push({ date: new Date().toISOString(), secs, kcal, count: done, focus: s.plan.routine?.id || settings.focus });
     history = history.slice(-400);
     store.set('history', history);
   }
@@ -410,7 +454,7 @@ function backHome() {
   heroShow();
 }
 
-$('start').addEventListener('click', startWorkout);
+$('start').addEventListener('click', () => startWorkout());
 $('p-pause').addEventListener('click', () => setPaused(!session.paused));
 $('p-next').addEventListener('click', () => jump(1));
 $('p-prev').addEventListener('click', () => jump(-1));
@@ -444,6 +488,7 @@ greet();
 renderSettings();
 renderProfile();
 renderLibrary();
+renderRoutines();
 renderStats();
 rebuild();
 

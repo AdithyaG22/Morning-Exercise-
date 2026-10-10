@@ -7,6 +7,7 @@ It is built for people who sit at a laptop all day and want to stay fit and heal
 - 🔴 **See which muscles work**: the muscles used in each exercise glow red, and the next exercise's muscles show in amber during rest.
 - ⏱️ **Interval timer**: 20 s exercise / 10 s rest by default, adjustable. Workouts run 5–30 minutes (default 15).
 - 📈 **Beginner → Intermediate → Advanced** levels.
+- 📋 **Ready-made routines**: e.g. *Beginner Full Body*, 4 circuits with breathing breaks, dumbbell moves included.
 - 🧘 **Focus modes**: Full body, Cardio, Core & back, **Yoga**, and **Desk relief** (stretches for screen workers).
 - 🗣️ **Voice coach and countdown beeps**, so you do not have to watch the screen.
 - 🔥 Streak, weekly calendar, minutes and estimated calories.
@@ -48,7 +49,8 @@ js/stage.js           Three.js scene, theme lighting, auto-framing camera, anima
 js/avatar.js          Skeleton, body shapes, muscle groups, sizing, posing, floor contact
 js/skin.js            Builds one smooth skin over the body shapes and binds it to the skeleton
 js/exercises.js       Exercise library: joint-angle keyframes, muscles, level, tips
-js/plan.js            Builds warm-up → main → cool-down for the chosen duration
+js/plan.js            Builds warm-up → main → cool-down for the chosen duration, and routine plans
+js/routines.js        Ready-made routines (e.g. 20-min Beginner Full Body in 4 circuits)
 js/audio.js           Beeps (Web Audio) and voice (speech synthesis)
 sw.js                 Offline cache
 vendor/three.module.min.js   Three.js r160 (MIT)

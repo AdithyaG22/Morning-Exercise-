@@ -141,6 +141,13 @@ input[type=number] {
 .ex-list .sub { display: block; font-size: 0.78rem; color: var(--muted); }
 .ex-list .sec-h { pointer-events: none; padding: 14px 0 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border: 0; }
 .ex-list .sec-h::before { display: none; }
+.ex-list.plain { counter-reset: none; }
+.ex-list.plain li::before { display: none; }
+.routine { display: flex; flex-direction: column; gap: 8px; }
+.routine + .routine { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+.routine p { margin: 0; }
+.routine .note { background: var(--accent-soft); border-radius: 10px; padding: 8px 10px; }
+.routine summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.9rem; padding: 4px 0; }
 
 .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; white-space: nowrap; }
 .tag.l2 { background: var(--tag2-bg); color: var(--tag2-fg); }

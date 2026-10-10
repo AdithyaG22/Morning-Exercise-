@@ -12,7 +12,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'dist', 'morning-move.html')
-MODULES = ['skin', 'avatar', 'stage', 'exercises', 'plan', 'audio', 'app']  # dependency order
+MODULES = ['skin', 'avatar', 'stage', 'exercises', 'routines', 'plan', 'audio', 'app']  # dependency order
 
 
 def read(path):

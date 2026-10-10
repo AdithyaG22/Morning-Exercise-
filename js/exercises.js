@@ -6,6 +6,7 @@
 // level: 1 beginner, 2 intermediate, 3 advanced
 // cat: warmup | cardio | strength | core | yoga | stretch
 // sides: hold one side for the first half, mirror for the second half
+// props: ['dumbbells'] shows dumbbells in the hands (water bottles work too)
 // met: metabolic equivalent, used for the calorie estimate
 
 // ---- Reusable poses ----
@@ -29,6 +30,9 @@ const PRONE = { pitch: 90, shF: 165, shAbd: 15, elbow: 5, ankle: 59, hipF: 3 };
 const TABLETOP = { pitch: 87, shF: 87, shAbd: 4, elbow: 0, wrist: 90, hipF: 87, knee: 90, ankle: 59, hipAbd: 4 };
 
 const SQUAT_LOW = { pitch: 35, hipF: 112, knee: 112, ankle: -35, shF: 125, shAbd: 6, elbow: 10, hipAbd: 8 };
+// Hip hinge with soft knees, back flat (bent-over rows, kickbacks)
+const HINGE = { pitch: 45, hipF: 52, knee: 15, ankle: -8 };
+
 const SQUAT_HANDS_DOWN = { pitch: 26, spineF: 53, hipF: 128, knee: 154, ankle: -40, shF: 54, shAbd: 10, wrist: 80, hipAbd: 8 };
 
 export const EXERCISES = [
@@ -391,6 +395,149 @@ export const EXERCISES = [
     muscles: ['chest', 'back', 'shoulders'],
     tips: 'Inhale slowly as your arms rise, exhale as they lower. Relax your whole body.',
     frames: [{ shAbd: 10, hipAbd: 6 }, { shAbd: 170, elbow: 5, hipAbd: 6, neckF: -8 }],
+  },
+
+  // ---------------- Added for the Beginner Full Body routine ----------------
+  {
+    id: 'arm-swings', on: 'feet', name: 'Arm Swings', cat: 'warmup', level: 1, met: 3, cycle: 1.4, view: 'front',
+    muscles: ['chest', 'shoulders', 'back'],
+    tips: 'Swing your arms open wide, then cross them in front of your chest. Keep it loose.',
+    frames: [
+      { shAbd: 85, shF: 10, elbow: 5, hipAbd: 8 },
+      { shF: 90, shAbd: -25, elbow: 10, hipAbd: 8 },
+    ],
+  },
+  {
+    id: 'side-leg-raise', on: 'feet', name: 'Side Leg Raises', cat: 'warmup', level: 1, met: 3.5, cycle: 2.4, view: 'front',
+    muscles: ['glutes', 'obliques', 'adductors'],
+    tips: 'Hands on hips, lift one straight leg out to the side, lower it and switch. Stay tall.',
+    frames: [
+      { ...HANDS_ON_HIPS, hipAbd_L: 40, hipAbd_R: -3, roll: 4, on: 'foot_R' },
+      { ...HANDS_ON_HIPS, d: 0.5 },
+      { ...HANDS_ON_HIPS, hipAbd_R: 40, hipAbd_L: -3, roll: -4, on: 'foot_L' },
+      { ...HANDS_ON_HIPS, d: 0.5 },
+    ],
+  },
+  {
+    id: 'twisters', on: 'feet', name: 'Twisters', cat: 'cardio', level: 1, met: 6, cycle: 1.2, view: 'front',
+    muscles: ['obliques', 'abs', 'calves'],
+    tips: 'Small hops, twisting your hips one way and your shoulders the other. Arms out for balance.',
+    frames: [
+      { yaw: 35, spineTwist: -35, shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6 },
+      { shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, lift: 0.05, ankle: 25, d: 0.5 },
+      { yaw: -35, spineTwist: 35, shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6 },
+      { shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, lift: 0.05, ankle: 25, d: 0.5 },
+    ],
+  },
+  {
+    id: 'cross-toe-touch', on: 'feet', name: 'Cross Toe Touch', cat: 'warmup', level: 1, met: 4, cycle: 2.6, view: 'threeq',
+    muscles: ['hamstrings', 'obliques', 'lowerBack', 'shoulders'],
+    tips: 'Feet wide. Reach one hand down to the opposite foot, other arm up. Stand and switch.',
+    frames: [
+      { hipAbd: 18, shAbd: 80, d: 0.6 },
+      { hipAbd: 18, pitch: 79.4, hipF: 107.2, ankle: 32.1, spineF: 40, spineTwist: 33.6, shF_R: 118.1, shAbd_R: -15, shAbd_L: 95, shF_L: 30, knee: 0, touch: [['hand_R', 'toes_L', 0.14]] },
+      { hipAbd: 18, shAbd: 80, d: 0.6 },
+      { hipAbd: 18, pitch: 79.4, hipF: 107.2, ankle: 32.1, spineF: 40, spineTwist: -33.6, shF_L: 118.1, shAbd_L: -15, shAbd_R: 95, shF_R: 30, knee: 0, touch: [['hand_L', 'toes_R', 0.14]] },
+    ],
+  },
+  {
+    id: 'diamond-pushups', on: 'hands toes', name: 'Diamond Push-ups', cat: 'strength', level: 2, met: 6, cycle: 2.4, view: 'side', mat: true,
+    muscles: ['triceps', 'chest', 'shoulders', 'abs'],
+    tips: 'Hands together under your chest, thumbs and fingers forming a diamond. Too hard? Drop to your knees.',
+    touch: [['hand_L', 'hand_R', 0.08]],
+    frames: [
+      { ...HIGH_PLANK, shAbd: -19, shRot: 17 },
+      { ...PUSHUP_DOWN, pitch: 88, shF: 5, elbow: 75, shAbd: -2, shRot: -45 },
+    ],
+  },
+  {
+    id: 'squat-hold', on: 'feet', name: 'Squat Hold', cat: 'strength', level: 1, met: 5, view: 'side',
+    muscles: ['quads', 'glutes', 'hamstrings'],
+    tips: 'Sit low as if on a chair and hold. Chest up, weight in your heels, keep breathing.',
+    frames: [{ ...SQUAT_LOW, shF: 100 }],
+  },
+  {
+    id: 'db-rows', on: 'feet', name: 'Dumbbell Rows', cat: 'strength', level: 1, met: 4, cycle: 2.4, view: 'side', props: ['dumbbells'],
+    muscles: ['back', 'biceps', 'shoulders', 'lowerBack'],
+    tips: 'Hinge forward with a flat back. Pull the weights to your ribs, squeeze your shoulder blades, lower slowly.',
+    frames: [
+      { ...HINGE, shF: 45, shAbd: 6, elbow: 5 },
+      { ...HINGE, shF: -10, shAbd: 10, elbow: 95 },
+    ],
+  },
+  {
+    id: 'shoulder-press', on: 'feet', name: 'Shoulder Press', cat: 'strength', level: 1, met: 4, cycle: 2.4, view: 'front', props: ['dumbbells'],
+    muscles: ['shoulders', 'triceps', 'traps'],
+    tips: 'Weights at shoulder height, press straight up overhead, lower back to your shoulders.',
+    frames: [
+      { shAbd: 85, elbow: 95, shRot: 90, hipAbd: 6 },
+      { shAbd: 168, elbow: 10, shRot: 90, hipAbd: 6 },
+    ],
+  },
+  {
+    id: 'front-raises', on: 'feet', name: 'Front Raises', cat: 'strength', level: 1, met: 3.5, cycle: 2.4, view: 'side', props: ['dumbbells'],
+    muscles: ['shoulders', 'chest'],
+    tips: 'Arms almost straight, lift the weights in front of you to shoulder height, lower slowly.',
+    frames: [
+      { shF: 8, elbow: 8, hipAbd: 6 },
+      { shF: 88, elbow: 8, hipAbd: 6 },
+    ],
+  },
+  {
+    id: 'lateral-raises', on: 'feet', name: 'Lateral Raises', cat: 'strength', level: 1, met: 3.5, cycle: 2.4, view: 'front', props: ['dumbbells'],
+    muscles: ['shoulders', 'traps'],
+    tips: 'Lift the weights out to the sides to shoulder height, elbows soft. Do not shrug.',
+    frames: [
+      { shAbd: 12, elbow: 10, hipAbd: 6 },
+      { shAbd: 85, elbow: 12, hipAbd: 6 },
+    ],
+  },
+  {
+    id: 'bicep-curls', on: 'feet', name: 'Bicep Curls', cat: 'strength', level: 1, met: 3.5, cycle: 2.2, view: 'threeq', props: ['dumbbells'],
+    muscles: ['biceps', 'forearms'],
+    tips: 'Elbows tucked at your sides, curl the weights up to your shoulders, lower all the way.',
+    frames: [
+      { shAbd: 10, elbow: 8, hipAbd: 6 },
+      { shAbd: 10, shF: 10, elbow: 135, hipAbd: 6 },
+    ],
+  },
+  {
+    id: 'tricep-kickbacks', on: 'feet', name: 'Tricep Kickbacks', cat: 'strength', level: 1, met: 3.5, cycle: 2.2, view: 'side', props: ['dumbbells'],
+    muscles: ['triceps', 'shoulders', 'back'],
+    tips: 'Hinge forward, upper arms along your body. Straighten your elbows to push the weights back.',
+    frames: [
+      { ...HINGE, shF: -45, shAbd: 6, elbow: 95 },
+      { ...HINGE, shF: -45, shAbd: 6, elbow: 5 },
+    ],
+  },
+  {
+    id: 'knee-touch', on: 'back feet', name: 'Knee Touches', cat: 'core', level: 1, met: 3.8, cycle: 2.2, view: 'side', mat: true,
+    muscles: ['abs'],
+    tips: 'Lying with knees bent, curl up and slide your hands up to touch your knees. Lower slowly.',
+    frames: [
+      { ...BACK_KNEES, shF: 30 },
+      { ...BACK_KNEES, spineF: 56, neckF: 15, shF: 50, shAbd: -1, touch: [['hand_L', 'knee_L', 0.1]] },
+    ],
+  },
+  {
+    id: 'russian-twists', on: 'seat feet', name: 'Russian Twists', cat: 'core', level: 1, met: 4, cycle: 2, view: 'threeq', mat: true,
+    muscles: ['obliques', 'abs', 'hipFlexors'],
+    tips: 'Sit leaning back with a straight back, feet on the floor. Rotate your chest side to side, hands together.',
+    frames: [
+      { pitch: -29, hipF: 109, knee: 95, ankle: 4, spineTwist: 40, shF: 60, shAbd: -25, elbow: 60 },
+      { pitch: -29, hipF: 109, knee: 95, ankle: 4, spineTwist: -40, shF: 60, shAbd: -25, elbow: 60 },
+    ],
+  },
+  {
+    id: 'plank-knee-elbow', on: 'hands toes', name: 'Knee to Elbow Plank', cat: 'core', level: 1, met: 5, cycle: 2.4, view: 'threeq', mat: true,
+    muscles: ['abs', 'obliques', 'shoulders', 'hipFlexors'],
+    tips: 'From a high plank, bring one knee out to the side toward the same elbow, then switch. Hips stay low.',
+    frames: [
+      { ...HIGH_PLANK, hipF_L: 124, hipAbd_L: 23, knee_L: 149, ankle_L: 3, ankle_R: 0, on: 'hands foot_R', touch: [['knee_L', 'elbow_L', 0.15]] },
+      { ...HIGH_PLANK, d: 0.6 },
+      { ...HIGH_PLANK, hipF_R: 124, hipAbd_R: 23, knee_R: 149, ankle_R: 3, ankle_L: 0, on: 'hands foot_L', touch: [['knee_R', 'elbow_R', 0.15]] },
+      { ...HIGH_PLANK, d: 0.6 },
+    ],
   },
 ];
 

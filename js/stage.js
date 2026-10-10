@@ -160,6 +160,7 @@ export class Stage {
     this.weights = ex ? ex.frames.map((f) => f.d || 1) : [1];
     this.viewYaw = VIEW_YAW[ex?.view || 'threeq'] * (mirrored ? -1 : 1);
     this.avatar.setHighlight(ex ? ex.muscles : [], highlight);
+    this.avatar.setProps(ex?.props);
     this.mat.visible = !!ex?.mat;
   }
 

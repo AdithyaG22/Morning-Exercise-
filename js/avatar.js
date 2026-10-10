@@ -109,6 +109,7 @@ export class Avatar {
     this.muscleMeshes = [];
     this.bones = [];
     this.shapes = [];   // body shapes the skin is generated from
+    this.props = [];
     this.highlight = new Set();
     this.skinColor = COLORS.skin;
     this._v = new THREE.Vector3();
@@ -181,6 +182,30 @@ export class Avatar {
     parent.add(m);
     this.girthTargets.push({ mesh: m, base: m.scale.clone(), basePos: m.position.clone() });
     return m;
+  }
+
+  /** A small dumbbell held across the palm (hidden until an exercise uses props: ['dumbbells']). */
+  dumbbell() {
+    const bar = new THREE.MeshStandardMaterial({ color: 0x2b3440, roughness: 0.4, metalness: 0.5 });
+    const plates = new THREE.MeshStandardMaterial({ color: 0xf2b22c, roughness: 0.5 });
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, 0.17, 12), bar));
+    for (const y of [-0.068, 0.068]) {
+      const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.046, 0.046, 0.04, 24), plates);
+      plate.position.y = y;
+      g.add(plate);
+    }
+    g.children.forEach((m) => { m.castShadow = true; });
+    g.rotation.x = Math.PI / 2;      // bar runs across the palm, front to back
+    g.position.set(0, -0.07, 0.005);
+    g.visible = false;
+    this.props.push(g);
+    return g;
+  }
+
+  setProps(list = []) {
+    const show = list.includes('dumbbells');
+    for (const p of this.props) p.visible = show;
   }
 
   /** Named reference point used to keep the body on the floor and by the pose checker. */
@@ -285,6 +310,7 @@ export class Avatar {
       this.marker(wrist, 0, -0.15, 0, 'hand_' + side);
       this.marker(wrist, 0, -0.04, 0, 'hand_' + side);
       this.arms[side] = { shoulder, elbow, wrist };
+      wrist.add(this.dumbbell());
     }
 
     // ---- Legs ----
