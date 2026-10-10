@@ -130,10 +130,18 @@ tapping or "No thanks" stores that rating's date in `settings.tipSeen` so it sta
 
 **Plan builder** (`buildPlan`): rounds = `max(4, round((minutes·60 + rest)/(work + rest)))`;
 ~15 % warm-up, ~12 % cool-down, rest main. Pools filter by `cat`, `level <= chosen level` and no
-`props`; exercises at the chosen level are double-weighted above Beginner. Standing moves come
-before mat moves; no exercise repeats back-to-back. Seeded by date (`todaySeed`), so the plan is
-stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`, `cardio`, `core`, `yoga`,
-`desk`. `buildRoutinePlan(r)` flattens circuits in order with circuit metadata.
+`props`; exercises at the chosen level are double-weighted above Beginner. Seeded by date
+(`todaySeed`), so the plan is stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`,
+`cardio`, `core`, `yoga`, `desk`. `buildRoutinePlan(r)` flattens circuits in order with circuit metadata.
+**Sequencing** (research and test numbers in `docs/SEQUENCING.md`): `warmUp` = one RAISE move first,
+then moving (never single-frame hold) warm-ups gentle → active; main = picked moves split into circuit
+rounds (each move once per round), each round `sequenceMain` = posture groups in `POSTURES` order
+(standing → prone → kneeling → side → seated → supine, from `posture(e)`), each group `arrange`d
+greedily (alternate `region(e)` upper/lower/core/cardio, intensity bell peaking at 65 %, compound early,
+no two MET ≥ 7 in a row); yoga/desk add `COUNTER` poses after backbends; `fixRepeats` only swaps within
+a posture and never moves a pinned counter-pose; `coolDown` picks stretches for worked muscles and orders
+them to continue from the last main posture (Deep Breathing first if ending standing, last otherwise).
+`region` and `posture` are exported for tests.
 
 **No jumping** (`settings.lowImpact`): `isJumping(e)` is true when any frame has `lift > 0` or the id
 is in `JUMPY` in plan.js (currently `plank-jacks`, which hops without lift). Do not add flags to
@@ -166,7 +174,7 @@ new settings fields must be optional with a default in `DEFAULT_SETTINGS`.
 rebuilds the skin. Invalid files change nothing and show an in-page message.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v15`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v16`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system

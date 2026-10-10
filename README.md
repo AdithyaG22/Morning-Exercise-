@@ -71,6 +71,7 @@ docs/EXERCISES.md     How poses are described, checked and added
 docs/EXERCISE-TECHNIQUE.md  Correct form for every exercise, with sources
 docs/PLAY-STORE.md    Step-by-step guide to publishing on Google Play
 docs/USER-RESEARCH.md Why people use (and quit) exercise apps, and what we built in response
+docs/SEQUENCING.md    How workouts are ordered (warm-up, flow, counter-poses, cool-down) and why
 store/                Play Store screenshots, feature graphic and listing text
 privacy.html          Privacy policy (needed for the Play Store)
 CLAUDE.md             Project guide for new Claude sessions
