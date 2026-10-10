@@ -568,6 +568,180 @@ export const EXERCISES = [
       { ...HIGH_PLANK, d: 0.6 },
     ],
   },
+
+  // ---------------- Added: bodyweight strength, cardio & core ----------------
+  {
+    id: 'reverse-lunges', on: 'feet', name: 'Reverse Lunges', cat: 'strength', level: 1, met: 5, cycle: 4, view: 'side',
+    muscles: ['quads', 'glutes', 'hamstrings', 'calves'],
+    tips: 'Step one foot back and lower your back knee toward the floor, chest up. Push through the front heel to stand. Hold a chair for balance if needed.',
+    frames: [
+      { ...HANDS_ON_HIPS, d: 0.6 },
+      { ...HANDS_ON_HIPS, pitch: 8, hipF_L: 90, knee_L: 87.8, ankle_L: -4.7, hipF_R: 1.8, knee_R: 90, ankle_R: -33.1 },
+      { ...HANDS_ON_HIPS, d: 0.6 },
+      { ...HANDS_ON_HIPS, pitch: 8, hipF_R: 90, knee_R: 87.8, ankle_R: -4.7, hipF_L: 1.8, knee_L: 90, ankle_L: -33.1 },
+    ],
+  },
+  {
+    id: 'side-lunges', on: 'feet', name: 'Side Lunges', cat: 'strength', level: 2, met: 5, cycle: 4, view: 'threeq',
+    muscles: ['adductors', 'glutes', 'quads', 'hamstrings'],
+    tips: 'Take a wide step to the side, sit your hips back over that foot and keep the other leg straight. Both feet stay flat. Push back to the middle and switch.',
+    frames: [
+      { shF: 80, shAbd: -20, elbow: 70, hipAbd: 6, d: 0.6 },
+      { shF: 80, shAbd: -20, elbow: 70, pitch: 30.4, hipF_L: 80, knee_L: 85, ankle_L: -29.1, hipAbd_L: 20, hipRot_L: 10, hipF_R: 25.6, hipAbd_R: 41.3, ankle_R: -0.4 },
+      { shF: 80, shAbd: -20, elbow: 70, hipAbd: 6, d: 0.6 },
+      { shF: 80, shAbd: -20, elbow: 70, pitch: 30.4, hipF_R: 80, knee_R: 85, ankle_R: -29.1, hipAbd_R: 20, hipRot_R: 10, hipF_L: 25.6, hipAbd_L: 41.3, ankle_L: -0.4 },
+    ],
+  },
+  {
+    id: 'sumo-squats', on: 'feet', name: 'Sumo Squats', cat: 'strength', level: 1, met: 5, cycle: 2.8, view: 'front',
+    muscles: ['adductors', 'glutes', 'quads', 'hamstrings'],
+    tips: 'Feet wide, toes turned out. Sit straight down with your chest up and knees pushing out over your toes, then squeeze your glutes to stand.',
+    frames: [
+      { hipAbd: 25, hipRot: 35, ankle: 3.9, pitch: 3.5, shF: 70, shAbd: -25, elbow: 100, d: 0.8 },
+      { hipAbd: 40, hipRot: 0, hipF: 82.6, knee: 95, ankle: -26, pitch: 24.2, shF: 70, shAbd: -25, elbow: 100, d: 1.2 },
+    ],
+  },
+  {
+    id: 'step-jacks', on: 'feet', name: 'Step Jacks', cat: 'cardio', level: 1, met: 4.5, cycle: 1.8, view: 'front',
+    muscles: ['shoulders', 'glutes', 'adductors', 'calves'],
+    tips: 'A quiet jumping jack: step one foot out to the side as both arms sweep overhead, step back in, switch. No jumping, so it is kind to knees and neighbours.',
+    frames: [
+      { shAbd: 165, elbow: 5, hipAbd_L: 25, hipAbd_R: -8.6, roll: -10 },
+      { shAbd: 12, hipAbd: 3, d: 0.8 },
+      { shAbd: 165, elbow: 5, hipAbd_R: 25, hipAbd_L: -8.6, roll: 10 },
+      { shAbd: 12, hipAbd: 3, d: 0.8 },
+    ],
+  },
+  {
+    id: 'skaters', on: 'foot_R', name: 'Skaters', cat: 'cardio', level: 2, met: 7, cycle: 1.6, view: 'threeq',
+    muscles: ['glutes', 'quads', 'adductors', 'calves'],
+    tips: 'Hop sideways onto one foot, sweep the other leg behind you and swing your arms across, like a speed skater. Low-impact option: step instead of hopping.',
+    frames: [
+      { pitch: 29, roll: 6.1, hipF_R: 60, knee_R: 55, ankle_R: -20.1, hipF_L: 5, hipAbd_L: -15, knee_L: 50, ankle_L: 30, spineTwist: 25, shF_L: 50, shAbd_L: -30, shF_R: -30, elbow: 20 },
+      { pitch: 10, hipF: 25, knee: 30, ankle: 25, shF: 10, elbow: 20, lift: 0.1, d: 0.6 },
+      { pitch: 29, roll: -6.1, hipF_L: 60, knee_L: 55, ankle_L: -20.1, hipF_R: 5, hipAbd_R: -15, knee_R: 50, ankle_R: 30, spineTwist: -25, shF_R: 50, shAbd_R: -30, shF_L: -30, elbow: 20, on: 'foot_L' },
+      { pitch: 10, hipF: 25, knee: 30, ankle: 25, shF: 10, elbow: 20, lift: 0.1, d: 0.6 },
+    ],
+  },
+  {
+    id: 'inchworm', on: 'feet', name: 'Inchworm', cat: 'strength', level: 2, met: 4.5, cycle: 7, view: 'side', mat: true,
+    muscles: ['abs', 'shoulders', 'hamstrings', 'chest'],
+    tips: 'Bend forward and put your hands on the floor (bend your knees as much as you need). Walk your hands out to a plank, then walk them back and stand up.',
+    frames: [
+      { d: 0.6 },
+      { pitch: 113.7, spineF: 35, hipF: 118.7, knee: 33.5, ankle: -20, shF: 117.7, wrist: 80, neckF: 10, on: 'feet hands' },
+      { pitch: 122.8, shF: 155, wrist: 70, hipF: 75.2, knee: 5, ankle: -20, on: 'hands feet' },
+      { ...HIGH_PLANK, d: 1.2, on: 'hands toes' },
+      { pitch: 122.8, shF: 155, wrist: 70, hipF: 75.2, knee: 5, ankle: -20, on: 'hands feet' },
+      { pitch: 113.7, spineF: 35, hipF: 118.7, knee: 33.5, ankle: -20, shF: 117.7, wrist: 80, neckF: 10, on: 'feet hands' },
+    ],
+  },
+  {
+    id: 'plank-shoulder-taps', on: 'hands toes', name: 'Plank Shoulder Taps', cat: 'core', level: 2, met: 5, cycle: 2, view: 'threeq', mat: true,
+    muscles: ['abs', 'obliques', 'shoulders', 'triceps'],
+    tips: 'High plank with feet wide. Lift one hand to tap the opposite shoulder without rocking your hips, then switch. Easier: do it with your knees down.',
+    frames: [
+      { ...HIGH_PLANK, hipAbd: 10, shF_L: 130.4, shAbd_L: -22, elbow_L: 113.1, shRot_L: -80, wrist_L: 0, spineTwist: -2.8, on: 'hand_R toes', touch: [['hand_L', 'shoulder_R', 0.1]] },
+      { ...HIGH_PLANK, hipAbd: 10, d: 0.6 },
+      { ...HIGH_PLANK, hipAbd: 10, shF_R: 130.4, shAbd_R: -22, elbow_R: 113.1, shRot_R: -80, wrist_R: 0, spineTwist: 2.8, on: 'hand_L toes', touch: [['hand_R', 'shoulder_L', 0.1]] },
+      { ...HIGH_PLANK, hipAbd: 10, d: 0.6 },
+    ],
+  },
+  {
+    id: 'reverse-crunches', on: 'back arms', name: 'Reverse Crunches', cat: 'core', level: 1, met: 3.8, cycle: 2.6, view: 'side', mat: true,
+    muscles: ['abs', 'hipFlexors'],
+    tips: 'Lying on your back, knees bent at 90° over your hips. Use your abs to curl your hips off the floor toward your ribs, then lower slowly. No swinging.',
+    frames: [
+      { pitch: -90, hipF: 90, knee: 90, ankle: 10, shF: -9.9, shAbd: 14.2, elbow: 0 },
+      { pitch: -110, spineF: 20, hipF: 110, knee: 90, ankle: 10, shF: -9.9, shAbd: 14.2, elbow: 0 },
+    ],
+  },
+  {
+    id: 'heel-touches', on: 'back feet', name: 'Heel Touches', cat: 'core', level: 1, met: 3.8, cycle: 1.6, view: 'threeq', mat: true,
+    muscles: ['obliques', 'abs'],
+    tips: 'Lying with knees bent and shoulders slightly lifted, reach one hand toward the same-side heel, then the other. Keep your lower back on the floor.',
+    frames: [
+      { ...BACK_KNEES, pitch: -90.8, hipF: 60, knee: 118.9, ankle: 43, hipAbd: 12, spineF: 26.9, neckF: 10, spineSide: 20, shF_L: 7.2, shAbd_L: 10, shF_R: 15, shAbd_R: 30, touch: [['hand_L', 'heel_L', 0.15]] },
+      { ...BACK_KNEES, pitch: -90.8, hipF: 60, knee: 118.9, ankle: 43, hipAbd: 12, spineF: 26.9, neckF: 10, spineSide: -20, shF_R: 7.2, shAbd_R: 10, shF_L: 15, shAbd_L: 30, touch: [['hand_R', 'heel_R', 0.15]] },
+    ],
+  },
+  {
+    id: 'hollow-hold', on: 'back', name: 'Hollow Body Hold', cat: 'core', level: 3, met: 4, view: 'side', mat: true,
+    muscles: ['abs', 'hipFlexors', 'quads'],
+    tips: 'Lower back pressed into the floor, shoulders and legs lifted, arms reaching past your ears. Too hard? Bend your knees or bring your arms forward.',
+    frames: [{ pitch: -90, spineF: 22, neckF: 12, shF: 165, shAbd: 8, elbow: 0, hipF: 30, ankle: 30 }],
+  },
+  {
+    id: 'donkey-kicks', on: 'hands knees', name: 'Donkey Kicks', cat: 'strength', level: 1, met: 3.5, cycle: 2.4, view: 'side', mat: true,
+    muscles: ['glutes', 'hamstrings', 'abs'],
+    tips: 'On hands and knees, keep one knee bent at 90° and press that foot up toward the ceiling. Small and controlled: do not arch your lower back.',
+    frames: [
+      TABLETOP,
+      { ...TABLETOP, hipF_L: -10, knee_L: 90, ankle_L: 0, on: 'hands knee_R' },
+      TABLETOP,
+      { ...TABLETOP, hipF_R: -10, knee_R: 90, ankle_R: 0, on: 'hands knee_L' },
+    ],
+  },
+  {
+    id: 'fire-hydrants', on: 'hands knees', name: 'Fire Hydrants', cat: 'strength', level: 1, met: 3.5, cycle: 2.4, view: 'back', mat: true,
+    muscles: ['glutes', 'abs', 'obliques'],
+    tips: 'On hands and knees, keep the knee bent and lift one leg out to the side up to hip height. Keep your back flat and do not lean away.',
+    frames: [
+      TABLETOP,
+      { ...TABLETOP, hipAbd_L: 50, on: 'hands knee_R' },
+      TABLETOP,
+      { ...TABLETOP, hipAbd_R: 50, on: 'hands knee_L' },
+    ],
+  },
+  {
+    id: 'clamshells', on: 'side_R forearm_R knee_R foot_R', name: 'Clamshells', cat: 'strength', level: 1, met: 2.8, cycle: 2.4, view: 'threeq', mat: true, sides: true,
+    muscles: ['glutes'],
+    tips: 'Lie on your side, knees bent and stacked, feet together. Keep your feet touching and lift your top knee like a clam opening, then lower slowly.',
+    frames: [
+      { roll: 86.5, pitch: -4.7, hipF: 52.4, knee: 90, shAbd_R: 180, elbow_R: 55.9, shF_L: 30, elbow_L: 60 },
+      { roll: 86.5, pitch: -4.7, hipF: 52.4, knee: 90, hipAbd_L: 35, hipRot_L: 30, shAbd_R: 180, elbow_R: 55.9, shF_L: 30, elbow_L: 60 },
+    ],
+  },
+  {
+    id: 'good-mornings', on: 'feet', name: 'Good Mornings', cat: 'strength', level: 1, met: 3.5, cycle: 3, view: 'side',
+    muscles: ['hamstrings', 'glutes', 'lowerBack'],
+    tips: 'Hands behind your head, knees soft. Push your hips back and tip your chest forward with a flat back until you feel your hamstrings, then stand tall.',
+    frames: [
+      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 6, d: 0.8 },
+      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 6, pitch: 70, hipF: 81.9, knee: 15, ankle: -8.3, d: 1.2 },
+    ],
+  },
+  {
+    id: 'standing-oblique-crunch', on: 'feet', name: 'Standing Side Crunch', cat: 'core', level: 1, met: 4, cycle: 2, view: 'front',
+    muscles: ['obliques', 'abs', 'hipFlexors'],
+    tips: 'Hands behind your head. Lift one knee out to the side and bend sideways to bring the same elbow down to meet it. Stand tall and switch.',
+    frames: [
+      { shAbd: 120, elbow: 132, shRot: 90, hipF_L: 60, hipAbd_L: 40, hipRot_L: 30, knee_L: 90, spineSide: 25, roll: 9.4, hipAbd_R: 1.8, on: 'foot_R' },
+      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 8, d: 0.6 },
+      { shAbd: 120, elbow: 132, shRot: 90, hipF_R: 60, hipAbd_R: 40, hipRot_R: 30, knee_R: 90, spineSide: -25, roll: -9.4, hipAbd_L: 1.8, on: 'foot_L' },
+      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 8, d: 0.6 },
+    ],
+  },
+  {
+    id: 'plank-to-dog', on: 'hands toes', name: 'Plank to Down Dog', cat: 'core', level: 2, met: 4.5, cycle: 3.2, view: 'side', mat: true,
+    muscles: ['shoulders', 'abs', 'hamstrings', 'calves'],
+    tips: 'From a high plank, press the floor away and lift your hips up and back into an upside-down V, then lower back to a straight plank. Bend your knees if your hamstrings are tight.',
+    frames: [
+      HIGH_PLANK,
+      { pitch: 132, shF: 174, shAbd: 8, wrist: 50, hipF: 89, ankle: -35, neckF: -10, on: 'hands feet' },
+    ],
+  },
+  {
+    id: 'boxing-punches', on: 'feet', name: 'Shadow Boxing', cat: 'cardio', level: 1, met: 5.5, cycle: 1.2, view: 'threeq',
+    muscles: ['shoulders', 'chest', 'triceps', 'obliques'],
+    tips: 'Soft knees, fists by your chin. Punch one arm straight out and turn your body with it, pull it back fast, then punch with the other. Keep it light and quick.',
+    frames: [
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF_L: 88, shAbd_L: -8, elbow_L: 5, shRot_L: -60, spineTwist: -20, shF_R: 35, shAbd_R: -20, elbow_R: 140, shRot_R: -20 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF: 35, shAbd: -20, elbow: 140, shRot: -20, d: 0.6 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF_R: 88, shAbd_R: -8, elbow_R: 5, shRot_R: -60, spineTwist: 20, shF_L: 35, shAbd_L: -20, elbow_L: 140, shRot_L: -20 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF: 35, shAbd: -20, elbow: 140, shRot: -20, d: 0.6 },
+    ],
+  },
 ];
 
 export const CATEGORIES = {
