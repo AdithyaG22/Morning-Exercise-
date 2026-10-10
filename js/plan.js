@@ -49,11 +49,20 @@ export const todaySeed = () => {
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 };
 
-export function buildPlan({ minutes = 15, level = 1, focus = 'full', work = 20, rest = 10, seed = todaySeed() }) {
+// Moves that jump without a `lift` in their frames (feet hop apart in a plank).
+const JUMPY = new Set(['plank-jacks']);
+
+/** True for moves with a jump or hop: any keyframe leaves the floor, or listed in JUMPY. */
+export function isJumping(e) {
+  return JUMPY.has(e.id) || e.frames.some((f) => (f.lift || 0) > 0);
+}
+
+export function buildPlan({ minutes = 15, level = 1, focus = 'full', work = 20, rest = 10, lowImpact = false, seed = todaySeed() }) {
   const rand = rng(seed * 31 + level * 7 + focus.length);
   const rounds = Math.max(4, Math.round((minutes * 60 + rest) / (work + rest)));
   const f = FOCUS[focus] || FOCUS.full;
-  const ok = (e) => e.level <= level && !e.props;   // equipment moves only appear in routines
+  // Equipment moves only appear in routines; "No jumping" removes every jumping move.
+  const ok = (e) => e.level <= level && !e.props && !(lowImpact && isJumping(e));
   // Weight exercises at the chosen level higher so harder plans feel harder.
   const weighted = (list) => list.flatMap((e) => (e.level === level && level > 1 ? [e, e] : [e]));
 
@@ -64,6 +73,11 @@ export function buildPlan({ minutes = 15, level = 1, focus = 'full', work = 20, 
   const extras = shuffle(EXERCISES.filter((e) => f.extra.includes(e.cat) && ok(e)), rand).slice(0, 3);
   mainPool = weighted([...mainPool, ...extras]);
   if (focus === 'desk') mainPool = [...mainPool, ...EXERCISES.filter((e) => e.cat === 'warmup' && e.met < 3)];
+  // Without jumps, Cardio has very few moves left: top up with brisk standing moves that keep the heart rate up.
+  if (lowImpact && new Set(mainPool).size < 6) {
+    mainPool = [...mainPool, ...EXERCISES.filter((e) => ok(e) && !e.mat && !mainPool.includes(e) &&
+      ((e.cat === 'warmup' && e.met >= 3.5) || e.cat === 'strength'))];
+  }
 
   const nWarm = Math.max(2, Math.round(rounds * 0.15));
   const nCool = Math.max(2, Math.round(rounds * 0.12));
@@ -79,8 +93,40 @@ export function buildPlan({ minutes = 15, level = 1, focus = 'full', work = 20, 
 
   return {
     items: [...warm, ...main, ...cool].map((ex) => ({ ex })),
-    work, rest, rounds,
+    work, rest, rounds, lowImpact,
     seconds: rounds * work + (rounds - 1) * rest,
+  };
+}
+
+// Desk break: moves that ease the neck, shoulders and back come first.
+const RELIEF = ['neck-tilt', 'shoulder-stretch', 'arm-circles', 'arm-swings', 'side-bend', 'torso-twist', 'tadasana-reach'];
+
+/**
+ * A short standing break for desk workers: no mat, no equipment, no jumping, gentle moves only.
+ * Starts with neck/shoulder/back relief, then hips and legs, and ends with deep breathing.
+ */
+export function buildBreakPlan({ minutes = 3, work = 20, rest = 10, seed = todaySeed() } = {}) {
+  const rand = rng(seed * 17 + minutes);
+  const rounds = Math.max(3, Math.round((minutes * 60 + rest) / (work + rest)));
+  const ok = (e) => !e.mat && !e.props && !isJumping(e) && e.level === 1 &&
+    (['warmup', 'stretch', 'yoga'].includes(e.cat) || e.id === 'calf-raises');
+  const pool = EXERCISES.filter(ok);
+  const breathe = pool.find((e) => e.id === 'deep-breath');
+  // Neck and shoulder moves lead, then the other back/shoulder openers.
+  const top = (e) => RELIEF.indexOf(e.id) < 2;
+  const reliefAll = pool.filter((e) => RELIEF.includes(e.id));
+  const relief = [...shuffle(reliefAll.filter(top), rand), ...shuffle(reliefAll.filter((e) => !top(e)), rand)];
+  const others = pool.filter((e) => !RELIEF.includes(e.id) && e !== breathe);
+
+  // Relief moves fill about half the break, then a mix of the rest, then a deep breath to finish.
+  const nEnd = breathe && rounds >= 4 ? 1 : 0;
+  const first = relief.slice(0, Math.min(relief.length, Math.max(2, Math.ceil((rounds - nEnd) / 2))));
+  const middle = take([...others, ...relief.slice(first.length)], Math.max(0, rounds - nEnd - first.length), rand, first[first.length - 1]);
+  const list = [...first, ...middle, ...(nEnd ? [breathe] : [])].slice(0, rounds);
+  return {
+    items: list.map((ex) => ({ ex })),
+    work, rest, rounds: list.length, kind: 'break',
+    seconds: list.length * work + (list.length - 1) * rest,
   };
 }
 

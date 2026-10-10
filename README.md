@@ -10,7 +10,14 @@ It is built for people who sit at a laptop all day and want to stay fit and heal
 - 📋 **Ready-made routines**: e.g. *Beginner Full Body*, 4 circuits with breathing breaks, dumbbell moves included.
 - 🧘 **Focus modes**: Full body, Cardio, Core & back, **Yoga**, and **Desk relief** (stretches for screen workers).
 - 🗣️ **Voice coach and countdown beeps**, so you do not have to watch the screen.
-- 🔥 Streak, weekly calendar, minutes and estimated calories.
+- ☕ **Desk break**: a 2, 3 or 5 minute standing stretch for your neck, shoulders and back. No mat, no jumping.
+- 🎯 **Weekly goal** (1–7 days, default 3) instead of a fragile daily streak: "3/4 this week", weeks in a row on goal,
+  a weekly calendar, minutes and estimated calories. Missing a day never resets anything.
+- 🙂 **"How did that feel?"** after each workout. If it keeps feeling too hard or too easy, the app suggests a change
+  you can accept with one tap. It never changes your settings on its own.
+- 🤫 **No jumping** switch: quieter workouts that are easier on your joints (Cardio still works).
+- 👋 **Quick setup on first launch**: your goal, days per week, level, and a short safety note. Every step can be skipped.
+- 💾 **Backup & restore**: save your progress to a file and load it back (phones can clear browser data).
 - 📴 **Works offline** and installs to your home screen. No account, no ads, and no data leaves your device.
 - 🪶 **Tiny**: about 0.9 MB total. The 3D trainer is built from code, so there are no heavy model files.
 
