@@ -121,7 +121,7 @@ stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`, `cardio
 Keep these keys and shapes backward-compatible; `store.get` merges saved values over defaults.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v9`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v10`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system

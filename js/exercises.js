@@ -205,10 +205,14 @@ export const EXERCISES = [
     ],
   },
   {
-    id: 'calf-raises', on: 'feet', name: 'Calf Raises', cat: 'strength', level: 1, met: 3, cycle: 1.8, view: 'side',
+    id: 'calf-raises', on: 'feet', name: 'Calf Raises', cat: 'strength', level: 1, met: 3, cycle: 3, view: 'side',
     muscles: ['calves'],
     tips: 'Rise slowly onto your toes, pause at the top, lower with control.',
-    frames: [{ ...HANDS_ON_HIPS }, { ...HANDS_ON_HIPS, ankle: 38, pitch: 2, hipF: -2, on: 'toes' }],
+    frames: [
+      { ...HANDS_ON_HIPS, d: 0.8 },
+      { ...HANDS_ON_HIPS, ankle: 38, pitch: 2, hipF: -2, on: 'toes', d: 0.6 },   // pause at the top
+      { ...HANDS_ON_HIPS, ankle: 38, pitch: 2, hipF: -2, on: 'toes', d: 1.3 },   // lower slowly
+    ],
   },
   {
     id: 'knee-pushups', on: 'hands knees', name: 'Knee Push-ups', cat: 'strength', level: 1, met: 4, cycle: 2.4, view: 'side', mat: true,
@@ -228,14 +232,14 @@ export const EXERCISES = [
     tips: 'Feet flat, push through your heels and squeeze your glutes at the top.',
     frames: [
       BACK_KNEES,
-      { pitch: -118, hipF: -16, knee: 96, ankle: 20, shF: -45, shAbd: 12, elbow: 0 },
+      { pitch: -112, hipF: -3, knee: 104, ankle: 16, shF: -38, shAbd: 12, elbow: 0 },
     ],
   },
   {
     id: 'superman', on: 'front arms knees', name: 'Superman', cat: 'strength', level: 1, met: 3.5, cycle: 3, view: 'side', mat: true,
     muscles: ['lowerBack', 'glutes', 'back', 'hamstrings'],
-    tips: 'Lying face down, lift your arms, chest and legs a few centimetres. Look at the floor.',
-    frames: [PRONE, { ...PRONE, spineF: -25, neckF: -5, shF: 175, hipF: -14, ankle: 60, on: 'front' }],
+    tips: 'Lying face down, lift your arms and legs a few centimetres off the floor. Keep your neck long and look at the floor; do not arch your lower back.',
+    frames: [PRONE, { ...PRONE, spineF: -8, neckF: 0, shF: 178, hipF: -14, ankle: 60, on: 'front' }],
   },
   {
     id: 'bird-dog', on: 'hands knees', name: 'Bird Dog', cat: 'strength', level: 1, met: 3, cycle: 4, view: 'side', mat: true,
@@ -452,7 +456,7 @@ export const EXERCISES = [
     tips: 'Hands together under your chest, thumbs and fingers forming a diamond. Too hard? Drop to your knees.',
     touch: [['hand_L', 'hand_R', 0.08]],
     frames: [
-      { ...HIGH_PLANK, shAbd: -19, shRot: 17 },
+      { ...HIGH_PLANK, shF: 68, shAbd: -19, shRot: 17 },
       { ...PUSHUP_DOWN, pitch: 88, shF: 5, elbow: 75, shAbd: -2, shRot: -45 },
     ],
   },
@@ -468,7 +472,7 @@ export const EXERCISES = [
     tips: 'Hinge forward with a flat back. Pull the weights to your ribs, squeeze your shoulder blades, lower slowly.',
     frames: [
       { ...HINGE, shF: 45, shAbd: 6, elbow: 5 },
-      { ...HINGE, shF: -10, shAbd: 10, elbow: 95 },
+      { ...HINGE, shF: -25, shAbd: 12, elbow: 70 },
     ],
   },
   {
@@ -504,7 +508,7 @@ export const EXERCISES = [
     tips: 'Elbows tucked at your sides, curl the weights up to your shoulders, lower all the way.',
     frames: [
       { shAbd: 10, elbow: 8, hipAbd: 6 },
-      { shAbd: 10, shF: 10, elbow: 135, hipAbd: 6 },
+      { shAbd: 10, shF: 2, elbow: 135, hipAbd: 6 },
     ],
   },
   {
@@ -512,8 +516,8 @@ export const EXERCISES = [
     muscles: ['triceps', 'shoulders', 'back'],
     tips: 'Hinge forward, upper arms along your body. Straighten your elbows to push the weights back.',
     frames: [
-      { ...HINGE, shF: -45, shAbd: 6, elbow: 95 },
-      { ...HINGE, shF: -45, shAbd: 6, elbow: 5 },
+      { ...HINGE, pitch: 75, hipF: 87, knee: 17, ankle: -3, shF: -15, shAbd: 6, elbow: 90 },
+      { ...HINGE, pitch: 75, hipF: 87, knee: 17, ankle: -3, shF: -15, shAbd: 6, elbow: 5 },
     ],
   },
   {
