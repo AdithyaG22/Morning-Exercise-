@@ -65,6 +65,24 @@ For each keyframe it reports:
 - **CLIP**: a hand or limb passes through another body part.
 - **TOUCH**: a contact target is out of reach.
 
+### Body data (stick figure in numbers)
+
+To see what a pose actually looks like without opening the 3D view, print its body data:
+
+```bash
+node tools/pose-data.mjs seated-twist 0            # one keyframe
+node tools/pose-data.mjs seated-twist              # every keyframe
+node tools/pose-data.mjs seated-twist 0 --mirror   # the other side
+node tools/pose-data.mjs seated-twist 0 --json     # machine-readable
+node tools/pose-data.mjs seated-twist 0 --svg out.svg   # front/side/top drawing (blue = left, red = right)
+```
+
+It prints joint positions in cm (named like MediaPipe: `left_wrist`, `right_knee`, `nose`…) both in the
+room and relative to the hips, the direction of each limb in words, what is on the floor, which body parts
+touch, notes such as "left foot is across the right leg", and small text stick figures from the front,
+side and top. Use it to answer "is the hand under the shoulder?" or "does the elbow touch the knee?"
+with numbers instead of screenshots. `--root <dir>` reads another copy of the code (e.g. a worktree).
+
 ## 4. Fixing a pose automatically
 
 The fitter adjusts the angles you name until the keyframe meets its rules, then prints the numbers:

@@ -60,7 +60,7 @@ app.js ──► stage.js ──► avatar.js ──► skin.js ──► vendor
    ├──► plan.js ──► exercises.js
    ├──► routines.js
    └──► audio.js
-tools/check-poses.mjs ──► avatar.js, skin.js, exercises.js, routines.js, tools/motion.js
+tools/check-poses.mjs, tools/pose-data.mjs ──► avatar.js, skin.js, exercises.js, routines.js, tools/motion.js
 ```
 
 | File | Role |
@@ -78,7 +78,7 @@ tools/check-poses.mjs ──► avatar.js, skin.js, exercises.js, routines.js, t
 | `sw.js` | Service worker: pre-caches `FILES`, network-first with cache fallback. |
 | `manifest.webmanifest` | PWA manifest (icons in `icons/`). |
 | `pose-debug.html` | Bare page that shows any keyframe for screenshots. |
-| `tools/` | `check-poses.mjs` (pose checker/fitter), `motion.js` (ROM table + `on` vocabulary), `build-preview.py` (single-file bundle). |
+| `tools/` | `check-poses.mjs` (pose checker/fitter), `pose-data.mjs` (stick-man body data), `motion.js` (ROM table + `on` vocabulary), `build-preview.py` (single-file bundle). |
 
 **Render loop** (`Stage.loop`, every animation frame): skip entirely while the canvas is hidden
 (`document.hidden` or no `offsetParent`) → advance `animTime` and the movement `phase`
@@ -204,7 +204,13 @@ Full reference: `docs/EXERCISES.md` and the header of `tools/motion.js`. Essenti
 node tools/check-poses.mjs                          # all keyframes; must end "N/N keyframes pass"
 node tools/check-poses.mjs squats                   # one exercise, with heights above the floor
 node tools/check-poses.mjs --fit pushups 0 pitch+shF ankle   # adjust listed angles to satisfy rules
+node tools/pose-data.mjs seated-twist 0 [--mirror] [--json] [--svg f.svg]  # stick-man body data
 ```
+**Body data first, screenshots last.** `tools/pose-data.mjs` prints joint keypoints in cm (MediaPipe-style
+names, world and pelvis-local), limb directions, floor contacts, touching body parts (< 8 cm), notes
+(crossed legs, hands across midline…) and ASCII front/side/top stick figures. Diagnose and verify pose
+changes with it; take one WebGL screenshot only as the final visual check.
+
 Checks: ROM, ON, BALANCE (standing on feet only), CLIP (limb inside another body part), TOUCH.
 It also fails if a routine names an unknown exercise id. It checks frames unmirrored. Angles wrap at
 360°, and shoulder extension past −60° is allowed while the arm is out to the side (abduction ≥ 60°).

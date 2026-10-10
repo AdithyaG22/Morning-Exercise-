@@ -64,6 +64,7 @@ vendor/three.module.min.js   Three.js r160 (MIT)
 
 tools/check-poses.mjs Checks every pose with numbers (joint ranges, floor contact, balance,
                       limbs passing through the body) and fits poses that fail
+tools/pose-data.mjs   Prints any pose as body data: joint positions, contacts, stick figures
 tools/motion.js       Joint-angle conventions and normal ranges of motion
 tools/build-preview.py  Bundles the app into one HTML page for previews
 pose-debug.html       Shows any exercise keyframe in 3D
