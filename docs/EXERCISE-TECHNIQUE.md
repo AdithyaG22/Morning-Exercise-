@@ -1030,3 +1030,326 @@ An alternating backstroke/freestyle version, with one arm half a cycle behind th
 
 ---
 
+
+---
+
+## Morning Move: technique research, bodyweight strength, cardio & core batch
+
+**Web access:** WebSearch worked; pages were not opened in full. Each note is based on the search
+engine's excerpts of the cited pages. Every URL below was returned by search. Details not backed by
+an excerpt are marked "(own knowledge)". Pose numbers are the app's joint angles (see EXERCISES.md).
+
+---
+
+### Reverse Lunges (`reverse-lunges`)
+**How to do it**
+1. Stand tall, feet hip-width apart, hands on hips.
+2. Take a big step back with one foot and land on the ball of that foot.
+3. Lower the back knee toward the floor (stop a few cm above it), chest lifted; front shin about vertical.
+4. Push through the front foot to return to standing. Alternate legs.
+
+**Key positions:** front leg hipF ≈ 90, knee ≈ 90, shin vertical; back thigh about vertical
+(hipF ≈ 0), knee ≈ 90, on the toes (ankle ≈ −35); trunk upright or slightly forward (pitch ≈ 8).
+
+**Sources:** https://acefitness.org/resources/everyone/exercise-library/319/reverse-lunge ;
+https://catalystathletics.com/exercise/735/Reverse-Lunge/ ;
+https://www.masterclass.com/articles/reverse-lunge-guide
+
+**App check:** New. Bottom frame: front hipF 90 / knee 88, back hipF 1.8 / knee 90 / ankle −33,
+pitch 8. Level 1 because stepping back is easier on the knee than a forward lunge (own knowledge);
+the tip offers a chair for balance.
+
+---
+
+### Side Lunges (`side-lunges`)
+**How to do it**
+1. Stand with feet together, hands clasped in front of the chest.
+2. Take a wide step to one side. Sit the hips back over that foot, bending that knee; the other leg
+   stays straight.
+3. Both heels stay flat on the floor. The bent knee tracks over the foot (shorten the step if it caves in).
+4. Push off the bent leg back to the start and switch sides.
+
+**Key positions:** bent leg hipF ≈ 80, knee ≈ 85, shin over foot; straight leg abducted ≈ 40°;
+trunk leans forward ≈ 30° with a flat back; both feet flat.
+
+**Sources:** https://acefitness.org/exerciselibrary/50 ;
+https://www.acefitness.org/about-ace/press-room/in-the-news/8340/how-to-do-a-lateral-lunge-to-work-your-inner-thighs-and-glutes-livestrong/
+
+**App check:** New. Bent leg hipF 80 / knee 85 / hipAbd 20, straight leg hipAbd 41, pitch 30,
+both feet on the floor (checker BALANCE passes). Shown from the three-quarter view.
+
+---
+
+### Sumo Squats (`sumo-squats`)
+**How to do it**
+1. Stand with feet wider than shoulders, toes turned out about 30–45°.
+2. Keep the chest up and lower the hips straight down, knees pushing out over the toes.
+3. Go as low as you can with heels down and a neutral back.
+4. Push through the whole foot to stand and squeeze the glutes at the top.
+
+**Key positions:** wide stance (hipAbd ≈ 25 standing, ≈ 40 at the bottom); thighs near parallel
+(hipF ≈ 83, knee ≈ 95); shins near vertical; trunk more upright than a normal squat.
+
+**Sources:** https://healthline.com/health/fitness-exercise/sumo-squat-exercises ;
+https://www.strengthlog.com/sumo-squat ; https://fitbod.me/exercises/sumo-squat
+
+**App check:** New. Top: hipAbd 25, hipRot 35 (toes out). Bottom: hipAbd 40, hipRot 0, hipF 83,
+knee 95, pitch 24. Note: in this rig, external rotation of a flexed hip swings the feet inward, so the
+bottom frame uses abduction (not rotation) to keep knees over toes.
+
+---
+
+### Step Jacks (`step-jacks`)
+**How to do it**
+1. Stand tall, feet together, arms at your sides.
+2. Step one foot out to the side and sweep both arms overhead, shifting your weight onto it.
+3. Step back in and lower the arms with control.
+4. Repeat to the other side. Core braced, do not arch the lower back as the arms go up.
+
+**Key positions:** one leg out ≈ 25° abduction, both feet on the floor; arms overhead
+(shAbd ≈ 165); no flight phase.
+
+**Sources:** https://www.puregym.com/exercises/cardio/jumping-jack/step-jacks/ ;
+https://trainwell.net/exercises/step-jack ; https://motra.com/exercises/stepJacks
+
+**App check:** New, Level 1 low-impact cardio. Arms 165°, stepping leg hipAbd 25, small weight
+shift (roll 10°).
+
+---
+
+### Skaters (`skaters`)
+**How to do it**
+1. Stand on one leg with a slight squat.
+2. Hop (or step) sideways onto the other foot, landing softly with the knee bent.
+3. Sweep the trailing leg behind the landing leg without putting it down, and swing the arms across the body.
+4. Pause briefly to control the landing, then hop back the other way.
+
+**Key positions:** landing leg hipF ≈ 60, knee ≈ 55; trunk forward ≈ 30°; trailing leg behind and
+across (hipAbd ≈ −15, knee ≈ 50); trunk turned toward the landing leg.
+
+**Sources:** https://www.builtlean.com/speed-skaters-exercise/ ;
+https://us.physitrack.com/home-exercise-video/skate-jumps ;
+https://prod.emoryhealthcare.org/centers-programs/acl-program/return-to-play/skaters-hold
+
+**App check:** New, Level 2. Landing frames on one foot (BALANCE passes), airborne frames
+`lift: 0.1`. Low-impact option (step instead of hop) is in the tip.
+
+---
+
+### Inchworm (`inchworm`)
+**How to do it**
+1. Stand tall. Hinge forward at the hips and put your hands on the floor (bend the knees as needed).
+2. Walk the hands forward until you are in a high plank, body in one line.
+3. Walk the hands back toward the feet.
+4. Roll up to standing. (ACE adds a push-up at the plank; optional.)
+
+**Key positions:** fold with hands on the floor; half-way "walked out" inverted V; high plank
+(arms vertical, shF = pitch).
+
+**Sources:** https://www.acefitness.org/exerciselibrary/254/inchworms ;
+https://theprehabguys.com/vimeo-video/inch-worm-walking/
+
+**App check:** New, Level 2 (ACE rates the push-up version advanced, so the app omits the push-up).
+Six frames: stand → fold (knees 34°, hands down) → inverted V → plank (held longer) → inverted V → fold.
+The hands do not visibly "walk"; the model blends between positions.
+
+---
+
+### Plank Shoulder Taps (`plank-shoulder-taps`)
+**How to do it**
+1. High plank, hands under shoulders, feet wider than hip-width for stability.
+2. Lift one hand and tap the opposite shoulder.
+3. Put it down and repeat with the other hand.
+4. Keep the hips square and still (anti-rotation); squeeze glutes, brace the core, move slowly.
+
+**Key positions:** HIGH_PLANK with feet apart (hipAbd 10); tapping hand at the opposite shoulder.
+
+**Sources:** https://redefiningstrength.com/plank-with-shoulder-taps/ ;
+https://www.muscleandstrength.com/exercises/shoulder-taps ;
+https://www.bustle.com/wellness/plank-shoulder-tap-benefits
+
+**App check:** New, Level 2. Touch rule: tapping hand within 10 cm of the opposite shoulder marker.
+Tip gives the knees-down option.
+
+---
+
+### Reverse Crunches (`reverse-crunches`)
+**How to do it**
+1. Lie on your back, arms by your sides, knees bent 90° and lifted over the hips.
+2. Exhale and use the abs to curl the pelvis up off the floor toward the ribs.
+3. Keep the knee angle the same; no kicking or swinging.
+4. Lower slowly back to the start.
+
+**Key positions:** start hipF 90, knee 90; top: pelvis rolled up (pitch −110, spine flexed 20,
+hipF 110); upper back, arms and head stay on the floor.
+
+**Sources:** https://acefitness.org/exerciselibrary/76 ;
+https://theprehabguys.com/vimeo-video/reverse-crunch/ ;
+https://catalystathletics.com/exercise/320/Reverse-Crunch/ ;
+https://www.healthline.com/health/reverse-crunches
+
+**App check:** New, Level 1 (ACE lists it as intermediate; it is used here as a gentle core move,
+small range). Both frames keep the back and arms on the floor.
+
+---
+
+### Heel Touches (`heel-touches`)
+**How to do it**
+1. Lie on your back, knees bent, feet flat and a little apart.
+2. Lift the head and shoulders slightly; arms long by your sides.
+3. Bend sideways to reach one hand toward the same-side heel, then the other.
+4. Lower back stays on the floor; slow and controlled.
+
+**Key positions:** BACK_KNEES with feet wider; spineF ≈ 27 (shoulders up), spineSide ±20; reaching
+hand near the heel.
+
+**Sources:** https://barbend.com/heel-touches ;
+https://www.muscleandstrength.com/exercises/lying-heel-touches.html ;
+https://fitnessvolt.com/alternate-heel-touchers-guide/
+
+**App check:** New, Level 1. Touch rule hand → same heel ≤ 15 cm. The fitter left the heels about
+5 cm up (on the balls of the feet); feet-flat would be slightly more accurate.
+
+---
+
+### Hollow Body Hold (`hollow-hold`)
+**How to do it**
+1. Lie on your back and press the lower back into the floor.
+2. Lift the shoulders off the floor and reach the arms past the ears.
+3. Lift straight legs a little off the floor, toes pointed.
+4. Hold while breathing; if the back arches, bend the knees or bring the arms forward.
+
+**Key positions:** lower back on the floor; spineF ≈ 22; shF ≈ 165; hipF ≈ 30, knees straight.
+
+**Sources:** https://www.hingehealth.com/gb/en/resources/articles/hollow-body-hold/ ;
+https://experiencelife.lifetime.life/article/break-it-down-the-hollow-body-hold/feed/ ;
+https://www.caliverse.app/exercises/hollow-body-hold-32
+
+**App check:** New, Level 3, single-frame hold; only the seat/lower back touch the floor.
+
+---
+
+### Donkey Kicks (`donkey-kicks`)
+**How to do it**
+1. On all fours, hands under shoulders, knees under hips, back flat.
+2. Keep one knee bent at 90° and press that foot up toward the ceiling, squeezing the glute.
+3. Small, controlled lift: stop before the lower back arches or the hips twist.
+4. Lower without touching the knee down; alternate (or do all reps on one side).
+
+**Key positions:** TABLETOP; working hip extended to about thigh-level with the body (hipF ≈ −10),
+knee 90°, sole facing the ceiling.
+
+**Sources:** https://www.thegymgroup.com/exercises/legs-and-glutes-exercises/how-to-do-donkey-kicks/ ;
+https://www.strengthlog.com/donkey-kicks/ ; https://www.coachweb.com/glute-exercises/8105/donkey-kicks
+
+**App check:** New, Level 1, alternating legs.
+
+---
+
+### Fire Hydrants (`fire-hydrants`)
+**How to do it**
+1. On all fours, wrists under shoulders, hips over knees, back flat.
+2. Keep the knee bent at 90° and lift the leg out to the side, up toward hip height.
+3. Do not rotate the trunk, lean away, or arch the back.
+4. Lower with control and alternate.
+
+**Key positions:** TABLETOP; working leg lifted out to the side; knee stays 90°.
+
+**Sources:** https://library.theprehabguys.com/vimeo-video/quadruped-fire-hydrant/ ;
+https://www.physitrack.com/exercise-library/how-to-perform-the-fire-hydrant-exercise ;
+https://womenshealthsa.co.za/fire-hydrant-exercise/
+
+**App check:** New, Level 1, shown from behind. Limitation: the rig applies hip abduction before
+flexion, so a thigh that reaches horizontal from all fours would need ≈ 90° abduction, beyond the
+50° range limit. The app uses 50°, so the knee rises to about 40° below hip height (a realistic
+"moderate" lift); the tip says "up to hip height".
+
+---
+
+### Clamshells (`clamshells`)
+**How to do it**
+1. Lie on one side, head on the lower arm, hips and knees bent (about 45° at the hips, 90° at the knees), knees stacked.
+2. Keep the feet together and the hips stacked (do not roll back).
+3. Lift the top knee toward the ceiling like a clam opening.
+4. Lower slowly. Do all reps, then switch sides.
+
+**Key positions:** roll ≈ 90 (side-lying); hipF ≈ 50, knee 90; top hip opens ≈ 35° abduction plus
+30° external rotation; feet stay together.
+
+**Sources:** https://www.goodrx.com/well-being/movement-exercise/clamshell-exercise ;
+https://www.msdmanuals.com/home/multimedia/video/side-lying-hip-external-rotation-clamshell-exercise ;
+https://www.physitrack.com/exercise-library/how-to-perform-the-clamshell-exercise
+
+**App check:** New, Level 1, `sides: true` (switches sides halfway). Bottom arm straight overhead
+with elbow bent under the head. Sources disagree on knee angle (45° vs 90°); the app uses 90° knees.
+
+---
+
+### Good Mornings (`good-mornings`)
+**How to do it**
+1. Stand with feet hip-width, hands lightly behind the head, knees soft.
+2. Push the hips back and tip the chest forward with a flat back.
+3. Stop at about horizontal, or sooner when you feel the hamstrings.
+4. Drive the hips forward to stand tall. Neck neutral.
+
+**Key positions:** pitch ≈ 70 trunk, hipF ≈ 82, knee ≈ 15; spine neutral (spineF 0).
+
+**Sources:** https://www.coachweb.com/exercises/back-exercises/184/good-morning ;
+https://www.masterclass.com/articles/good-morning-exercise-guide ;
+https://www.motra.com/exercises/bodyweightGoodMorning
+
+**App check:** New, Level 1. Balance check passes with the hips shifted back.
+
+---
+
+### Standing Side Crunch (`standing-oblique-crunch`)
+**How to do it**
+1. Stand with feet about shoulder-width apart, hands behind the head (fingers not locked), elbows wide.
+2. Lift one knee up and out to the side.
+3. Bend sideways to bring the same-side elbow down to meet it; do not pull on the neck.
+4. Return to standing and alternate.
+
+**Key positions:** standing on one foot; lifted leg hipF ≈ 60, hipAbd ≈ 40, knee 90; spineSide ±25.
+
+**Sources:** https://fitbod.me/exercises/standing-oblique-crunch ;
+https://www.tomsguide.com/features/i-did-the-standing-bicycle-crunch-for-a-week-heres-what-happened-to-my-core ;
+https://www.sweat.com/exercises/standing-x-crunch
+
+**App check:** New, Level 1. Differs from `knee-elbow` (cross-body) by being a same-side crunch.
+
+---
+
+### Plank to Down Dog (`plank-to-dog`)
+**How to do it**
+1. Start in a high plank, hands under shoulders, body straight.
+2. Press the floor away through the arms and shoulder blades and lift the hips up and back into an
+   inverted V.
+3. Heels reach toward the floor; bend the knees if the hamstrings are tight.
+4. Shift forward and lower back to the plank with control.
+
+**Key positions:** HIGH_PLANK ↔ the app's `downward-dog` pose (pitch 132, shF 174, hipF 89).
+
+**Sources:** https://julielohre.com/plank-to-downward-dog/ ;
+https://motra.com/exercises/plankToDownwardFacingDog ;
+https://theprehabguys.com/vimeo-video/downward-dog-to-upward-dog/
+
+**App check:** New, Level 2, reuses existing plank and dog angles.
+
+---
+
+### Shadow Boxing (`boxing-punches`)
+**How to do it**
+1. Feet about hip-width, knees soft, fists by the chin, elbows in, chin slightly tucked.
+2. Punch one arm straight out at shoulder height, turning the torso with it; exhale.
+3. Pull it straight back to the guard.
+4. Punch with the other arm. Control over speed; no jumping, so it is low impact.
+
+**Key positions:** guard shF ≈ 35, elbow ≈ 140; punch shF ≈ 88, elbow ≈ 5, trunk turned ≈ 20°;
+knees ≈ 15.
+
+**Sources:** https://experiencelife.lifetime.life/article/shadowboxing-cardio-workout/ ;
+https://www.getphysical.com/blog/shadowboxing-for-cardiovascular-endurance ;
+https://www.onepeloton.com/blog/what-is-shadowboxing
+
+**App check:** New, Level 1 low-impact cardio. Feet are square rather than in a staggered boxing
+stance (simpler for the planner's "standing" moves; own choice).
