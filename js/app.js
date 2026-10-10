@@ -29,6 +29,7 @@ sound.beeps = settings.beeps;
 // ---------- 3D stage ----------
 const canvas = $('stage');
 const stage = new Stage(canvas);
+window.__stage = stage;
 // Build the smooth skin just after the first paint so the app appears instantly.
 setTimeout(() => stage.setBody(profile), 60);
 function applyTheme() {
@@ -340,7 +341,6 @@ function enterSegment() {
     if (seg.i === Math.floor(total / 2) && total > 6) setTimeout(() => say('Halfway there. Keep going!'), 500);
   } else {
     ph.textContent = phaseLabel(seg);
-    stage.speed = 0.6;
     stage.play(ex, { highlight: 'next' });
     if (seg.breather) {
       $('p-nextup').textContent = `Next: Circuit ${item.circuit + 1} · ${item.circuitName}`;

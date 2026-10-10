@@ -104,6 +104,20 @@ export class Stage {
     requestAnimationFrame(this.loop);
   }
 
+  /** Lower the drawing resolution on slow devices so the animation stays smooth. */
+  adaptQuality(dt) {
+    const q = this.quality || (this.quality = { t: 0, frames: 0, ratio: this.renderer.getPixelRatio() });
+    q.t += dt; q.frames++;
+    if (q.t < 2) return;
+    const fps = q.frames / q.t;
+    q.t = 0; q.frames = 0;
+    if (fps < 40 && q.ratio > 1) {
+      q.ratio = Math.max(1, q.ratio - 0.25);
+      this.renderer.setPixelRatio(q.ratio);
+      this.resize();
+    }
+  }
+
   bindDrag() {
     let down = null;
     const c = this.canvas;
@@ -144,10 +158,18 @@ export class Stage {
     this.avatar.setSkin(dark ? 0xe8ebef : 0xd2d9e2);
   }
 
-  setBody(profile) { this.avatar.setBody(profile); }
+  setBody(profile) {
+    this.avatar.setBody(profile);
+    this.computeFraming();
+  }
 
   /** Show an exercise. mirrored = do the other side. */
   play(ex, { mirrored = false, highlight = 'active' } = {}) {
+    if (ex && ex === this.exercise && mirrored === this.mirrored) {
+      // Same exercise continues (e.g. get-ready → go): keep moving, only change the highlight.
+      this.avatar.setHighlight(ex.muscles, highlight);
+      return;
+    }
     this.blendFrom = { ...this.pose };
     this.blendStart = this.animTime;
     this.exercise = ex;
@@ -162,6 +184,27 @@ export class Stage {
     this.avatar.setHighlight(ex ? ex.muscles : [], highlight);
     this.avatar.setProps(ex?.props);
     this.mat.visible = !!ex?.mat;
+    this.phase = 0;
+    this.computeFraming();
+  }
+
+  /** One camera framing per exercise that fits the whole movement, so the camera stays still
+   *  while the body moves (instead of chasing every arm and leg). */
+  computeFraming() {
+    const box = this.frameBox || (this.frameBox = new THREE.Box3());
+    box.makeEmpty();
+    const n = this.frames.length;
+    for (let i = 0; i < n; i++) {
+      for (const k of n > 1 ? [0, 0.5] : [0]) {
+        this.avatar.applyPose(k ? lerpPose(this.frames[i], this.frames[(i + 1) % n], k) : this.frames[i]);
+        box.union(this.avatar.bounds);
+      }
+    }
+    const c = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    this.frameTarget = new THREE.Vector3(c.x, Math.max(c.y, 0.35), c.z);
+    this.frameSize = size;
+    this.avatar.applyPose(this.pose);
   }
 
   /** Jump straight to one keyframe (used by the pose debugger). */
@@ -169,6 +212,7 @@ export class Stage {
     this.play(ex, { mirrored });
     this.frames = [this.frames[frame]];
     this.weights = [1];
+    this.computeFraming();
     this.blendStart = -10;
     this.snapCam = true;
     this.camYaw = this.viewYaw;
@@ -186,9 +230,8 @@ export class Stage {
       p.neckF += b * 1;
       return p;
     }
-    const cycle = (this.exercise?.cycle || 2) / this.speed;
     const total = this.weights.reduce((a, b) => a + b, 0);
-    let u = ((t % cycle) / cycle) * total;
+    let u = (this.phase % 1) * total;
     let i = 0;
     while (u > this.weights[i] && i < frames.length - 1) { u -= this.weights[i]; i++; }
     const a = frames[i], b = frames[(i + 1) % frames.length];
@@ -201,8 +244,14 @@ export class Stage {
     if (!this.running) return;
     requestAnimationFrame(this.loop);
     const dt = Math.min(0.05, this.clock.getDelta());
-    if (!this.paused) this.animTime += dt;
+    // Nothing to draw while the 3D view is hidden (another tab is open, or the app is in the background)
+    if (document.hidden || !this.canvas.offsetParent) return;
+    if (!this.paused) {
+      this.animTime += dt;
+      this.phase = (this.phase || 0) + (dt * this.speed) / (this.exercise?.cycle || 2);
+    }
     const t = this.animTime;
+    this.adaptQuality(dt);
 
     const target = this.sample(t - this.exStart);
     const bt = Math.min(1, (t - this.blendStart) / 0.7);
@@ -210,21 +259,20 @@ export class Stage {
     this.avatar.applyPose(this.pose);
     this.avatar.update(performance.now() / 1000);
 
-    // Auto-frame the body
-    const box = this.avatar.bounds;
-    const center = box.getCenter(this._center || (this._center = new THREE.Vector3()));
-    const size = box.getSize(this._size || (this._size = new THREE.Vector3()));
-    const k = this.snapCam ? 1 : 1 - Math.exp(-dt * 3);
+    // Camera: aim at the framing that fits the whole exercise; move gently only when it changes
+    if (!this.frameTarget) this.computeFraming();
+    const size = this.frameSize;
+    const k = this.snapCam ? 1 : 1 - Math.exp(-dt * 2);
     this.snapCam = false;
-    const wantTarget = (this._want || (this._want = new THREE.Vector3())).set(center.x, Math.max(center.y, 0.35), center.z);
-    this.camTarget.lerp(wantTarget, k);
+    this.camTarget.lerp(this.frameTarget, k);
     const vFov = THREE.MathUtils.degToRad(this.camera.fov);
-    const fitH = (Math.max(size.y, 0.9) * 1.25) / (2 * Math.tan(vFov / 2));
-    const horiz = Math.max(size.x, size.z, 0.6) * 1.2;
+    const fitH = (Math.max(size.y, 0.9) * 1.2) / (2 * Math.tan(vFov / 2));
+    const horiz = Math.max(size.x, size.z, 0.6) * 1.15;
     const fitW = horiz / (2 * Math.tan(vFov / 2) * this.camera.aspect);
     const wantDist = Math.max(fitH, fitW, 2.2);
     this.camDist += (wantDist - this.camDist) * k;
     this.camYaw += (this.viewYaw - this.camYaw) * k;
+    const center = this.frameTarget;
 
     const yaw = THREE.MathUtils.degToRad(this.camYaw + this.userYaw);
     const pitch = THREE.MathUtils.degToRad(8 + this.userPitch);

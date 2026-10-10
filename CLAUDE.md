@@ -71,9 +71,13 @@ tools/check-poses.mjs ──► avatar.js, skin.js, exercises.js, routines.js, t
 | `pose-debug.html` | Bare page that shows any keyframe for screenshots. |
 | `tools/` | `check-poses.mjs` (pose checker/fitter), `motion.js` (ROM table + `on` vocabulary), `build-preview.py` (single-file bundle). |
 
-**Render loop** (`Stage.loop`, every animation frame): advance `animTime` (unless paused) →
-`sample(t)` the current exercise → blend from the previous pose over 0.7 s → `avatar.applyPose`
-→ `avatar.update(time)` (muscle colours/pulse) → auto-frame camera → render.
+**Render loop** (`Stage.loop`, every animation frame): skip entirely while the canvas is hidden
+(`document.hidden` or no `offsetParent`) → advance `animTime` and the movement `phase`
+(`dt · speed / cycle`, always speed 1, so the motion never jumps) → `sample()` → blend from the
+previous pose over 0.7 s → `avatar.applyPose` → `avatar.update(time)` → camera → render.
+`adaptQuality` lowers the pixel ratio (down to 1) when the frame rate stays under 40 fps.
+`play()` with the same exercise and side only changes the highlight (get-ready → GO keeps moving).
+`window.__stage` (set in app.js) exposes the stage for browser tests.
 
 **Pose pipeline:**
 1. An exercise's `frames` are shorthand angle objects. `Stage.play(ex, {mirrored, highlight})`
@@ -88,7 +92,10 @@ tools/check-poses.mjs ──► avatar.js, skin.js, exercises.js, routines.js, t
    shoulders and hips use Euler order `XZY`).
 4. **Grounding:** the lowest of all named markers is put on the floor (`object.position.y`), plus
    `lift × scale` for jumps. You never set height by hand. `avatar.bounds` is the marker box.
-5. **Camera:** targets the bounds centre and picks a distance that fits height and width; yaw comes
+5. **Camera:** `computeFraming()` runs once per `play()` (and after `setBody`): it poses the avatar
+   at every keyframe and half-way between, takes the union of the marker bounds, and the camera
+   eases (≈2/s) to a fixed target and distance that fit the whole movement, so it stays still while
+   the body moves. Yaw comes
    from `view` (`front` 0°, `threeq` 30°, `side` 75°, `sidefront` 55°, `back` 180°; negated when
    mirrored) plus the user's drag. Double-click resets.
 
@@ -122,7 +129,7 @@ stable for the day; "↻ Shuffle" changes the seed. Focus modes: `full`, `cardio
 Keep these keys and shapes backward-compatible; `store.get` merges saved values over defaults.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v12`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v13`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system
