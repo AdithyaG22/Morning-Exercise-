@@ -285,6 +285,10 @@ screenshots go stale after UI changes, regenerate them at 360×640 @3x (1080×19
 - Linear-blend skinning pinches/thins at deep bends (knees, elbows, hips in deep squats).
 - The one-foot balance check ignores foot roll; the checker only tests unmirrored frames.
 - Voice coach is English only (`say` uses `en-US`).
+- **Open task: exercise accuracy audit.** The owner reports many exercises look wrong. Known: Seated
+  Spinal Twist needs the bent leg's foot crossed outside the straight leg's knee and the opposite elbow
+  pressed against that knee (add `touch` goals). Audit every exercise with `tools/pose-data.mjs`
+  against `docs/EXERCISE-TECHNIQUE.md`, fix, keep the checker at 100 %, bump `sw.js`, rebuild the preview.
 - Ideas: retarget motion capture (e.g. CMU BVH) onto the skeleton; extract poses from videos with
   MediaPipe; morning reminders/notifications; more voice-coach languages; more routines.
 
