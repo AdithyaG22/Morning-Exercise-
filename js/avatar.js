@@ -464,7 +464,7 @@ export class Avatar {
       for (const m of this.markers) {
         if (!PLANTED.test(m.name)) continue;
         m.getWorldPosition(v);
-        if (v.y < 0.03 * k && !(out.get(m.name)?.y < v.y)) out.set(m.name, v.clone());
+        if (v.y < 0.03 * k) out.set(m, v.clone());   // each marker compared with itself
       }
       return out;
     };
@@ -476,15 +476,17 @@ export class Avatar {
       const cur = floorPoints(p);
       // Each point that stays down suggests a shift; keep the one most points agree with.
       const moves = [];
-      for (const [name, a] of prev) {
-        const b = cur.get(name);
+      for (const [m, a] of prev) {
+        const b = cur.get(m);
         if (b && Math.hypot(a.x - b.x, a.z - b.z) < 0.35 * k) moves.push([a.x - b.x, a.z - b.z]);
       }
       if (moves.length) {
         let best = [];
         for (const [mx, mz] of moves) {
           const agree = moves.filter(([x, z]) => Math.hypot(x - mx, z - mz) < 0.04 * k);
-          if (agree.length > best.length) best = agree;
+          // Most points agreeing wins; on a tie, the smaller shift (closer to the authored pose)
+          const size = (g) => Math.hypot(g.reduce((s, m) => s + m[0], 0), g.reduce((s, m) => s + m[1], 0)) / g.length;
+          if (agree.length > best.length || (agree.length === best.length && size(agree) < size(best))) best = agree;
         }
         const dx = best.reduce((s, m) => s + m[0], 0) / best.length;
         const dz = best.reduce((s, m) => s + m[1], 0) / best.length;

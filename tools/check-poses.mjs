@@ -199,33 +199,36 @@ function checkFrame(ex, frame, fi, mirrored) {
 }
 
 // Planted hands, feet and knees must not slide along the floor between keyframes.
-// A point counts as planted when it is on the floor at both keyframes and half-way between.
+// A point counts as planted when it is on the floor at both keyframes and stays low (under 8 cm)
+// half-way between; a real step lifts the foot higher than that.
 const PLANTED = /^(hand|heel|toes|knee|forearm|elbow)_/;
 function slideCheck(ex) {
   const n = ex.frames.length;
   if (n < 2) return [];
   const poses = av.plantSupports(ex.frames.map((f) => expandPose(f)));
-  const floorPoints = (pose) => {
+  const floorPoints = (pose, h = FLOOR) => {
     av.applyPose(pose);
     const out = new Map();
-    for (const [name, pts] of markersByName()) {
-      if (!PLANTED.test(name)) continue;
-      const lo = pts.reduce((a, b) => (b.p.y < a.p.y ? b : a));
-      if (lo.p.y < FLOOR * k) out.set(name, lo.p);
-    }
+    av.markers.forEach((m, idx) => {   // each marker compared with itself (a hand has two)
+      if (!PLANTED.test(m.name)) return;
+      const p = m.getWorldPosition(new THREE.Vector3());
+      if (p.y < h * k) out.set(idx, p);
+    });
     return out;
   };
   const out = [];
   for (let i = 0; i < n; i++) {
     const j = (i + 1) % n;
     if (poses[i].lift > 0.01 || poses[j].lift > 0.01) continue;
-    const a = floorPoints(poses[i]), mid = floorPoints(lerpPose(poses[i], poses[j], 0.5)), b = floorPoints(poses[j]);
-    for (const [name, pa] of a) {
-      const pb = b.get(name);
-      if (!pb || !mid.has(name)) continue;
-      const d = Math.hypot(pa.x - pb.x, pa.z - pb.z) / k;
-      if (d > SLIDE) out.push(`SLIDE #${i}→#${j} ${name} slides ${Math.round(d * 100)} cm`);
+    const a = floorPoints(poses[i]), mid = floorPoints(lerpPose(poses[i], poses[j], 0.5), 0.08), b = floorPoints(poses[j]);
+    const worst = new Map();
+    for (const [idx, pa] of a) {
+      const pb = b.get(idx);
+      if (!pb || !mid.has(idx)) continue;
+      const d = Math.hypot(pa.x - pb.x, pa.z - pb.z) / k, name = av.markers[idx].name;
+      if (d > SLIDE && d > (worst.get(name) || 0)) worst.set(name, d);
     }
+    for (const [name, d] of worst) out.push(`SLIDE #${i}→#${j} ${name} slides ${Math.round(d * 100)} cm`);
   }
   return out;
 }
