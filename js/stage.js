@@ -160,6 +160,7 @@ export class Stage {
 
   setBody(profile) {
     this.avatar.setBody(profile);
+    if (this.rawFrames) this.frames = this.avatar.plantSupports(this.rawFrames);
     this.computeFraming();
   }
 
@@ -175,10 +176,11 @@ export class Stage {
     this.exercise = ex;
     this.mirrored = mirrored;
     this.exStart = this.animTime;
-    this.frames = ex ? ex.frames.map((f) => {
+    this.rawFrames = ex ? ex.frames.map((f) => {
       const p = expandPose(f);
       return mirrored ? mirrorPose(p) : p;
     }) : [expandPose({})];
+    this.frames = this.avatar.plantSupports(this.rawFrames);
     this.weights = ex ? ex.frames.map((f) => f.d || 1) : [1];
     this.viewYaw = VIEW_YAW[ex?.view || 'threeq'] * (mirrored ? -1 : 1);
     this.avatar.setHighlight(ex ? ex.muscles : [], highlight);

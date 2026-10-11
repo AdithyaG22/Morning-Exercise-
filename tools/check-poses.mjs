@@ -12,14 +12,17 @@
 //   BALANCE  when standing, the centre of mass is over the feet
 //   CLIP     a hand, foot or limb does not pass through another body part
 //   TOUCH    the targets in `touch` (e.g. hand holds foot) are within reach
+//   SLIDE    a hand, foot or knee that stays on the floor from one keyframe to the next
+//            (and half-way between) does not slide along it
 import * as THREE from '../vendor/three.module.min.js';
-import { Avatar, expandPose, mirrorPose } from '../js/avatar.js';
+import { Avatar, expandPose, mirrorPose, lerpPose } from '../js/avatar.js';
 import { makePrim } from '../js/skin.js';
 import { EXERCISES } from '../js/exercises.js';
 import { ROUTINES } from '../js/routines.js';
 import { ROM, SUPPORT_TERMS } from './motion.js';
 
 const FLOOR = 0.03;      // a marker within 3 cm of the floor counts as touching
+const SLIDE = 0.06;      // a planted support point may move this far between keyframes (rolling on toes etc.)
 const CLIP = -0.02;      // 2 cm inside another body part counts as passing through
 
 const only = process.argv[2];
@@ -195,6 +198,38 @@ function checkFrame(ex, frame, fi, mirrored) {
   return problems;
 }
 
+// Planted hands, feet and knees must not slide along the floor between keyframes.
+// A point counts as planted when it is on the floor at both keyframes and half-way between.
+const PLANTED = /^(hand|heel|toes|knee|forearm|elbow)_/;
+function slideCheck(ex) {
+  const n = ex.frames.length;
+  if (n < 2) return [];
+  const poses = av.plantSupports(ex.frames.map((f) => expandPose(f)));
+  const floorPoints = (pose) => {
+    av.applyPose(pose);
+    const out = new Map();
+    for (const [name, pts] of markersByName()) {
+      if (!PLANTED.test(name)) continue;
+      const lo = pts.reduce((a, b) => (b.p.y < a.p.y ? b : a));
+      if (lo.p.y < FLOOR * k) out.set(name, lo.p);
+    }
+    return out;
+  };
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    if (poses[i].lift > 0.01 || poses[j].lift > 0.01) continue;
+    const a = floorPoints(poses[i]), mid = floorPoints(lerpPose(poses[i], poses[j], 0.5)), b = floorPoints(poses[j]);
+    for (const [name, pa] of a) {
+      const pb = b.get(name);
+      if (!pb || !mid.has(name)) continue;
+      const d = Math.hypot(pa.x - pb.x, pa.z - pb.z) / k;
+      if (d > SLIDE) out.push(`SLIDE #${i}→#${j} ${name} slides ${Math.round(d * 100)} cm`);
+    }
+  }
+  return out;
+}
+
 // ---------- Fitter ----------
 /** How far a frame is from meeting its rules (0 = perfect). Units: metres² plus scaled degrees². */
 function cost(ex, frame) {
@@ -294,6 +329,8 @@ for (const ex of EXERCISES) {
     const probs = checkFrame(ex, f, i, false);
     if (probs.length) { bad++; lines.push(`  #${i}: ${probs.join(' | ')}`); }
   });
+  const slides = slideCheck(ex);
+  if (slides.length) { bad++; total++; lines.push('  ' + slides.join(' | ')); }
   if (lines.length || only) console.log(`${lines.length ? '✗' : '✓'} ${ex.id}\n${lines.join('\n')}`);
 }
 // Every exercise a routine names must exist

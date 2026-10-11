@@ -62,6 +62,8 @@ export function lerpPose(a, b, t, out = {}) {
   return out;
 }
 
+const PLANTED = /^(hand|heel|toes|knee|forearm|elbow)_/;   // points that can carry weight on the floor
+
 const COLORS = {
   skin: 0xe8ebef,      // porcelain-white sculpture
   active: new THREE.Color(0xff4a26),
@@ -445,6 +447,54 @@ export class Avatar {
     this.object.position.y = dy;
     box.min.y += dy; box.max.y += dy;
     this.object.updateMatrixWorld(true);
+  }
+
+  /** Keep planted hands, feet and knees still between keyframes. The body hangs from the pelvis,
+   *  so bending (a squat, a push-up, rising on the toes) would otherwise slide them along the floor.
+   *  For each keyframe this shifts the pelvis (x/z) so the points that stay on the floor from the
+   *  previous keyframe stay where they were. Moves over 35 cm are steps or jumps and are left alone.
+   *  Returns new pose objects; the input is not changed. */
+  plantSupports(poses) {
+    const n = poses.length;
+    if (n < 2) return poses;
+    const k = this.scaleFactor, v = new THREE.Vector3();
+    const floorPoints = (pose) => {
+      this.applyPose(pose);
+      const out = new Map();
+      for (const m of this.markers) {
+        if (!PLANTED.test(m.name)) continue;
+        m.getWorldPosition(v);
+        if (v.y < 0.03 * k && !(out.get(m.name)?.y < v.y)) out.set(m.name, v.clone());
+      }
+      return out;
+    };
+    const out = [{ ...poses[0] }];
+    let prev = floorPoints(out[0]);
+    for (let i = 1; i < n; i++) {
+      const p = { ...poses[i] };
+      if (p.lift > 0.01 || poses[i - 1].lift > 0.01) { out.push(p); prev = floorPoints(p); continue; }
+      const cur = floorPoints(p);
+      // Each point that stays down suggests a shift; keep the one most points agree with.
+      const moves = [];
+      for (const [name, a] of prev) {
+        const b = cur.get(name);
+        if (b && Math.hypot(a.x - b.x, a.z - b.z) < 0.35 * k) moves.push([a.x - b.x, a.z - b.z]);
+      }
+      if (moves.length) {
+        let best = [];
+        for (const [mx, mz] of moves) {
+          const agree = moves.filter(([x, z]) => Math.hypot(x - mx, z - mz) < 0.04 * k);
+          if (agree.length > best.length) best = agree;
+        }
+        const dx = best.reduce((s, m) => s + m[0], 0) / best.length;
+        const dz = best.reduce((s, m) => s + m[1], 0) / best.length;
+        p.x += dx / k;
+        p.z += dz / k;
+        prev = floorPoints(p);
+      } else prev = cur;
+      out.push(p);
+    }
+    return out;
   }
 
   update(time) {
