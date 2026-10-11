@@ -808,23 +808,23 @@ export const EXERCISES = [
     muscles: ['shoulders', 'chest', 'triceps', 'obliques'],
     tips: 'Soft knees, fists by your chin. Punch one arm straight out and turn your body with it, pull it back fast, then punch with the other. Keep it light and quick.',
     frames: [
-      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF_L: 88, shAbd_L: -8, elbow_L: 5, shRot_L: -60, spineTwist: -20, shF_R: 35, shAbd_R: -20, elbow_R: 140, shRot_R: -20 },
-      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF: 35, shAbd: -20, elbow: 140, shRot: -20, d: 0.6 },
-      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF_R: 88, shAbd_R: -8, elbow_R: 5, shRot_R: -60, spineTwist: 20, shF_L: 35, shAbd_L: -20, elbow_L: 140, shRot_L: -20 },
-      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF: 35, shAbd: -20, elbow: 140, shRot: -20, d: 0.6 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF_L: 88, shAbd_L: -8, elbow_L: 5, shRot_L: -60, spineTwist: -20, shF_R: 45, shAbd_R: -20, elbow_R: 135, shRot_R: -20 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF: 45, shAbd: -20, elbow: 135, shRot: -20, d: 0.6 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF_R: 88, shAbd_R: -8, elbow_R: 5, shRot_R: -60, spineTwist: 20, shF_L: 45, shAbd_L: -20, elbow_L: 135, shRot_L: -20 },
+      { hipAbd: 8, knee: 15, hipF: 12, ankle: -5, shF: 45, shAbd: -20, elbow: 135, shRot: -20, d: 0.6 },
     ],
   },
   // ---------------- Added: yoga & stretching ----------------
   {
     id: 'sun-salutation-half', on: 'feet', name: 'Half Sun Salutation', cat: 'yoga', level: 1, met: 3, cycle: 16, view: 'side',
     muscles: ['hamstrings', 'shoulders', 'lowerBack', 'back', 'calves'],
-    tips: 'Breathe in, arms up. Breathe out, fold forward. Breathe in, lift halfway with a flat back. Breathe out, fold. Breathe in, rise up.',
+    tips: 'Breathe in, arms up. Breathe out, fold forward with soft knees and let your hands reach your shins. Breathe in, lift halfway with a flat back, hands just below your knees. Breathe out, fold. Breathe in, rise up.',
     frames: [
       { shAbd: 10, d: 0.7 },
       { shF: 172, shAbd: 10, elbow: 0, neckF: -10, spineF: -6 },
-      { pitch: 75, spineF: 35, hipF: 81, knee: 5, ankle: -5, shF: 105, shAbd: 5, elbow: 10, neckF: 10 },
-      { pitch: 82, spineF: -5, hipF: 102.4, knee: 8.6, ankle: 4.4, shF: 46.3, shAbd: 6, elbow: 0, neckF: -20, touch: [['hand_L', 'knee_L', 0.16]] },
-      { pitch: 75, spineF: 35, hipF: 81, knee: 5, ankle: -5, shF: 105, shAbd: 5, elbow: 10, neckF: 10 },
+      { pitch: 80.6, spineF: 45, hipF: 95, knee: 15, ankle: -7.6, shF: 92.6, shAbd: -6.2, elbow: 10, neckF: 10, touch: [['hand_L', 'shin_L', 0.07], ['hand_R', 'shin_R', 0.07]] },
+      { pitch: 82, spineF: -5, hipF: 102, knee: 12, ankle: 4, shF: 50, shAbd: -6, elbow: 0, neckF: -20, touch: [['hand_L', 'knee_L', 0.07], ['hand_R', 'knee_R', 0.07]] },
+      { pitch: 80.6, spineF: 45, hipF: 95, knee: 15, ankle: -7.6, shF: 92.6, shAbd: -6.2, elbow: 10, neckF: 10, touch: [['hand_L', 'shin_L', 0.07], ['hand_R', 'shin_R', 0.07]] },
       { shF: 172, shAbd: 10, elbow: 0, neckF: -10, spineF: -6 },
     ],
   },
@@ -835,36 +835,40 @@ export const EXERCISES = [
     frames: [{ pitch: -6.6, hipF_L: 90, knee_L: 95, ankle_L: -10, hipF_R: -20.6, knee_R: 84.3, ankle_R: 50, shF: 170, shAbd: 10, elbow: 0, neckF: -5 }],
   },
   {
-    id: 'thread-needle', on: 'knees hand_R forearm_L head', name: 'Thread the Needle', cat: 'yoga', level: 1, met: 2.2, view: 'side', mat: true, sides: true,
+    id: 'thread-needle', on: 'knees hand_R forearm_L head', touch: [['hand_R', 'head', 0.32]], name: 'Thread the Needle', cat: 'yoga', level: 1, met: 2.2, view: 'side', mat: true, sides: true,
     muscles: ['back', 'shoulders', 'obliques'],
-    tips: 'On hands and knees, slide one arm under your chest, palm up, and lower that shoulder and the side of your head toward the mat. Hips stay over knees.',
-    frames: [{ ...TABLETOP, pitch: 119.7, hipF: 119.7, spineTwist: -40, roll: -0.3, shF_R: 76.9, shF_L: 87.3, shAbd_L: -35.5, elbow_L: 0, wrist_L: 0, neckSide: 28.5, neckTurn: -9.6 }],
+    tips: 'On hands and knees, slide one arm under your chest and out past your other hand, palm up. Lower that shoulder and the side of your head to the mat. Keep the other hand planted a little forward, hips over knees.',
+    frames: [{ ...TABLETOP, pitch: 119.1, hipF: 119.1, spineTwist: -45, roll: 2.3, shF_R: 99.4, shAbd_R: -18, elbow_R: 68, wrist_R: 90, shF_L: 93.7, shAbd_L: -33, elbow_L: 0, wrist_L: 0, neckSide: 28.5, neckTurn: -9.6 }],
   },
   {
-    id: 'seated-twist', on: 'seat heels hand_L', touch: [['elbow_R', 'knee_L', 0.17]], name: 'Seated Spinal Twist', cat: 'yoga', level: 1, met: 2.2, view: 'sidefront', mat: true, sides: true,
+    id: 'seated-twist', on: 'seat heels foot_L hand_L', name: 'Seated Spinal Twist', cat: 'yoga', level: 1, met: 2.2, view: 'sidefront', mat: true, sides: true,
+    // Left foot flat on the floor just outside the right knee (left hip adducted), right elbow pressed
+    // against the outside of the left knee, left hand on the floor behind, chest and head turned left.
+    touch: [['elbow_R', 'knee_L', 0.06], ['heel_L', 'knee_R', 0.14]],
     muscles: ['obliques', 'lowerBack', 'back', 'glutes'],
-    tips: 'Sit tall, one leg straight. Cross the other foot over the knee, hug it with the opposite arm and turn to look behind you.',
-    frames: [{ pitch: -20, spineF: 12, hipF_R: 69.5, knee_R: 0, ankle_R: 0, hipF_L: 130, knee_L: 119, hipAbd_L: -12, ankle_L: 10, spineTwist: 40, neckTurn: 40, shF_R: 60, shAbd_R: -40, elbow_R: 100, shF_L: -36, shAbd_L: 10, elbow_L: 0, wrist_L: 80 }],
+    tips: 'Sit tall, one leg straight. Cross the other foot over it and set it flat outside your straight knee. Press the opposite elbow against the outside of the bent knee, put your other hand on the floor behind you and turn to look over your shoulder.',
+    frames: [{ pitch: -15, spineF: 5, spineTwist: 40, neckTurn: 40, hipF_R: 74, knee_R: 0, ankle_R: 0, hipF_L: 128, knee_L: 101, hipAbd_L: -13, hipRot_L: 29, ankle_L: 40, shF_R: 51.5, shAbd_R: -11.5, elbow_R: 72.5, shF_L: -38, shAbd_L: 10, elbow_L: 0, wrist_L: 80 }],
   },
   {
-    id: 'butterfly', on: 'seat feet', touch: [['hand_L', 'toes_L', 0.1]], name: 'Butterfly Stretch', cat: 'stretch', level: 1, met: 2, view: 'front', mat: true,
+    id: 'butterfly', on: 'seat feet', touch: [['heel_L', 'heel_R', 0.03], ['toes_L', 'toes_R', 0.04], ['hand_L', 'foot-top_L', 0.05], ['hand_R', 'foot-top_R', 0.05]], name: 'Butterfly Stretch', cat: 'stretch', level: 1, met: 2, view: 'front', mat: true,
     muscles: ['adductors', 'hipFlexors', 'lowerBack'],
-    tips: 'Sit tall with the soles of your feet together and let your knees fall open. Hold your feet and lean forward from your hips.',
-    frames: [{ pitch: -15.5, hipF: 105.3, hipAbd: 45, hipRot: 50, knee: 135, ankle: 10, spineF: 34.7, shF: 50.5, shAbd: -17.5, elbow: 10, neckF: 0 }],
+    tips: 'Sit tall with the soles of your feet pressed together and let your knees fall open. Hold your feet with both hands and lean gently forward, chest lifted.',
+    frames: [{ pitch: -8.6, hipF: 112, hipAbd: 50, hipRot: 50, knee: 120, ankle: 21.5, spineF: 22, shF: 50, shAbd: -10.3, elbow: 6.4, neckF: -5 }],
   },
   {
-    id: 'knees-to-chest', on: 'back', touch: [['hand_L', 'shin_L', 0.1]], name: 'Knees to Chest', cat: 'stretch', level: 1, met: 2, view: 'side', mat: true,
+    id: 'knees-to-chest', on: 'back', touch: [['hand_L', 'shin_L', 0.05], ['hand_R', 'shin_R', 0.05]], name: 'Knees to Chest', cat: 'stretch', level: 1, met: 2, view: 'side', mat: true,
     muscles: ['lowerBack', 'glutes'],
-    tips: 'Lie on your back and hug both knees toward your chest. Keep your head and shoulders relaxed on the mat.',
-    frames: [{ pitch: -90, spineF: 15, neckF: 10, hipF: 129.5, knee: 140, ankle: 20, shF: 25.6, shAbd: -2, elbow: 49.9 }],
+    tips: 'Lie on your back and hug both knees in, hands wrapped around your shins just below the knees. Keep your head and shoulders relaxed on the mat.',
+    frames: [{ pitch: -95, spineF: 3, neckF: 5, hipF: 128, knee: 140, ankle: 20, shF: 10, shAbd: -9.6, shRot: 2, elbow: 46 }],
   },
   {
-    id: 'supine-twist', on: 'back arms', name: 'Lying Spinal Twist', cat: 'yoga', level: 1, met: 2, view: 'front', mat: true, sides: true,
+    id: 'supine-twist', on: 'back arms foot_L', touch: [['knee_R', 'knee_L', 0.16], ['heel_R', 'heel_L', 0.14]], name: 'Lying Spinal Twist', cat: 'yoga', level: 1, met: 2, view: 'front', mat: true, sides: true,
     muscles: ['obliques', 'lowerBack', 'glutes', 'chest'],
-    tips: 'Lie on your back, arms out wide. Let your bent knees drop to one side and turn your head the other way. Keep both shoulders down.',
-    // Lying on the back, pelvis rolled about 45° toward the floor (pitch -45 + yaw 90 + roll -90 is a roll about
-    // the body's long axis) and the chest turned back flat with spineTwist. Knees hover just above the mat.
-    frames: [{ pitch: -45, yaw: 90, roll: -90, spineTwist: -45, hipF: 90, knee: 90, ankle: 20, hipAbd_L: 30, hipAbd_R: -25, shAbd: 60, shF: -23.3, elbow: 0, neckTurn: -30 }],
+    tips: 'Lie on your back, arms out wide. Let your bent knees drop together to one side, top knee over the bottom knee, and turn your head the other way. Keep your shoulders as close to the mat as you can; a cushion under the knees is fine.',
+    // Lying on the back, pelvis rolled about 55° toward the left (pitch -35 + yaw 90 + roll -90 is a roll about
+    // the body's long axis) and the chest turned back with spineTwist -45 (the rig's limit), so the right shoulder
+    // lifts a few cm. Knees stacked, bottom knee about 12 cm above the mat (as if on a cushion), bottom foot down.
+    frames: [{ pitch: -35, yaw: 90, roll: -90, spineTwist: -45, hipF: 95, knee: 95, ankle: 20, hipAbd_L: 24, hipAbd_R: -25, hipRot_L: -18, hipRot_R: 28, shAbd_L: 80, shAbd_R: 42, shF_L: 15, shF_R: -31, elbow: 0, neckTurn: -30 }],
   },
   {
     id: 'puppy-pose', on: 'knees hands head', name: 'Puppy Pose', cat: 'yoga', level: 1, met: 2.2, view: 'side', mat: true,
@@ -873,22 +877,22 @@ export const EXERCISES = [
     frames: [{ pitch: 125.3, spineF: -15.9, hipF: 114, knee: 90, ankle: 59, shF: 175, shAbd: 10, elbow: 0, wrist: 15, neckF: 30 }],
   },
   {
-    id: 'sphinx', on: 'forearms front knees', name: 'Sphinx Pose', cat: 'yoga', level: 1, met: 2.2, view: 'side', mat: true,
+    id: 'sphinx', on: 'forearms hands front knees', name: 'Sphinx Pose', cat: 'yoga', level: 1, met: 2.2, view: 'side', mat: true,
     muscles: ['lowerBack', 'abs', 'chest'],
-    tips: 'Lie on your belly, elbows under shoulders, forearms flat. Lift your chest gently and keep your neck long.',
-    frames: [{ pitch: 88.7, spineF: -34.5, neckF: -10, shF: 71.5, shAbd: 10, elbow: 90, wrist: 0, ankle: 60 }],
+    tips: 'Lie on your belly, elbows under your shoulders, forearms flat and palms down. Press into your forearms to lift your chest gently and keep your neck long.',
+    frames: [{ pitch: 88.6, spineF: -41, neckF: -5, shF: 52, shAbd: 10, elbow: 86, wrist: -14, ankle: 60 }],
   },
   {
     id: 'boat-pose', on: 'seat', name: 'Boat Pose', cat: 'yoga', level: 2, met: 3.5, view: 'side', mat: true,
     muscles: ['abs', 'hipFlexors', 'obliques', 'lowerBack'],
-    tips: 'Lean back with a long, straight back and lift your feet so your shins are level. Reach your arms forward. Keep your chest lifted.',
-    frames: [{ pitch: -40, hipF: 110, knee: 85, ankle: 20, shF: 50, shAbd: 8, elbow: 0, neckF: 5 }],
+    tips: 'Lean back with a long, straight back and lift your feet so your shins are level with the floor. Reach your arms forward beside your knees. Keep your chest lifted.',
+    frames: [{ pitch: -40, hipF: 100, knee: 50, ankle: 20, shF: 50, shAbd: 8, elbow: 0, neckF: 5 }],
   },
   {
-    id: 'chest-opener', on: 'feet', touch: [['hand_L', 'hand_R', 0.06]], name: 'Standing Chest Opener', cat: 'stretch', level: 1, met: 2, view: 'side',
+    id: 'chest-opener', on: 'feet', touch: [['hand_L', 'hand_R', 0.04]], name: 'Standing Chest Opener', cat: 'stretch', level: 1, met: 2, view: 'side',
     muscles: ['chest', 'shoulders', 'biceps'],
-    tips: 'Clasp your hands behind your back, straighten your arms and lift your chest. Shoulders down, do not arch your lower back.',
-    frames: [{ shF: -45, shAbd: -14.5, shRot: -20, elbow: 0, neckF: -8, hipAbd: 5 }],
+    tips: 'Clasp your hands behind your back, straighten your arms and lift your chest. Shoulders down and back; do not arch your lower back.',
+    frames: [{ shF: -45, shAbd: -16, shRot: -20, elbow: 0, spineF: -5, neckF: -8, hipAbd: 5 }],
   },
   {
     id: 'neck-rolls', on: 'feet', name: 'Neck Rolls', cat: 'warmup', level: 1, met: 2, cycle: 8, view: 'threeq',
@@ -897,21 +901,21 @@ export const EXERCISES = [
     frames: [{ neckSide: 32 }, { neckF: 35 }, { neckSide: -32 }, { neckF: 35 }],
   },
   {
-    id: 'wrist-stretch', on: 'feet', touch: [['hand_R', 'hand_L', 0.09]], name: 'Wrist & Forearm Stretch', cat: 'stretch', level: 1, met: 1.8, cycle: 12, view: 'sidefront', sides: true,
+    id: 'wrist-stretch', on: 'feet', touch: [['hand_R', 'hand_L', 0.07]], name: 'Wrist & Forearm Stretch', cat: 'stretch', level: 1, met: 1.8, cycle: 12, view: 'sidefront', sides: true,
     muscles: ['forearms'],
-    tips: 'Arm straight out, palm forward. Gently pull your fingers back with the other hand, then turn the palm down and press the hand down.',
+    tips: 'Arm straight out in front of your chest, palm forward and fingers up. Hold the fingers with your other hand and gently pull them back, then turn the hand down and press on the back of it.',
     frames: [
-      { shF_L: 90, elbow_L: 0, wrist_L: 70, shF_R: 65.5, shAbd_R: -43.2, elbow_R: 37.9, hipAbd: 5 },
-      { shF_L: 90, elbow_L: 0, wrist_L: 70, shF_R: 65.5, shAbd_R: -43.2, elbow_R: 37.9, hipAbd: 5 },
-      { shF_L: 90, elbow_L: 0, wrist_L: -70, shF_R: 59.4, shAbd_R: -42.6, elbow_R: 36.8, hipAbd: 5 },
-      { shF_L: 90, elbow_L: 0, wrist_L: -70, shF_R: 59.4, shAbd_R: -42.6, elbow_R: 36.8, hipAbd: 5 },
+      { shF_L: 90, shAbd_L: -25, elbow_L: 0, wrist_L: 70, shF_R: 100, shAbd_R: -20, elbow_R: 0, hipAbd: 5 },
+      { shF_L: 90, shAbd_L: -25, elbow_L: 0, wrist_L: 70, shF_R: 100, shAbd_R: -20, elbow_R: 0, hipAbd: 5 },
+      { shF_L: 90, shAbd_L: -25, elbow_L: 0, wrist_L: -70, shF_R: 85, shAbd_R: -20, elbow_R: 0, hipAbd: 5 },
+      { shF_L: 90, shAbd_L: -25, elbow_L: 0, wrist_L: -70, shF_R: 85, shAbd_R: -20, elbow_R: 0, hipAbd: 5 },
     ],
   },
   {
     id: 'hamstring-stretch', on: 'feet', name: 'Standing Hamstring Stretch', cat: 'stretch', level: 1, met: 2, view: 'sidefront', sides: true,
     muscles: ['hamstrings', 'calves', 'lowerBack'],
-    tips: 'Put one heel forward with the toes up and that leg straight. Bend the back knee and hinge forward from your hips with a flat back.',
-    frames: [{ ...HANDS_ON_HIPS, pitch: 44.1, hipF_L: 63.4, knee_L: 0, ankle_L: -25, hipF_R: 65.4, knee_R: 21.6, ankle_R: -1.8, neckF: -10 }],
+    tips: 'Step one heel forward, toes up and that leg straight. Bend your back knee, hands on your hips, and hinge forward from the hips with a flat back until you feel the back of the front thigh.',
+    frames: [{ ...HANDS_ON_HIPS, pitch: 44, hipF_L: 68, knee_L: 0, ankle_L: -25, hipF_R: 70.4, knee_R: 40.3, ankle_R: -16.2, neckF: -10 }],
   },
 ];
 
