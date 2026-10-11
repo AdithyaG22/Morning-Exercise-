@@ -210,17 +210,19 @@ export const EXERCISES = [
     id: 'squats', on: 'feet', name: 'Bodyweight Squats', cat: 'strength', level: 1, met: 5, cycle: 2.6, view: 'side',
     muscles: ['quads', 'glutes', 'hamstrings', 'adductors'],
     tips: 'Feet shoulder-width, chest up, push hips back. Knees follow your toes.',
-    frames: [{ shF: 15, hipAbd: 8, d: 0.8 }, { ...SQUAT_LOW, d: 1.2 }],
+    // Feet a little wider than hips with toes turned slightly out (hipRot); knees follow the toes.
+    frames: [{ shF: 15, hipAbd: 8, hipRot: 12, d: 0.8 }, { ...SQUAT_LOW, hipRot: 12, d: 1.2 }],
   },
   {
     id: 'lunges', on: 'feet', name: 'Alternating Lunges', cat: 'strength', level: 2, met: 5.5, cycle: 4, view: 'side',
     muscles: ['quads', 'glutes', 'hamstrings', 'calves'],
-    tips: 'Step forward, lower until both knees are about 90°. Front knee stays over the ankle.',
+    tips: 'Hands on hips, chest up. Take a big step forward and lower straight down until both knees are about 90°, front knee over the ankle, back knee just above the floor. Push back to standing and switch legs.',
     frames: [
       { ...HANDS_ON_HIPS, d: 0.6 },
-      { ...HANDS_ON_HIPS, hipF_L: 82, knee_L: 84, ankle_L: -6, hipF_R: -9, knee_R: 87, ankle_R: -37 },
+      // Step forward: the back foot stays where it stood (z moves the body forward with the step).
+      { ...HANDS_ON_HIPS, hipF_L: 82, knee_L: 84, ankle_L: -6, hipF_R: -9, knee_R: 87, ankle_R: -37, z: 0.642 },
       { ...HANDS_ON_HIPS, d: 0.6 },
-      { ...HANDS_ON_HIPS, hipF_R: 82, knee_R: 84, ankle_R: -6, hipF_L: -9, knee_L: 87, ankle_L: -37 },
+      { ...HANDS_ON_HIPS, hipF_R: 82, knee_R: 84, ankle_R: -6, hipF_L: -9, knee_L: 87, ankle_L: -37, z: 0.642 },
     ],
   },
   {
@@ -236,22 +238,32 @@ export const EXERCISES = [
   {
     id: 'knee-pushups', on: 'hands knees', name: 'Knee Push-ups', cat: 'strength', level: 1, met: 4, cycle: 2.4, view: 'side', mat: true,
     muscles: ['chest', 'triceps', 'shoulders'],
-    tips: 'Knees down, body straight from knees to head. Lower your chest toward the floor.',
-    frames: [KNEE_PLANK, KNEE_PUSH_DOWN],
+    tips: 'Hands a little wider than your shoulders, knees down, body straight from knees to head. Lower your chest toward the floor between your hands, then press back up.',
+    // Hands and knees stay planted: the body pivots on the knees (z shifts the pelvis so they don't slide).
+    frames: [
+      { ...KNEE_PLANK, pitch: 58.7, shF: 50 },
+      { ...KNEE_PUSH_DOWN, pitch: 78.5, shF: -9.4, shAbd: 17.2, elbow: 94.7, knee: 73.9, z: 0.093 },
+    ],
   },
   {
     id: 'pushups', on: 'hands toes', name: 'Push-ups', cat: 'strength', level: 2, met: 6, cycle: 2.2, view: 'side', mat: true,
     muscles: ['chest', 'triceps', 'shoulders', 'abs'],
-    tips: 'Hands under shoulders, body in one straight line. Lower until chest is near the floor.',
-    frames: [HIGH_PLANK, PUSHUP_DOWN],
+    tips: 'Hands under your shoulders, body in one straight line from head to heels. Lower until your chest is near the floor, elbows about 45° from your sides.',
+    // Hands and toes stay planted: the body pivots on the toes (z shifts the pelvis so the hands don't slide).
+    frames: [
+      { ...HIGH_PLANK, pitch: 73.8, shF: 62, ankle: 28.2 },
+      { ...PUSHUP_DOWN, pitch: 88, shF: -4.7, shAbd: 24, elbow: 105, ankle: 4.4, z: 0.059 },
+    ],
   },
   {
     id: 'glute-bridge', on: 'back feet arms', name: 'Glute Bridge', cat: 'strength', level: 1, met: 3.5, cycle: 2.6, view: 'side', mat: true,
     muscles: ['glutes', 'hamstrings', 'lowerBack'],
-    tips: 'Feet flat, push through your heels and squeeze your glutes at the top.',
+    tips: 'Feet flat and hip-width apart, arms on the floor. Push through your heels and lift your hips until shoulders, hips and knees form a straight line. Squeeze your glutes; do not arch your back.',
     frames: [
       BACK_KNEES,
-      { pitch: -112, hipF: -3, knee: 104, ankle: 16, shF: -38, shAbd: 12, elbow: 0 },
+      // Top: shoulders, hips and knees in one line (hipF 0), shins near vertical, feet flat and
+      // in the same place as at the start (z keeps the shoulders from sliding).
+      { pitch: -108.3, hipF: 0, knee: 88.8, ankle: 19.5, shF: -33.4, shAbd: 12, elbow: 0, z: -0.026 },
     ],
   },
   {
@@ -282,52 +294,71 @@ export const EXERCISES = [
   {
     id: 'crunches', on: 'back feet', name: 'Crunches', cat: 'core', level: 1, met: 3.8, cycle: 2.2, view: 'side', mat: true,
     muscles: ['abs'],
-    tips: 'Lift your shoulders off the floor using your abs. Do not pull on your neck.',
+    tips: 'Knees bent, feet flat, arms crossed on your chest. Curl your head and shoulders up until your shoulder blades leave the floor; your lower back stays down. Lower slowly.',
+    // Arms crossed on the chest (Mayo Clinic): each hand rests on the opposite shoulder.
+    touch: [['hand_L', 'shoulder_R', 0.09], ['hand_R', 'shoulder_L', 0.09]],
     frames: [
-      { ...BACK_KNEES, shF: 40 },
-      { ...BACK_KNEES, spineF: 28, neckF: 10, shF: 50 },
+      { ...BACK_KNEES, shF: 40.5, shAbd: -14.4, elbow: 117.7, shRot: -80.3, wrist: 0 },
+      { ...BACK_KNEES, spineF: 28, neckF: 12, shF: 40.5, shAbd: -14.4, elbow: 117.7, shRot: -80.3, wrist: 0 },
     ],
   },
   {
     id: 'dead-bug', on: 'back', name: 'Dead Bug', cat: 'core', level: 1, met: 3, cycle: 4, view: 'side', mat: true,
     muscles: ['abs', 'hipFlexors'],
-    tips: 'Press your lower back into the floor. Extend opposite arm and leg slowly.',
+    tips: 'Arms up to the ceiling, hips and knees at 90°. Press your lower back into the floor, then slowly reach one arm overhead while the opposite leg straightens until it hovers just above the floor. Return and switch.',
     frames: [
       { pitch: -90, shF: 90, elbow: 0, hipF: 90, knee: 90, ankle: 0 },
-      { pitch: -90, shF_L: 90, shF_R: 175, elbow: 0, hipF_R: 90, knee_R: 90, hipF_L: 25, knee_L: 5, ankle: 0 },
+      { pitch: -90, shF_L: 90, shF_R: 175, elbow: 0, hipF_R: 90, knee_R: 90, hipF_L: 12, knee_L: 0, ankle: 0 },
       { pitch: -90, shF: 90, elbow: 0, hipF: 90, knee: 90, ankle: 0 },
-      { pitch: -90, shF_R: 90, shF_L: 175, elbow: 0, hipF_L: 90, knee_L: 90, hipF_R: 25, knee_R: 5, ankle: 0 },
+      { pitch: -90, shF_R: 90, shF_L: 175, elbow: 0, hipF_L: 90, knee_L: 90, hipF_R: 12, knee_R: 0, ankle: 0 },
     ],
   },
   {
-    id: 'leg-raises', on: 'back', name: 'Leg Raises', cat: 'core', level: 2, met: 4, cycle: 3, view: 'side', mat: true,
+    id: 'leg-raises', on: 'back arms', name: 'Leg Raises', cat: 'core', level: 2, met: 4, cycle: 3, view: 'side', mat: true,
     muscles: ['abs', 'hipFlexors'],
-    tips: 'Legs straight, lift them to 90°, lower slowly without touching the floor.',
-    frames: [{ ...BACK_FLAT, hipF: 8 }, { ...BACK_FLAT, hipF: 85 }],
+    tips: 'Arms on the floor by your sides, lower back pressed down. Lift your straight legs to vertical, then lower them slowly until your heels hover just above the floor.',
+    // Arms rest on the floor beside the body (shF −10), palms down.
+    frames: [{ ...BACK_FLAT, shF: -10, hipF: 4, d: 1.2 }, { ...BACK_FLAT, shF: -10, hipF: 88, d: 0.8 }],
   },
   {
-    id: 'flutter-kicks', on: 'back', name: 'Flutter Kicks', cat: 'core', level: 2, met: 4, cycle: 0.8, view: 'side', mat: true,
+    id: 'flutter-kicks', on: 'back arms', name: 'Flutter Kicks', cat: 'core', level: 2, met: 4, cycle: 0.8, view: 'side', mat: true,
     muscles: ['abs', 'hipFlexors', 'quads'],
-    tips: 'Legs straight and low, kick up and down in small quick movements.',
+    tips: 'Lower back pressed into the floor, heels a hand-width off it. Kick your straight legs up and down in small, quick movements. If your back arches, raise your legs a little.',
     frames: [
-      { ...BACK_FLAT, hipF_L: 35, hipF_R: 15, neckF: 15 },
-      { ...BACK_FLAT, hipF_L: 15, hipF_R: 35, neckF: 15 },
+      { ...BACK_FLAT, shF: -10, hipF_L: 18, hipF_R: 5, neckF: 15 },
+      { ...BACK_FLAT, shF: -10, hipF_L: 5, hipF_R: 18, neckF: 15 },
     ],
   },
   {
-    id: 'bicycle', on: 'back', name: 'Bicycle Crunches', cat: 'core', level: 2, met: 5, cycle: 1.8, view: 'threeq', mat: true,
+    id: 'bicycle', on: 'back', name: 'Bicycle Crunches', cat: 'core', level: 2, met: 5, cycle: 2.4, view: 'threeq', mat: true,
     muscles: ['abs', 'obliques', 'hipFlexors'],
-    tips: 'Bring elbow toward the opposite knee while extending the other leg. Slow and controlled.',
+    tips: 'Fingertips behind your head, shoulders off the floor. Twist so one elbow comes to the opposite knee while the other leg stretches out low. Slow and controlled; do not pull on your neck.',
+    // Twist toward the bent knee: the opposite elbow swings across to meet it, the other hand stays
+    // behind the head with the elbow wide.
     frames: [
-      { pitch: -90, spineF: 35, spineTwist: 30, neckF: 10, shAbd: 120, elbow: 132, shRot: 90, hipF_L: 90, knee_L: 95, hipF_R: 25, knee_R: 5, ankle: 10 },
-      { pitch: -90, spineF: 35, spineTwist: -30, neckF: 10, shAbd: 120, elbow: 132, shRot: 90, hipF_R: 90, knee_R: 95, hipF_L: 25, knee_L: 5, ankle: 10 },
+      {
+        pitch: -90, spineF: 45, spineTwist: 45, neckF: 10,
+        shAbd_L: 153.6, shF_L: 27.9, elbow_L: 111.3, shRot_L: 89.4,
+        shAbd_R: 10, shF_R: 95, elbow_R: 120.4, shRot_R: -30.1,
+        hipF_L: 102.3, knee_L: 124.7, hipAbd_L: -7.3, hipF_R: 25, knee_R: 5, ankle: 10,
+        touch: [['elbow_R', 'knee_L', 0.12], ['hand_R', 'head', 0.1], ['hand_L', 'head-back', 0.08]],
+      },
+      {
+        pitch: -90, spineF: 45, spineTwist: -45, neckF: 10,
+        shAbd_R: 153.6, shF_R: 27.9, elbow_R: 111.3, shRot_R: 89.4,
+        shAbd_L: 10, shF_L: 95, elbow_L: 120.4, shRot_L: -30.1,
+        hipF_R: 102.3, knee_R: 124.7, hipAbd_R: -7.3, hipF_L: 25, knee_L: 5, ankle: 10,
+        touch: [['elbow_L', 'knee_R', 0.12], ['hand_L', 'head', 0.1], ['hand_R', 'head-back', 0.08]],
+      },
     ],
   },
   {
     id: 'side-plank', on: 'forearm_R foot_R', name: 'Side Plank', cat: 'core', level: 2, met: 4, view: 'front', mat: true, sides: true,
     muscles: ['obliques', 'shoulders', 'abs', 'glutes'],
-    tips: 'Elbow under shoulder, lift your hips so your body forms a straight line.',
-    frames: [{ roll: 72, shAbd_R: 72, elbow_R: 90, shRot_R: 90, shAbd_L: 100, elbow_L: 0, hipAbd: 0, neckSide: 0 }],
+    tips: 'Elbow under your shoulder, forearm pointing forward, feet stacked. Lift your hips so your body forms a straight line from head to feet.',
+    // Forearm flat on the floor pointing forward (shRot 0), top leg resting on the bottom one.
+    touch: [['heel_L', 'heel_R', 0.1]],
+    frames: [{ roll: 68.5, shAbd_R: 68.5, elbow_R: 90, shRot_R: 0, shAbd_L: 100, elbow_L: 0, hipAbd_L: 1.8, hipAbd_R: -8.3, spineSide: 3.3, neckSide: 0 }],
   },
 
   // ---------------- Yoga ----------------
