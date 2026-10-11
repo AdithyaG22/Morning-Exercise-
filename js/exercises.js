@@ -455,10 +455,10 @@ export const EXERCISES = [
     muscles: ['glutes', 'obliques', 'adductors'],
     tips: 'Hands on hips, lift one straight leg out to the side, lower it and switch. Stay tall.',
     frames: [
-      { ...HANDS_ON_HIPS, hipAbd_L: 40, hipAbd_R: -3, roll: 4, on: 'foot_R' },
-      { ...HANDS_ON_HIPS, d: 0.5 },
-      { ...HANDS_ON_HIPS, hipAbd_R: 40, hipAbd_L: -3, roll: -4, on: 'foot_L' },
-      { ...HANDS_ON_HIPS, d: 0.5 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, hipAbd_L: 40, hipAbd_R: -3, roll: 4, on: 'foot_R' },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, d: 0.5 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, hipAbd_R: 40, hipAbd_L: -3, roll: -4, on: 'foot_L' },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, d: 0.5 },
     ],
   },
   {
@@ -466,10 +466,11 @@ export const EXERCISES = [
     muscles: ['obliques', 'abs', 'calves'],
     tips: 'Small hops, twisting your hips one way and your shoulders the other. Arms out for balance.',
     frames: [
-      { yaw: 35, spineTwist: -35, shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6 },
-      { shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, lift: 0.05, ankle: 25, d: 0.5 },
-      { yaw: -35, spineTwist: 35, shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6 },
-      { shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, lift: 0.05, ankle: 25, d: 0.5 },
+      // Land twisted: hips and feet turned, chest still facing forward; soft knees
+      { yaw: 35, spineTwist: -35, shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, hipF: 12, knee: 18, ankle: -6 },
+      { shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, lift: 0.05, ankle: 25, knee: 4, d: 0.5 },
+      { yaw: -35, spineTwist: 35, shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, hipF: 12, knee: 18, ankle: -6 },
+      { shAbd: 70, elbow: 70, shRot: -30, hipAbd: 6, lift: 0.05, ankle: 25, knee: 4, d: 0.5 },
     ],
   },
   {
@@ -478,19 +479,19 @@ export const EXERCISES = [
     tips: 'Feet wide. Reach one hand down to the opposite foot, other arm up. Stand and switch.',
     frames: [
       { hipAbd: 18, shAbd: 80, d: 0.6 },
-      { hipAbd: 18, pitch: 80, hipF: 109.4, ankle: 18, spineF: 41.5, spineTwist: 33.8, shF_R: 117.3, shAbd_R: -15, shAbd_L: 95, shF_L: 30, knee: 12, touch: [['hand_R', 'toes_L', 0.14]] },
+      { hipAbd: 18, pitch: 80, hipF: 109.4, ankle: 18, spineF: 41.5, spineTwist: 33.8, shF_R: 117.3, shAbd_R: -15, shAbd_L: 45, shF_L: -50, knee: 12, touch: [['hand_R', 'foot-top_L', 0.08]] },
       { hipAbd: 18, shAbd: 80, d: 0.6 },
-      { hipAbd: 18, pitch: 80, hipF: 109.4, ankle: 18, spineF: 41.5, spineTwist: -33.8, shF_L: 117.3, shAbd_L: -15, shAbd_R: 95, shF_R: 30, knee: 12, touch: [['hand_L', 'toes_R', 0.14]] },
+      { hipAbd: 18, pitch: 80, hipF: 109.4, ankle: 18, spineF: 41.5, spineTwist: -33.8, shF_L: 117.3, shAbd_L: -15, shAbd_R: 45, shF_R: -50, knee: 12, touch: [['hand_L', 'foot-top_R', 0.08]] },
     ],
   },
   {
-    id: 'diamond-pushups', on: 'hands toes', name: 'Diamond Push-ups', cat: 'strength', level: 2, met: 6, cycle: 2.4, view: 'side', mat: true,
+    id: 'diamond-pushups', on: 'hands toes', name: 'Diamond Push-ups', cat: 'strength', level: 2, met: 6, cycle: 2.4, view: 'sidefront', mat: true,
     muscles: ['triceps', 'chest', 'shoulders', 'abs'],
     tips: 'Hands together under your chest, thumbs and fingers forming a diamond. Too hard? Drop to your knees.',
     touch: [['hand_L', 'hand_R', 0.08]],
     frames: [
-      { ...HIGH_PLANK, shF: 68, shAbd: -19, shRot: 17 },
-      { ...PUSHUP_DOWN, pitch: 88, shF: 5, elbow: 75, shAbd: -2, shRot: -45 },
+      { ...HIGH_PLANK, shF: 58, shAbd: -19, shRot: 17 },
+      { ...PUSHUP_DOWN, pitch: 86, shF: 20, elbow: 89.5, shAbd: -2, shRot: -45 },
     ],
   },
   {
@@ -502,10 +503,12 @@ export const EXERCISES = [
   {
     id: 'db-rows', on: 'feet', name: 'Dumbbell Rows', cat: 'strength', level: 1, met: 4, cycle: 2.4, view: 'side', props: ['dumbbells'],
     muscles: ['back', 'biceps', 'shoulders', 'lowerBack'],
-    tips: 'Hinge forward with a flat back. Pull the weights to your ribs, squeeze your shoulder blades, lower slowly.',
+    tips: 'Soft knees, hinge forward with a flat back until your chest is well forward. Pull the weights up beside your ribs, elbows close to your body, squeeze your shoulder blades, lower slowly.',
     frames: [
-      { ...HINGE, shF: 45, shAbd: 6, elbow: 5 },
-      { ...HINGE, shF: -25, shAbd: 12, elbow: 70 },
+      // Deeper hinge (torso ~30° above horizontal); arms hang straight down, then the elbows drive
+      // back past the ribs with the forearms vertical (elbow = pitch − shF)
+      { ...HINGE, pitch: 60, hipF: 71.5, knee: 18, ankle: -11, shF: 60, shAbd: 8, elbow: 5 },
+      { ...HINGE, pitch: 60, hipF: 71.5, knee: 18, ankle: -11, shF: -20, shAbd: 14, elbow: 80 },
     ],
   },
   {
@@ -518,12 +521,13 @@ export const EXERCISES = [
     ],
   },
   {
-    id: 'front-raises', on: 'feet', name: 'Front Raises', cat: 'strength', level: 1, met: 3.5, cycle: 2.4, view: 'side', props: ['dumbbells'],
+    id: 'front-raises', on: 'feet', name: 'Front Raises', cat: 'strength', level: 1, met: 3.5, cycle: 2.4, view: 'sidefront', props: ['dumbbells'],
     muscles: ['shoulders', 'chest'],
-    tips: 'Arms almost straight, lift the weights in front of you to shoulder height, lower slowly.',
+    tips: 'Weights in front of your thighs, palms facing you. Arms almost straight, lift them in front of you to shoulder height, palms down, then lower slowly. No swinging or leaning back.',
+    // Overhand grip: the arms are turned in (shRot) so the bars run left-right, palms down at the top
     frames: [
-      { shF: 8, elbow: 8, hipAbd: 6 },
-      { shF: 88, elbow: 8, hipAbd: 6 },
+      { shF: 10, shAbd: 2, shRot: -80, elbow: 8, hipAbd: 6 },
+      { shF: 88, shAbd: 2, shRot: -80, elbow: 8, hipAbd: 6 },
     ],
   },
   {
@@ -558,27 +562,28 @@ export const EXERCISES = [
     muscles: ['abs'],
     tips: 'Lying with knees bent, curl your shoulders up and slide your hands up your thighs toward your knees. Lower slowly.',
     frames: [
-      { ...BACK_KNEES, shF: 30 },
-      { ...BACK_KNEES, spineF: 40, neckF: 12, shF: 50, shAbd: -1, touch: [['hand_L', 'knee_L', 0.2]] },
+      { ...BACK_KNEES, shF: 22, shAbd: -8, elbow: 0, touch: [['hand_L', 'knee_L', 0.2], ['hand_R', 'knee_R', 0.2]] },
+      { ...BACK_KNEES, spineF: 39.4, neckF: 12, shF: 52, shAbd: -4, elbow: 0, touch: [['hand_L', 'knee_L', 0.06], ['hand_R', 'knee_R', 0.06]] },
     ],
   },
   {
     id: 'russian-twists', on: 'seat feet', name: 'Russian Twists', cat: 'core', level: 1, met: 4, cycle: 2, view: 'threeq', mat: true,
     muscles: ['obliques', 'abs', 'hipFlexors'],
-    tips: 'Sit leaning back with a straight back, feet on the floor. Rotate your chest side to side, hands together.',
+    tips: 'Sit leaning back with a straight back, feet on the floor. Hands clasped in front of your chest, rotate your chest side to side.',
+    touch: [['hand_L', 'hand_R', 0.06]],
     frames: [
-      { pitch: -42, hipF: 101.7, knee: 110.7, ankle: 15.1, spineTwist: 40, shF: 60, shAbd: -25, elbow: 60 },
-      { pitch: -42, hipF: 101.7, knee: 110.7, ankle: 15.1, spineTwist: -40, shF: 60, shAbd: -25, elbow: 60 },
+      { pitch: -42, hipF: 101.7, knee: 110.7, ankle: 15.1, spineTwist: 40, shF: 25, shAbd: -22, shRot: 0, elbow: 60 },
+      { pitch: -42, hipF: 101.7, knee: 110.7, ankle: 15.1, spineTwist: -40, shF: 25, shAbd: -22, shRot: 0, elbow: 60 },
     ],
   },
   {
     id: 'plank-knee-elbow', on: 'hands toes', name: 'Knee to Elbow Plank', cat: 'core', level: 1, met: 5, cycle: 2.4, view: 'threeq', mat: true,
     muscles: ['abs', 'obliques', 'shoulders', 'hipFlexors'],
-    tips: 'From a high plank, bring one knee out to the side toward the same elbow, then switch. Hips stay low.',
+    tips: 'From a high plank, bring one knee out to the side up toward the outside of the same elbow, crunching that side of your waist. Step back and switch. Hips stay low and level.',
     frames: [
-      { ...HIGH_PLANK, hipF_L: 130, hipAbd_L: 50, hipRot_L: 30, knee_L: 155, ankle_L: -16, ankle_R: 0, on: 'hands foot_R', touch: [['knee_L', 'elbow_L', 0.32]] },
+      { ...HIGH_PLANK, shF: 72, shAbd_L: 25, shAbd_R: -12, spineSide: 17, hipF_L: 120, hipAbd_L: 50, hipRot_L: -8, knee_L: 135, ankle_L: 45, ankle_R: 20, on: 'hands foot_R', touch: [['knee_L', 'elbow_L', 0.15]] },
       { ...HIGH_PLANK, d: 0.6 },
-      { ...HIGH_PLANK, hipF_R: 130, hipAbd_R: 50, hipRot_R: 30, knee_R: 155, ankle_R: -16, ankle_L: 0, on: 'hands foot_L', touch: [['knee_R', 'elbow_R', 0.32]] },
+      { ...HIGH_PLANK, shF: 72, shAbd_R: 25, shAbd_L: -12, spineSide: -17, hipF_R: 120, hipAbd_R: 50, hipRot_R: -8, knee_R: 135, ankle_R: 45, ankle_L: 20, on: 'hands foot_L', touch: [['knee_R', 'elbow_R', 0.15]] },
       { ...HIGH_PLANK, d: 0.6 },
     ],
   },
@@ -589,10 +594,10 @@ export const EXERCISES = [
     muscles: ['quads', 'glutes', 'hamstrings', 'calves'],
     tips: 'Step one foot back and lower your back knee toward the floor, chest up. Push through the front heel to stand. Hold a chair for balance if needed.',
     frames: [
-      { ...HANDS_ON_HIPS, d: 0.6 },
-      { ...HANDS_ON_HIPS, pitch: 8, hipF_L: 90, knee_L: 87.8, ankle_L: -4.7, hipF_R: 1.8, knee_R: 90, ankle_R: -33.1 },
-      { ...HANDS_ON_HIPS, d: 0.6 },
-      { ...HANDS_ON_HIPS, pitch: 8, hipF_R: 90, knee_R: 87.8, ankle_R: -4.7, hipF_L: 1.8, knee_L: 90, ankle_L: -33.1 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, d: 0.6 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, pitch: 8, hipF_L: 90, knee_L: 87.8, ankle_L: -4.7, hipF_R: 1.8, knee_R: 90, ankle_R: -33.1 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, d: 0.6 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, pitch: 8, hipF_R: 90, knee_R: 87.8, ankle_R: -4.7, hipF_L: 1.8, knee_L: 90, ankle_L: -33.1 },
     ],
   },
   {
