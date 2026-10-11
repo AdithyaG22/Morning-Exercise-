@@ -83,50 +83,59 @@ export const EXERCISES = [
   {
     id: 'hip-circles', on: 'feet', name: 'Hip Circles', cat: 'warmup', level: 1, met: 2.5, cycle: 3, view: 'front',
     muscles: ['obliques', 'lowerBack', 'glutes'],
-    tips: 'Hands on hips, feet shoulder-width. Draw big slow circles with your hips.',
+    tips: 'Hands on hips, feet shoulder-width, knees soft. Draw big slow circles with your hips while your shoulders stay over your feet.',
+    // Hands on the hip bones (elbows out to the sides), not in front of the belly. There is no
+    // marker on the side of the hip, so the touch uses the seat markers (back corners of the
+    // pelvis): within 20 cm keeps each hand at the side of its hip.
+    touch: [['hand_L', 'seat', 0.2], ['hand_R', 'seat', 0.2]],
     frames: [
-      { ...HANDS_ON_HIPS, x: 0.06, hipAbd_L: 6, hipAbd_R: 14, spineSide: -8 },
-      { ...HANDS_ON_HIPS, hipAbd: 10, z: 0.05, pitch: -5, spineF: 10, hipF: -8.3, ankle: -3.3 },
-      { ...HANDS_ON_HIPS, x: -0.06, hipAbd_L: 14, hipAbd_R: 6, spineSide: 8 },
-      { ...HANDS_ON_HIPS, hipAbd: 10, z: -0.05, pitch: 6, spineF: -6, hipF: 9.3, ankle: 3.3 },
+      { shF: -25, shAbd: 45, shRot: -55, elbow: 100, x: 0.06, hipAbd_L: 6, hipAbd_R: 14, spineSide: -8 },
+      { shF: -25, shAbd: 45, shRot: -55, elbow: 100, hipAbd: 10, z: 0.05, pitch: -5, spineF: 10, hipF: -8.3, ankle: -3.3 },
+      { shF: -25, shAbd: 45, shRot: -55, elbow: 100, x: -0.06, hipAbd_L: 14, hipAbd_R: 6, spineSide: 8 },
+      { shF: -25, shAbd: 45, shRot: -55, elbow: 100, hipAbd: 10, z: -0.05, pitch: 6, spineF: -6, hipF: 9.3, ankle: 3.3 },
     ],
   },
   {
-    id: 'torso-twist', on: 'feet', name: 'Torso Twists', cat: 'warmup', level: 1, met: 3, cycle: 2, view: 'front',
+    id: 'torso-twist', on: 'feet', name: 'Torso Twists', cat: 'warmup', level: 1, met: 3, cycle: 2.4, view: 'front',
     muscles: ['obliques', 'abs', 'lowerBack'],
-    tips: 'Keep hips facing forward and rotate from your waist. Arms loose at chest height.',
+    tips: 'Feet shoulder-width, knees soft. Cross your arms over your chest, hands on the opposite shoulders. Keep your hips facing forward and turn your chest side to side, letting your head follow.',
+    // Arms folded across the chest: each hand rests on the opposite shoulder (enforced by touch).
+    touch: [['hand_L', 'shoulder_R', 0.08], ['hand_R', 'shoulder_L', 0.08]],
     frames: [
-      { spineTwist: 45, neckTurn: 15, shAbd: 75, elbow: 115, shRot: -35, hipAbd: 9 },
-      { spineTwist: -45, neckTurn: -15, shAbd: 75, elbow: 115, shRot: -35, hipAbd: 9 },
+      { spineTwist: 40, neckTurn: 15, shF: 68, shAbd: -11, elbow: 122, shRot: -80, hipAbd: 9, knee: 6 },
+      { spineTwist: -40, neckTurn: -15, shF: 68, shAbd: -11, elbow: 122, shRot: -80, hipAbd: 9, knee: 6 },
     ],
   },
   {
     id: 'side-bend', on: 'feet', name: 'Standing Side Bends', cat: 'warmup', level: 1, met: 2.5, cycle: 3.5, view: 'front',
     muscles: ['obliques', 'back'],
-    tips: 'Reach one arm overhead and lean to the opposite side. Do not lean forward.',
+    tips: 'Reach one arm up and over your head and lean to the opposite side, sliding the other hand down the side of your thigh. Do not lean forward or twist.',
+    // The lower hand slides down the outside of the thigh toward the knee (touch keeps it on the leg).
     frames: [
-      { spineSide: 32, shAbd_R: 165, elbow_R: 15, shAbd_L: 15, hipAbd: 9 },
+      { spineSide: 32, shAbd_R: 165, elbow_R: 15, shAbd_L: 15, hipAbd: 9, touch: [['hand_L', 'knee_L', 0.18]] },
       { hipAbd: 9 },
-      { spineSide: -32, shAbd_L: 165, elbow_L: 15, shAbd_R: 15, hipAbd: 9 },
+      { spineSide: -32, shAbd_L: 165, elbow_L: 15, shAbd_R: 15, hipAbd: 9, touch: [['hand_R', 'knee_R', 0.18]] },
       { hipAbd: 9 },
     ],
   },
   {
     id: 'tadasana-reach', on: 'feet', name: 'Mountain Reach', cat: 'warmup', level: 1, met: 2.3, cycle: 6, view: 'threeq',
     muscles: ['shoulders', 'back', 'calves', 'abs'],
-    tips: 'Breathe in as you reach up and rise onto your toes. Breathe out as you lower.',
-    frames: [{ d: 0.8 }, { shAbd: 172, elbow: 0, ankle: 25, neckF: -10, pitch: 4, hipF: -3, on: 'toes' }],
+    tips: 'Breathe in as you sweep your arms out and up, press your palms together overhead and rise onto your toes. Breathe out as you lower.',
+    // Top: arms by the ears with the palms pressed together overhead (touch), heels lifted.
+    frames: [{ d: 0.8 }, { shAbd: 180, elbow: 28, shRot: 90, ankle: 25, neckF: -10, pitch: 4, hipF: -3, on: 'toes', touch: [['hand_L', 'hand_R', 0.05]] }],
   },
 
   // ---------------- Cardio ----------------
   {
     id: 'jumping-jacks', on: 'feet', name: 'Jumping Jacks', cat: 'cardio', level: 1, met: 8, cycle: 1.1, view: 'front',
     muscles: ['calves', 'shoulders', 'glutes', 'adductors'],
-    tips: 'Land softly on the balls of your feet. Low impact option: step one leg out at a time.',
+    tips: 'Jump your feet out wider than your hips as your straight arms sweep up until your hands almost clap overhead, then jump back. Land softly with knees slightly bent.',
+    // Ground frames land with soft knees; at the top the hands nearly meet overhead (touch).
     frames: [
-      { shAbd: 12, hipAbd: 3 },
+      { shAbd: 12, hipAbd: 3, knee: 10, hipF: 5, ankle: -5 },
       { shAbd: 90, hipAbd: 10, lift: 0.07, ankle: 30, d: 0.6 },
-      { shAbd: 172, hipAbd: 17, elbow: 5 },
+      { shAbd: 180, hipAbd: 17, elbow: 23, shRot: 90, knee: 10, hipF: 5, ankle: -5, touch: [['hand_L', 'hand_R', 0.1]] },
       { shAbd: 90, hipAbd: 10, lift: 0.07, ankle: 30, d: 0.6 },
     ],
   },
@@ -144,23 +153,32 @@ export const EXERCISES = [
   {
     id: 'butt-kicks', on: 'feet', name: 'Butt Kicks', cat: 'cardio', level: 1, met: 7, cycle: 0.8, view: 'side',
     muscles: ['hamstrings', 'calves', 'quads'],
-    tips: 'Jog in place and kick your heels toward your glutes.',
+    tips: 'Jog in place on the balls of your feet and flick each heel up to your glutes. Knees point down, chest stays tall.',
+    // The kicking heel comes up to the seat (touch); the thigh stays about vertical.
     frames: [
-      { knee_L: 130, hipF_L: -5, ankle_L: 20, shF_R: 35, shF_L: -25, elbow: 85, ankle_R: 15, roll: 5.7, pitch: 6.9, hipAbd_R: 1.5, on: 'foot_R' },
+      { knee_L: 150, hipF_L: -3, ankle_L: 20, touch: [['heel_L', 'seat', 0.1]], shF_R: 35, shF_L: -25, elbow: 85, ankle_R: 15, roll: 5.7, pitch: 6.9, hipAbd_R: 1.5, on: 'foot_R' },
       { elbow: 85, lift: 0.03, ankle: 20, d: 0.4 },
-      { knee_R: 130, hipF_R: -5, ankle_R: 20, shF_L: 35, shF_R: -25, elbow: 85, ankle_L: 15, roll: -5.7, pitch: 6.9, hipAbd_L: 1.5, on: 'foot_L' },
+      { knee_R: 150, hipF_R: -3, ankle_R: 20, touch: [['heel_R', 'seat', 0.1]], shF_L: 35, shF_R: -25, elbow: 85, ankle_L: 15, roll: -5.7, pitch: 6.9, hipAbd_L: 1.5, on: 'foot_L' },
       { elbow: 85, lift: 0.03, ankle: 20, d: 0.4 },
     ],
   },
   {
-    id: 'knee-elbow', on: 'feet', touch: [['hand_L', 'head-back', 0.14]], name: 'Standing Knee to Elbow', cat: 'cardio', level: 1, met: 5, cycle: 1.8, view: 'front',
+    id: 'knee-elbow', on: 'feet', name: 'Standing Knee to Elbow', cat: 'cardio', level: 1, met: 5, cycle: 2, view: 'threeq',
     muscles: ['obliques', 'abs', 'hipFlexors'],
-    tips: 'Hands behind your head. Bring your knee up to meet the opposite elbow.',
+    tips: 'Fingertips lightly behind your head, elbows wide. Lift one knee and twist so the opposite elbow meets it, then stand tall and switch.',
+    // Crunch frames: the lifted knee comes up past hip height and the opposite elbow swings forward
+    // and down to touch it (hand stays at the back of the head); the other elbow stays wide.
     frames: [
-      { hipF_L: 90, knee_L: 90, spineTwist: 30, spineF: 20, spineSide: -10, shAbd: 120, elbow: 132, shRot: 90, roll: 4, hipAbd_R: 1, on: 'foot_R' },
-      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 8 },
-      { hipF_R: 90, knee_R: 90, spineTwist: -30, spineF: 20, spineSide: 10, shAbd: 120, elbow: 132, shRot: 90, roll: -4, hipAbd_L: 1, on: 'foot_L' },
-      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 8 },
+      { hipF_L: 125, knee_L: 110, hipAbd_L: -2.7, spineTwist: 45, spineF: 50, spineSide: -9, neckF: 10,
+        shAbd: 122, shRot: 90, elbow: 134, shF: 16, shF_R: 111.7, shAbd_R: -21.2, shRot_R: -25.7, elbow_R: 124.7,
+        roll: 5.4, hipAbd_R: 1, on: 'foot_R',
+        touch: [['elbow_R', 'knee_L', 0.07], ['hand_L', 'head-back', 0.08], ['hand_R', 'head-back', 0.08]] },
+      { shAbd: 122, elbow: 134, shRot: 90, shF: 16, hipAbd: 8, touch: [['hand_L', 'head-back', 0.07], ['hand_R', 'head-back', 0.07]] },
+      { hipF_R: 125, knee_R: 110, hipAbd_R: -2.7, spineTwist: -45, spineF: 50, spineSide: 9, neckF: 10,
+        shAbd: 122, shRot: 90, elbow: 134, shF: 16, shF_L: 111.7, shAbd_L: -21.2, shRot_L: -25.7, elbow_L: 124.7,
+        roll: -5.4, hipAbd_L: 1, on: 'foot_L',
+        touch: [['elbow_L', 'knee_R', 0.07], ['hand_R', 'head-back', 0.08], ['hand_L', 'head-back', 0.08]] },
+      { shAbd: 122, elbow: 134, shRot: 90, shF: 16, hipAbd: 8, touch: [['hand_L', 'head-back', 0.07], ['hand_R', 'head-back', 0.07]] },
     ],
   },
   {
@@ -180,7 +198,7 @@ export const EXERCISES = [
       { ...SQUAT_LOW, shF: -35, shRot: 0, d: 1.2 },
       { shAbd: 20, shF: 160, ankle: 35, lift: 0.2, d: 0.7 },
       { lift: 0.08, shF: 90, ankle: 25, d: 0.3 },
-      { pitch: 21.7, hipF: 53.4, knee: 35, ankle: -21.6, shF: 40, d: 0.5 },   // land softly
+      { pitch: 25, hipF: 60, knee: 45, ankle: -12, shF: 40, d: 0.5 },   // land softly, feet flat
     ],
   },
   {
