@@ -211,6 +211,7 @@ export class Stage {
 
   /** Jump straight to one keyframe (used by the pose debugger). */
   snapTo(ex, frame = 0, mirrored = false) {
+    this.exercise = null;   // force a fresh play() even for the same exercise
     this.play(ex, { mirrored });
     this.frames = [this.frames[frame]];
     this.weights = [1];

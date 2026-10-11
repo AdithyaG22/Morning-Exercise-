@@ -178,7 +178,7 @@ new settings fields must be optional with a default in `DEFAULT_SETTINGS`.
 rebuilds the skin. Invalid files change nothing and show an in-page message.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v22`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v23`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system
@@ -295,8 +295,7 @@ screenshots go stale after UI changes, regenerate them at 360×640 @3x (1080×19
   are at the end of `docs/EXERCISE-TECHNIQUE.md`. Rig limits found: spine twist max 45°, hip abduction
   max 50°, no shoulder blades, no forearm rotation (curls show a hammer grip), no finger joints, no
   `thigh`/`sole`/`hip-side` markers, `touch` has only a maximum distance (no "at least" or "left of").
-  The mat always lies front-to-back. `pose-debug.html`: set `stageRef.exercise = null` before calling
-  `show()` again for the same exercise.
+  The mat always lies front-to-back.
 - Ideas: retarget motion capture (e.g. CMU BVH) onto the skeleton; extract poses from videos with
   MediaPipe; morning reminders/notifications; more voice-coach languages; more routines.
 
