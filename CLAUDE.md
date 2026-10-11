@@ -99,9 +99,13 @@ previous pose over 0.7 s → `avatar.applyPose` → `avatar.update(time)` → ca
    wobble on `spineF`/`neckF`.
 3. `Avatar.applyPose` sets bone rotations (spine split 45 % waist / 55 % chest; neck/head 50/50;
    shoulders and hips use Euler order `XZY`).
-4. **Grounding:** the lowest of all named markers is put on the floor (`object.position.y`), plus
+4. **Planting:** `Avatar.plantSupports(poses)` (called by `Stage.play` and `setBody`) shifts each
+   keyframe's pelvis `x`/`z` so hands, feet, knees and forearms that stay on the floor from the previous
+   keyframe stay where they were (the body hangs from the pelvis, so bending would otherwise slide them).
+   Moves over 35 cm are steps or jumps and are left alone; on a tie it keeps the smaller shift.
+5. **Grounding:** the lowest of all named markers is put on the floor (`object.position.y`), plus
    `lift × scale` for jumps. You never set height by hand. `avatar.bounds` is the marker box.
-5. **Camera:** `computeFraming()` runs once per `play()` (and after `setBody`): it poses the avatar
+6. **Camera:** `computeFraming()` runs once per `play()` (and after `setBody`): it poses the avatar
    at every keyframe and half-way between, takes the union of the marker bounds, and the camera
    eases (≈2/s) to a fixed target and distance that fit the whole movement, so it stays still while
    the body moves. Yaw comes
@@ -211,7 +215,9 @@ names, world and pelvis-local), limb directions, floor contacts, touching body p
 (crossed legs, hands across midline…) and ASCII front/side/top stick figures. Diagnose and verify pose
 changes with it; take one WebGL screenshot only as the final visual check.
 
-Checks: ROM, ON, BALANCE (standing on feet only), CLIP (limb inside another body part), TOUCH.
+Checks: ROM, ON, BALANCE (standing on feet only), CLIP (limb inside another body part), TOUCH, and per
+exercise SLIDE (after planting, a contact point on the floor at two neighbouring keyframes and under 8 cm
+half-way must not move more than 6 cm; a real step must lift the foot mid-step with an extra keyframe).
 It also fails if a routine names an unknown exercise id. It checks frames unmirrored. Angles wrap at
 360°, and shoulder extension past −60° is allowed while the arm is out to the side (abduction ≥ 60°).
 
@@ -285,10 +291,12 @@ screenshots go stale after UI changes, regenerate them at 360×640 @3x (1080×19
 - Linear-blend skinning pinches/thins at deep bends (knees, elbows, hips in deep squats).
 - The one-foot balance check ignores foot roll; the checker only tests unmirrored frames.
 - Voice coach is English only (`say` uses `en-US`).
-- **Open task: exercise accuracy audit.** The owner reports many exercises look wrong. Known: Seated
-  Spinal Twist needs the bent leg's foot crossed outside the straight leg's knee and the opposite elbow
-  pressed against that knee (add `touch` goals). Audit every exercise with `tools/pose-data.mjs`
-  against `docs/EXERCISE-TECHNIQUE.md`, fix, keep the checker at 100 %, bump `sw.js`, rebuild the preview.
+- **Exercise accuracy audit done (Oct 2026)**: every exercise re-checked; findings, numbers and rig limits
+  are at the end of `docs/EXERCISE-TECHNIQUE.md`. Rig limits found: spine twist max 45°, hip abduction
+  max 50°, no shoulder blades, no forearm rotation (curls show a hammer grip), no finger joints, no
+  `thigh`/`sole`/`hip-side` markers, `touch` has only a maximum distance (no "at least" or "left of").
+  The mat always lies front-to-back. `pose-debug.html`: set `stageRef.exercise = null` before calling
+  `show()` again for the same exercise.
 - Ideas: retarget motion capture (e.g. CMU BVH) onto the skeleton; extract poses from videos with
   MediaPipe; morning reminders/notifications; more voice-coach languages; more routines.
 

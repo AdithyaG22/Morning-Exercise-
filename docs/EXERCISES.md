@@ -64,6 +64,10 @@ For each keyframe it reports:
   It uses standard body-segment masses.
 - **CLIP**: a hand or limb passes through another body part.
 - **TOUCH**: a contact target is out of reach.
+- **SLIDE** (per exercise): a hand, foot or knee that stays on the floor between two keyframes slides along it.
+  The app already keeps planted points still by shifting the body (`Avatar.plantSupports`), so a SLIDE means
+  the pose itself is inconsistent (e.g. the feet narrow in a squat) or a step glides instead of lifting. Fix it
+  by keeping the contact where it was, or by adding an in-between keyframe that lifts the foot or hand.
 
 ### Body data (stick figure in numbers)
 

@@ -1589,3 +1589,599 @@ rather than the shins, which is the common beginner variation.
 - **Extended Side Angle:** with the rig's hip-abduction limit (50°), a bent front knee with a horizontal thigh plus a 60° side tilt could not balance with both feet flat. The fitter only "passed" by lifting the heels or exceeding the ROM, so it was swapped for Thread the Needle (upper-back relief for desk workers).
 - **Mountain pose with breathing:** skipped, because `deep-breath` and `tadasana-reach` already cover it.
 - **Shoulder rolls:** the rig has no shoulder-blade joint, so only neck rolls were added.
+
+
+## Accuracy audit (October 2026)
+
+Every exercise was re-checked against the sources above with `tools/pose-data.mjs` (body data in cm)
+and one final 3D view per change. Below: what was wrong, the fix, and the numbers that prove it.
+"Before"/"after" positions are for a 175 cm body. Rig limits found during the audit are listed per group.
+
+
+### Group 1 audit: warm-up and cardio exercises
+
+Checker: `node tools/check-poses.mjs` gives **236/236 keyframes pass**.
+Body numbers come from `tools/pose-data.mjs` and a nearest-marker/surface probe, on a 175 cm body.
+
+#### Changed
+
+##### Standing Knee to Elbow (`knee-elbow`): the main fix
+- **Problem:** the elbow never reached the knee. In crunch frame #0, `elbow_R` was at (-45,135,35) and `knee_L` at (11,91,41), about **70 cm apart**. The knee came up only to hip height and the torso hardly crunched. The arm's elbow pointed out to the side, so twisting could not bring it across. Only the left hand had a (loose, 14 cm) head contact.
+- **Fix, crunch frames (#0 and its manual mirror #2):**
+  - Knee higher and slightly across: `hipF 125, knee 110, hipAbd -2.7`.
+  - Twist and crunch: `spineTwist ±45, spineF 50, spineSide ∓9`.
+  - The working arm swings its elbow forward and down while the hand stays behind the head: `shF 111.7, shAbd -21.2, shRot -25.7, elbow 124.7`. Without this, the rig's XZY shoulder cannot move a sideways-pointing elbow forward.
+  - The other elbow stays wide.
+- **Fix, upright frames:** both hands behind the head.
+- **Other changes:** view `front` → `threeq`, because the elbow–knee contact happens in depth. Cycle 1.8 → 2 s. Clearer tip.
+- **Contacts enforced (touch):**
+  - `elbow_R ↔ knee_L ≤ 7 cm` (mirrored in #2).
+  - `hand_L/hand_R ↔ head-back ≤ 8 cm` in the crunch and ≤ 7 cm upright.
+- **After:** elbow↔knee 7 cm. Hands 5–6 cm from the back of the head. No CLIP.
+- **Sources:**
+  - https://fitbod.me/exercises/standing-elbow-to-knee-crunch
+  - https://ie.physitrack.com/home-exercise-video/side-crunch-in-standing-with-knee-lifts ("bend the trunk to touch knee to elbow")
+  - https://blog.healthadvocate.com/2023/06/workout-of-the-week-standing-knee-crunch/
+- **Body limit:** the torso leans about 42° from vertical at the crunch. That is more "crunch" than the "don't hunch" cue suggests, but less flexion cannot close the gap with this body's proportions and shoulder rig.
+
+##### Hip Circles (`hip-circles`)
+- **Problem:** the shared `HANDS_ON_HIPS` arms put both hands **in front of the belly, touching each other** (hand_L ↔ hand_R 3 cm). The hands were not on the hips.
+- **Fix:** I overrode the arms inside this entry, without touching the shared constant: `shF -25, shAbd 45, shRot -55, elbow 100`. The elbows now point out to the sides and the palms sit on the side of the pelvis, at the iliac-crest height. Fingertips are within -4…+1 cm of the pelvis surface and the palm is 5–7 cm from the waist. The tip now says "knees soft" and "shoulders stay over the feet".
+- **Contact enforced:** `hand_L/R ↔ seat ≤ 20 cm`. The rig has no side-of-hip marker, so this uses the seat markers at the back corners of the pelvis. The old pose fails it (23 cm) and the new one passes.
+- **Sources:**
+  - https://fitbod.me/exercises/standing-hip-circle
+  - https://www.caliverse.app/exercises/hip-circles-261
+  - https://hrs.byu.edu/stretching/warmups
+- **Note for the coordinator:** `HANDS_ON_HIPS` is wrong for every exercise that uses it. The hands meet at the belly. Consider changing the constant to `{ shF: -25, shAbd: 45, shRot: -55, elbow: 100 }` and re-checking its users.
+
+##### Torso Twists (`torso-twist`)
+- **Problem:** the "arms loose at chest height" pose ended up with one forearm angled down across the belly and the other behind the back (see the before shots). It did not read as any standard variant. The twist was ±45, at the ROM ceiling.
+- **Fix:** arms folded across the chest, each hand on the opposite shoulder: `shF 68, shAbd -11, elbow 122, shRot -80`. I set twist to ±40, `knee 6`, cycle 2.4 s, and wrote a new tip.
+- **Contacts enforced:** `hand_L ↔ shoulder_R ≤ 8 cm` and `hand_R ↔ shoulder_L ≤ 8 cm`. Measured 7 cm each, and the forearms cross (6 cm apart).
+- **Sources:**
+  - https://www.physitrack.com/exercise-library/how-to-perform-the-torso-twist-exercise
+  - https://www.pdx.edu/recreation/sites/g/files/znldhr2076/files/2020-12/Week%202%20Mobility%20Routine.pdf
+  - https://grandavehousing.calpoly.edu/news/standing-warm-up-guide-prime (hips stay forward, twist side to side)
+
+##### Mountain Reach (`tadasana-reach`)
+- **Problem:** at the top, the arms were straight up about 40 cm apart.
+- **Fix:** palms pressed together overhead (`shAbd 180, elbow 28, shRot 90`), which is the Upward Salute "press palms together" cue. The tip is updated.
+- **Contact enforced:** `hand_L ↔ hand_R ≤ 5 cm` at the top.
+- **Body limit:** the rig has no shoulder blade or collarbone, and abduction is capped at 180°. The hands can only meet with the elbows about 28° bent, a soft diamond, not perfectly straight arms.
+- **Sources:**
+  - https://www.yogajournal.com/poses/upward-salute/
+  - https://gymgeek.com/exercises/yoga-poses/upward-salute-pose/
+  - https://pranayoga.co.in/asana/urdvah-hastasana-upward-hands-posture-upwards-salute/
+
+##### Jumping Jacks (`jumping-jacks`)
+- **Problem:** the overhead hands were about 40 cm apart (sources say "almost clapping"), and the knees were locked on landing.
+- **Fix:** top frame `shAbd 180, elbow 23, shRot 90`. Both ground frames get `knee 10, hipF 5, ankle -5` for a soft landing. The tip is updated.
+- **Contact enforced:** `hand_L ↔ hand_R ≤ 10 cm` at the top.
+- **Sources:**
+  - https://healthanswers.pfizer.com/physical-activity/aerobic/how-to-do-jumping-jacks
+  - https://gymkee.com/sw/exercises/cardio/jumping-jacks
+  - https://acibademinternational.com/?p=138642 (soft knees)
+
+##### Butt Kicks (`butt-kicks`)
+- **Problem:** the kicking heel stopped 22 cm from the glutes (knee 130).
+- **Fix:** `knee 150, hipF -3`. The thigh stays vertical and the heel now reaches the seat. The tip is updated.
+- **Contact enforced:** `heel ↔ seat ≤ 10 cm` on each kick frame.
+- **Sources:**
+  - https://livestrong.com/article/13770360-butt-kicks-exercise
+  - https://www.caliverse.app/exercises/butt-kicks-1523
+  - https://www.masterclass.com/articles/butt-kicks-guide
+
+##### Squat Jumps (`squat-jumps`)
+- **Problem:** the landing frame stood on the heels with the **toes 7 cm in the air** (`ankle -21.6`).
+- **Fix:** the landing is `pitch 25, hipF 60, knee 45, ankle -12`. The feet are now flat (toes at 1 cm) and the knee is 45°, which matches the absorbing landing in the sources.
+- **Sources:**
+  - https://www.acefitness.org/resources/everyone/exercise-library/116/squat-jumps/
+  - https://www.nasm.org/resource-center/exercise-library/squat-jump
+
+##### Standing Side Bends (`side-bend`): contact only
+- **Checked:** the pose was already right. The lower hand rests on the outside of the thigh (surface distance -2 cm) and the top arm reaches over the head.
+- **Added:** a `touch` (hand ↔ same-side knee ≤ 18 cm) so the hand stays on the leg, plus a clearer tip ("slide the other hand down your thigh").
+
+#### Checked, no change needed
+- **`march`:** knee at hip height (thigh 92° from vertical), opposite arm swing, stance foot flat.
+- **`arm-circles`:** true small circles (below → forward → above → behind), two forward then two backward.
+- **`neck-tilt`:** ear to shoulder ±32° through neutral, shoulders still.
+- **`high-knees`:** knee at hip height (knee y 98 vs hip y 101), on the ball of the standing foot, short flight frames.
+- **`mountain-climbers`:** hands under the shoulders (wrist z = shoulder z = 44). The driving knee comes under the chest, 20 cm from the elbow, with the foot off the floor.
+- **`burpees`:** stand → squat with hands on the floor just outside the feet → high plank → squat → jump with arms overhead.
+- **`plank-jacks`:** high plank, ankles 24 → 62 cm apart, hips level.
+
+#### Rig and tool limits hit
+1. **No side-of-hip marker.** "Hands on hips" can only be enforced loosely through the `seat` markers. A `hip_L/R` marker on the pelvis side (about ±0.15, 0.02, 0) would make this exact.
+2. **The shared `HANDS_ON_HIPS` constant puts the hands at the belly, touching each other.** It affects other exercises; the suggested values are above.
+3. **No shoulder-blade elevation, and abduction is capped at 180°.** Hands can only meet overhead with bent elbows (Mountain Reach, Jumping Jacks).
+4. **XZY shoulder order.** With the elbow out to the side (shAbd ≈ 90–120), `shF` only spins the arm. To bring an elbow forward (knee-to-elbow), you have to switch to a forward arm pose (high shF, negative shAbd) with negative rotation.
+5. **The checker's fitter cost ignores CLIP.** For this work I used a scratch copy that adds a clip penalty. It also accepts wrapped angles (it suggested `shAbd 336.7`), a fitter trap worth guarding against in `romExcess`/`cost`.
+6. **Contact with a body surface is approximated by marker-to-marker distances,** so thresholds of 7–10 cm mean real skin contact for hands, which are marker-centred.
+
+
+### Group 2 audit notes
+
+Squats, lunges, calf raises, knee push-ups, push-ups, glute bridge, superman, bird dog, plank, crunches, dead bug, leg raises, flutter kicks, bicycle and side plank.
+
+Only the entries for these exercises in `js/exercises.js` changed. No shared constants were edited (overrides are spread inside the entries).
+Checker: `236/236 keyframes pass`.
+
+
+A key finding that affects every floor exercise: the renderer keeps the pelvis fixed in x/z. Any keyframe that rotates the whole body therefore makes the planted hands or feet **slide along the floor**. I fixed this with the existing `z` pelvis-shift key plus re-fitted angles, so the support points stay put.
+
+Sources were reached through WebSearch excerpts only, because page fetching was blocked. I reused the URLs from docs/EXERCISE-TECHNIQUE.md and added the new ones below.
+
+---
+
+##### Push-ups (`pushups`): changed
+- **Wrong:** between top and bottom the hands slid 25 cm toward the feet. Wrist-to-toes distance went from 145 to 120 cm. At the bottom the wrists ended up beside the waist, 29 cm behind the shoulders.
+- **Fix:** top `{...HIGH_PLANK, pitch 73.8, shF 62, ankle 28.2}`, which puts the wrists 10 cm behind the shoulder joint (hands under the shoulders and upper chest). Bottom `{...PUSHUP_DOWN, pitch 88, shF -4.7, shAbd 24, elbow 105, ankle 4.4, z 0.059}`.
+- **Numbers (after):** wrist z 35 → 32 (3 cm drift, before 25 cm). Toes −98 → −93 (toe roll). Chest 8–9 cm off the floor at the bottom. Elbow flare shAbd 24 (≈45° tuck cue).
+- **Contacts:** `on: 'hands toes'` (checker). The hands staying planted is enforced by the fit, not by the checker (see limits).
+- **Sources:** acefitness.org/resources/everyone/exercise-library/13/bent-knee-push-up/ ; catalystathletics.com/exercise/869/Push-Up/
+
+##### Knee push-ups (`knee-pushups`): changed
+- **Wrong:** the hands slid 13 cm (hand–knee 85 → 72 cm), and the chest stayed 16 cm up.
+- **Fix:** top `pitch 58.7, shF 50`. Bottom `pitch 78.5, shF -9.4, shAbd 17.2, elbow 94.7, knee 73.9, z 0.093` (the knee angle keeps the raised feet where they were).
+- **Numbers:** wrist z 32 → 31, knee z −38 → −36, chest 11 cm, hips-front 5 cm (no sag onto the floor).
+- **Sources:** ACE bent-knee push-up (above) ; mayoclinic.org/healthy-lifestyle/fitness/multimedia/pushups/vid-20084674
+
+##### Glute bridge (`glute-bridge`): changed
+- **Wrong:** at the top the heels were 4 cm off the floor (the person was on tiptoe), and the hips were 3° past the line.
+- **Fix:** top `{pitch -108.3, hipF 0, knee 88.8, ankle 19.5, shF -33.4, z -0.026}`. The fit kept the shoulders and heels at their start positions.
+- **Numbers:** heel and toes y 0/0 (before 4/0). Heel z 51 = start. Shoulder joint z −48 = start. Shoulder 18, hip 35 and knee 48 cm sit on one line. Hands on the floor.
+- **Note:** the old doc estimate of a trunk angle of 30–40° can't be reached together with vertical shins and a straight shoulder–knee line on this body. About 18–20° is the geometric result.
+- **Contacts:** `on: 'back feet arms'`. Tips rewritten (hip-width feet, straight line, no arch).
+- **Sources:** physitrack glute bridge ; acefitness.org/resources/everyone/exercise-library/66/glute-bridge
+
+##### Crunches (`crunches`): changed
+- **Wrong:** both arms pointed up at the ceiling (shF 40–50), which is not a recognised crunch arm position.
+- **Fix:** arms crossed on the chest, as in the Mayo Clinic video, in both frames: `shF 40.5, shAbd -14.4, elbow 117.7, shRot -80.3`. Up frame `spineF 28, neckF 12`, so the shoulder blades clear the floor and the lower back stays down. In frame 1, `back` is 2 cm from the floor.
+- **Contacts enforced:** `touch: hand_L→shoulder_R ≤ 9 cm, hand_R→shoulder_L ≤ 9 cm` (measured about 7 cm).
+- **Sources:** https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/abdominal-crunch/vid-20084664 (arms crossed, head and shoulders up, hands behind the head discouraged)
+
+##### Bicycle crunches (`bicycle`): changed
+- **Wrong:** the elbow never went near the knee. Right elbow to left knee was about 52 cm (elbow at x −39, knee at x +11). The hands floated about 20 cm from the back of the head.
+- **Fix:** new frames fitted with spineTwist ±45 (the rig maximum) and spineF 45. The twisting-side arm brings its elbow forward across the body (`shAbd 10, shF 95, elbow 120, shRot -30`) with the fingertips at the side of the head. The other arm stays wide with the hand behind the head (`shAbd 153.6, shF 27.9, elbow 111.3, shRot 89.4`). Bent knee `hipF 102, knee 125, hipAbd -7`. Straight leg `hipF 25`. Frame 2 is a hand-written exact mirror. Cycle 1.8 → 2.4 s (slow and controlled).
+- **Numbers:** elbow_R–knee_L ≈ 10 cm (before ≈ 52). hand_R–head ≤ 8 cm. hand_L–head-back ≈ 6 cm.
+- **Contacts enforced (per frame):** `elbow_R→knee_L ≤ 12 cm`, `hand_R→head ≤ 10`, `hand_L→head-back ≤ 8`, and the mirror in frame 1.
+- **Sources:** thegymgroup.com/exercises/abs-and-core-exercises/how-to-do-a-bicycle-crunch ; healthanswers.pfizer.com/physical-activity/cross-training/how-to-do-bicycle-crunches ; masterclass.com/articles/how-to-do-bicycle-crunches. These say "elbow toward the opposite knee; touching not required".
+
+##### Side plank (`side-plank`): changed
+- **Wrong:** the supporting forearm pointed along the body toward the head (shRot 90) instead of forward. The feet were about 18 cm apart, not stacked.
+- **Fix:** `roll 68.5, shAbd_R 68.5, shRot_R 0` (forearm flat and pointing forward). `hipAbd_L 1.8, hipAbd_R -8.3, spineSide 3.3` keep the hips on the shoulder–ankle line and stack the feet.
+- **Numbers:** elbow joint x −54 vs shoulder −52 (elbow under the shoulder). Wrist 25 cm in front of the elbow. Hip y 21 vs line 20.4 (straight). Ankles stacked 7 cm apart vertically.
+- **Contacts enforced:** `touch heel_L→heel_R ≤ 10 cm`, `on: 'forearm_R foot_R'`.
+- **Sources:** https://nasm.org/exercise-library/side-plank ; https://www.sussex.ac.uk/sport/documents/side-planks.pdf ; redefiningstrength.com/?p=12310
+
+##### Alternating lunges (`lunges`): changed
+- **Wrong:** the pelvis stayed in place, so both feet slid. The back foot shot 64 cm backwards instead of the front foot stepping forward.
+- **Fix:** `z: 0.642` on both lunge frames, so the back foot's toes stay exactly where they stood (toes_R z 17 = standing) and the body travels forward with the step. The angles were already right (front shin vertical, back knee 9 cm off the floor). Tips rewritten.
+- **Sources:** acefitness.org/resources/everyone/exercise-library/94/forward-lunge/
+
+##### Squats (`squats`): small change
+- `hipRot: 12` in both frames: feet a little wider than the hips with the toes slightly out, and the knees follow the toes (ACE). Heels stay down. Balance passes.
+- **Source:** acefitness.org/resources/everyone/exercise-library/135/bodyweight-squat/
+
+##### Leg raises (`leg-raises`): changed
+- **Wrong:** the arms hovered 7–11 cm above the floor (sources: arms on the floor, palms down). The bottom heel was 17 cm up.
+- **Fix:** `shF -10` (arms resting on the floor), `on: 'back arms'`, bottom `hipF 4` (heels hover about 10 cm up), top `hipF 88`. Slower lowering (`d` 1.2 / 0.8).
+- **Source:** coachweb.com/abs-exercises/8505/flutter-kicks
+
+##### Flutter kicks (`flutter-kicks`): changed
+- **Wrong:** the arms were off the floor and the kicks were too high (heels 20–44 cm).
+- **Fix:** `shF -10`, `on: 'back arms'`, kicks hipF 5 ↔ 18 (heels about 13–33 cm, small and low). Tips: if the back arches, raise the legs a little.
+- **Sources:** coachweb.com/abs-exercises/8505/flutter-kicks ; masterclass.com/articles/flutter-kicks-workout-guide
+
+##### Dead bug (`dead-bug`): small change
+- The extended leg now hovers lower and fully straight (hipF 25 → 12, knee 5 → 0). Tips spell out the start position and the opposite arm/leg.
+- **Source:** nasm.org/resource-center/exercise-library/dead-bug
+
+##### Unchanged (verified correct)
+- **Bird dog:** the support hand and knee stay put (wrist z 47, knee −5 in both frames). The reaching arm is horizontal (hand y 55 ≈ shoulder 54). The opposite leg is about horizontal. Opposite arm and leg are correct.
+- **Forearm plank:** the elbow joint is directly under the shoulder (z 47/47), forearms forward, body straight, on the toes.
+- **Superman:** arms and legs lift a few cm with a small spine extension (−8), as previously fixed to the ACE cue.
+- **Calf raises:** ankle 38 at the top, pause, slow lowering. Fine.
+
+##### Limits of the rig and tools
+- **Hand/foot sliding is invisible to the checker.** No checker rule says "this support point must stay at the same floor position across keyframes". I fitted it by hand with `z`. **Suggestion:** a `pin` rule in check-poses that compares the named support markers' x/z between consecutive frames, with about 3 cm tolerance.
+- **spineTwist is capped at 45°** (ROM), and the shoulders are a ball joint with no scapular protraction. In the bicycle, the elbow gets to about 10 cm from the knee, not touching. The sources say touching isn't required.
+- **No scapula and a rigid trunk.** In a push-up with toes and hands planted, the wrists can only end up about 20 cm behind the shoulders. The toes roll about 5 cm (toe marker) at the bottom.
+- **Knee push-ups** keep the feet raised behind (knee about 90°). The shins-on-the-floor version would need knee ≈ 30° and a longer plank. Both are valid; I kept the existing feet-up variant.
+
+
+### Group 3 audit: yoga and stretch poses
+
+Only exercise entries in `js/exercises.js` were changed. Shared pose constants were not touched.
+Checker: `node tools/check-poses.mjs` → **236/236 keyframes pass**.
+
+Numbers below come from `tools/pose-data.mjs` keypoints (cm, 175 cm body; x = trainer's left, y = up, z = forward)
+
+#### Changed
+
+##### Tree (`tree`)
+- **Wrong:** the foot sat low, with the heel at 68 cm and the toes on the knee/shin area (toes_L 0.8 cm inside the right shin). Sources say never put the foot on the knee. The arms were overhead and apart, with no palms-together contact.
+- **Fix:** I raised the foot so the sole presses the inner thigh: hipF_L 45, hipAbd_L 45, knee_L 150. The heel now sits at 81 cm, touching the right thigh surface (−1.0 cm), and the toes point down at 60 cm, above the 50 cm knee. The palms now meet at the chest (shF 35, shAbd 23, elbow 126, shRot −57).
+- **Contacts enforced:** `heel_L→knee_R ≤ 34 cm` and `toes_L→knee_R ≤ 14 cm` keep the foot on the thigh above the knee (CLIP stops it from sinking in). `hand_L→hand_R ≤ 5 cm` keeps the palms together; the fingertips are 0.9 cm apart.
+- **Tip:** says to press the sole into the inner thigh or calf, palms together at the chest.
+- **Sources:** yogamatters.com/blogs/pose-library/tree-pose-vrikshasana ; canada.humankinetics.com/blogs/excerpt/tree-pose-asana-for-the-root-chakra ; liforme.com/blogs/blog/tree-pose (existing).
+- **Limit:** the hands are blobs, so it reads as a "steeple". The wrists stay about 20 cm apart while the fingertips touch.
+
+##### Cross-body Shoulder Stretch (`shoulder-stretch`)
+- **Wrong:** the helping hand floated up at face height (hand_R at 162–172 cm, about 33 cm from the other elbow), so nothing held the stretched arm.
+- **Fix:** I changed the helping arm to shF_R 20, shAbd_R 15, elbow_R 130 and shRot_R −60. The hand now holds the stretched arm just above the elbow (hand 0.2 cm from the upper-arm surface).
+- **Contacts:** `hand_R→elbow_L ≤ 7 cm` (now 5 cm) and `elbow_L→chest ≤ 16 cm` (now 7 cm; the arm is pulled in to the chest).
+- **Tip:** updated to "hold it just above the elbow".
+- **Sources:** mayoclinic.org/healthy-lifestyle/adult-health/multimedia/shoulder-stretches/vid-20084699 ; au.physitrack.com/home-exercise-video/cross-body-stretch.
+
+##### Seated Forward Bend (`seated-fold`)
+- **Wrong:** the hands hung in the air about 16 cm short of and beside the feet, so they never held them.
+- **Fix:** spineF 35→38, shF 150→145, shAbd 8→−6 (arms in line with the feet), elbow 5→25 (soft elbows as the hands wrap the feet). Now the wrist is at z 89 / y 19 against the sole (heel/toes at z 86).
+- **Contacts:** `hand_L→toes_L ≤ 8 cm` and `hand_R→toes_R ≤ 8 cm` (now 7 cm). The seat and heels stay on the floor.
+- **Tip:** says to hold the feet, ankles or shins, and to bend the knees if tight.
+- **Sources:** en.wikipedia.org/wiki/Paschimottanasana ; workoutlabs.com/yoga-poses-guide/seated-forward-bend-paschimottanasana/ ; lessons.com/yoga-classes/yoga-poses/seated-forward-bend-pose.
+- **Limit:** hipF is capped at 130 (ROM), so the pelvis can only tip 40°. More fold comes from the spine. I tried bent knees, but they lift the seat off the floor unless hipF goes past 130, so the legs stay straight.
+
+##### Standing Forward Fold (`forward-fold`)
+- **Wrong:** the arms dangled 44 cm in front of the feet and touched nothing (hands 21 cm above the floor).
+- **Fix:** shF 105→72, shAbd −5, elbow 0, neckF 15 (head heavier). The fingertips now rest on the front of the shins (0.3 cm from the shin surface).
+- **Contacts:** `hand_L→shin_L` and `hand_R→shin_R` ≤ 8 cm.
+- **Tip:** says to rest the hands on the shins (or the floor) and let the head hang.
+- **Sources:** ekhartyoga.com/poses/standing-forward-bend ; brettlarkin.com/standing-forward-fold-uttanasana ; yogamatters.com/blogs/pose-library/standing-forward-bend-uttanasana.
+
+##### Bridge Pose (`bridge-yoga`)
+- **Wrong:** the body rested on the **head**, not the shoulders. head-back was on the floor and the shoulders were 21 cm up, because the neck had no flexion. The heels were also lifted (ankle 26).
+- **Fix:** neckF 0→50 (head lies flat, chin toward chest), hipF −22→−15, ankle 26→3 (feet flat), shF −51→−38 (arms long on the floor). The shoulder joints are now 10 cm up, which is just body thickness, and the upper-back marker is 5 cm up. Heels and toes are on the floor, shins vertical (178°), and hands and forearms flat.
+- **Contacts:** the floor terms `back feet arms` cover this.
+- **Tip:** says to keep the weight on the upper back and shoulders, not the neck.
+- **Sources:** artofliving.org/yoga/yoga-poses/bridge-posture-setu-bandhasana ; lessons.com/yoga-poses/bridge-pose ; teens.aboutkidshealth.ca/yoga-poses-for-muscle-strengthening.
+- **Limit:** the hips are at 35 cm (was 46 cm, but that was only possible by standing on the head). The thighs slope up about 17° to the knees, not level. A higher bridge needs more than 50° neck flexion (ROM max) or a flexible upper back, and the rig's chest is one rigid piece.
+
+##### Warrior II (`warrior2`)
+- **Wrong:** the front shin folded back under the body. The front ankle was at x 9 (the hip is at x 8), with the knee sticking out at x 37 and the heel 15 cm off the floor (only toes_L touched). The stance was narrow, with no vertical shin and no level thigh.
+- **Fix:** a new pose fitted with custom goals (front foot pointing sideways, shin vertical, thigh near level, back leg straight, back foot turned about 20° in, centre of mass between the feet, chest facing front): `yaw 35, spineTwist −35, hipF_L 61, hipAbd_L 50, hipRot_L 25, knee_L 74, ankle_L 5, hipF_R −30, hipAbd_R 50, hipRot_R 34, ankle_R −7, roll 6`.
+- **Result:** the stance is 124 cm heel to heel. The front knee is at x 50 over the ankle at x 52 (shin 177°, vertical), the front thigh 103° (13° below level), the back leg straight, both feet flat, the torso upright, and the arms level.
+- **Tip:** describes the wide stance and foot directions.
+- **Sources:** liforme.com/blogs/blog/how-to-do-warrior-two ; beyogi.com/poses/warrior-ii-pose/ ; lessons.com/yoga-poses/warrior-ii-pose.
+- **Limits:** the front thigh cannot point straight sideways, because hipAbd is capped at 50. So the pelvis turns 35° toward the front leg and the chest twists back. knee_L reads 74° while the thigh is near level. Also, the exercise mat always lies front-to-back, so in this wide side stance the feet hang off it. That is a stage limit (`stage.js` mat orientation).
+
+##### Triangle (`triangle`)
+- **Wrong:** the lower hand hung beside the knee: wrist at (42, 52), 18 cm out from the leg and above the knee. The touch rule allowed 12 cm.
+- **Fix:** roll −23.7→−26, hipF_L 18 / hipF_R −8 (hinge over the front leg), hipAbd_R −21, shAbd_L 57, shF_L 18 (lower hand forward onto the shin), back ankle −8 (heel down). The torso now tilts 52° (was 49°), the top arm is vertical (3°), the bottom arm points down (169°), and the fingertips are 3.6 cm from the shin surface.
+- **Contact:** tightened to `hand_L→shin_L ≤ 9 cm` (marker to marker; was 12).
+- **Tip:** says to tip from the hip, rest the hand on the shin, top arm up.
+- **Sources:** liforme.com/blogs/blog/triangle-pose-trikonasana ; onepeloton.com/en-CA/blog/triangle-pose ; artofliving.org/us-en/triangle-pose.
+- **Limit (unchanged, already in the docs):** spineSide 38 and hipAbd_L 50 are at their ROM limits. A deeper hip tilt (60–70°) and the hand lower on the shin need more hip abduction than the rig allows.
+
+##### Cat-Cow (`cat-cow`)
+- **Wrong:** in cow, the shins pointed up off the floor (heels at 26 cm). In cat, the knees floated 18 cm off the floor, held up only by the foot tops. The hips jumped from 44 to 59 cm between the frames, and the wrists slid 22 cm.
+- **Fix:** I set both frames with the thighs vertical (hipF = pitch) and knee 90 (shins flat), so the knees stay on the floor. The arms are vertical, wrists under shoulders.
+  - Cow: `pitch/hipF 100.1, spineF −24, neckF −25, shF 74`. The chest (47 cm) dips below the hips (48 cm) and the head lifts.
+  - Cat: `pitch/hipF 71.7, spineF 28, neckF 30, shF 103`. The chest (54 cm) rises above the hips (50 cm) and the head drops.
+- **Result:** knees and shins stay on the floor in both frames. The hips move only 48 → 50 cm and the wrists only z 43 → 48.
+- **Tip:** adds "wrists under shoulders, knees under hips".
+- **Sources:** healthlinkbc.ca/healthwise/yoga-cat-cow-pose ; yorksj.ac.uk 5x5-a-day Cat_cow PDF (existing).
+
+##### Child's Pose (`childs-pose`)
+- **Pose:** already correct (forehead on the floor at head 1 cm / face 3 cm, arms extended, hands down).
+- **Added:** a contact rule for "hips sit back on the heels": `sit-bones→heel_L/R ≤ 10 cm`. The heel is 6 cm from the pelvis surface.
+- **Sources:** ekhartyoga.com/poses/balasana ; beyogi.com/poses/childs-pose/.
+
+##### Standing Quad Stretch (`quad-stretch`)
+- **Wrong:** the hand already held the foot, but the bent knee splayed out. The knees were 22 cm apart at x 16 vs −6; sources say to keep the knees together.
+- **Fix:** hipAbd_L −12.4, plus small refits (roll 5.7, shF_L −41.3, shAbd_L −7.7, elbow_L 34). The knees are now 10 cm apart (centre to centre, so touching).
+- **Contacts:** `hand_L→foot-top_L ≤ 6 cm` (kept) and new `knee_L→knee_R ≤ 12 cm`.
+- **Tip:** updated.
+- **Sources:** au.physitrack.com/home-exercise-video/quads-stretch---stand ; uk.physitrack.com/home-exercise-video/quadriceps-stretch-in-standing ; ourspace.rjah.nhs.uk/?p=1807.
+
+#### Checked, no change needed
+- **Downward Dog:** inverted V. Torso 132° with the arms in line (137°), heels 3 cm off the floor (fine for beginners), head between the arms.
+- **Cobra:** low cobra with the pelvis, thighs and foot tops down. Hands just behind the shoulders, elbows bent back by the ribs, chest lifted about 21°.
+- **Chair:** thighs 30° below level, torso leaning 28° with the arms roughly in line (39°), knees over the feet, heels down.
+- **Deep Breathing:** arms rise out to the sides from 10° to 170°, no back arch.
+- **Arm Swings:** a full continuous circle (linear shF 0→360). Overhead the arms are 20° off vertical, behind the body they open out, and it loops seamlessly.
+
+#### Rig / tool limits hit
+1. **Hip abduction capped at 50°** (ROM) limits the Triangle tilt and the Warrior II front thigh direction. A pelvis yaw plus spine twist works around it for Warrior II.
+2. **Neck flexion capped at 50°** and a rigid chest limit the bridge height, which stays at 35 cm with the shoulders down.
+3. **hipF capped at 130°**: Seated Fold cannot bend the knees without lifting the seat.
+4. **No inner-thigh, sole or palm markers.** Tree uses heel/toes→knee distances plus CLIP to keep the foot on the thigh. Palm contacts use the hand-centre markers. A `thigh_` (mid-thigh) marker and a `sole_` marker would make tree, butterfly and similar contacts exact.
+5. **The mat is always front-to-back**, so wide side stances (Warrior II, Triangle) step off it. `stage.js` could rotate or scale the mat to the frame box.
+6. **The checker only tests unmirrored frames.** I spot-checked the mirrored sides with `pose-data.mjs --mirror`: the contacts held.
+7. `pose-debug.html` `show()` cannot switch frames of the same exercise, because `play()` ignores a repeat of the same exercise. The workaround is to set `stageRef.exercise = null` first.
+
+
+### Group 4 exercise audit: notes
+
+Checker: `node tools/check-poses.mjs` gives 236/236 keyframes pass.
+
+The web searches worked, but pages could not be opened, so every source note below is based on search excerpts. Sources already listed in docs/EXERCISE-TECHNIQUE.md still apply. New excerpts from this pass:
+- Knee-to-elbow / spiderman plank: puregym.com/exercises/abs/plank-knee-to-elbow/, caliverse.app/exercises/plank-spider-445 ("drive the knee toward the outside of the same elbow"), exercise.com/exercises/knee-to-elbow-plank, redefiningstrength.com/?p=29048 (hips level, go only as far as flexibility allows)
+- Russian twist: physitrack.com/exercise-library/how-to-perform-the-russian-twist-exercise, library.theprehabguys.com/?p=32390, bodybuilding.com/exercises/russian-twist (flat back, lean back, rotate the torso)
+- Triceps kickback: acefitness.org/exerciselibrary/55/dumbbell-triceps-kickback (upper arm parallel to and close to the torso, forearm hanging vertically, the upper arm stays still)
+- Twist jumps: dieringe.com/exercises/twist-jumps, fitwill.app/exercise/7674/trunk-twist-hop (the twist comes from the hips, land softly)
+
+#### Changed
+
+##### Shared bug: hands-on-hips (side-leg-raise, reverse-lunges)
+- **Wrong:** the shared `HANDS_ON_HIPS` puts both palms on the front of the belly. The palm sat at x = 2 cm (the midline), 9 cm from the belly marker, so the hands crossed in front instead of resting on the hips.
+- **Fix:** these two entries now override the arms locally to `shF -10, shAbd 35, elbow 85, shRot -70`, found by a grid search for a palm on the side of the pelvis. The palm is now at x = ±16 cm, at iliac-crest height, halfway between front and back, with the elbows out to the sides. I did not edit the shared constant. Other exercises that use HANDS_ON_HIPS (lines ~88, 220, 231) have the same problem, so the coordinator may want to change the constant itself to these values.
+- No touch goal was added, because there is no marker on the side of the hip.
+
+##### twisters
+- **Wrong:** stiff, straight-legged landings.
+- **Fix:** each landing now has `hipF 12, knee 18, ankle -6`, so the knees are soft. The flight frame has knee 4. The hips still turn ±35° while the chest faces forward (spineTwist ∓35).
+
+##### cross-toe-touch
+- **Wrong:** the top arm pointed mostly sideways. The hand was 62 cm to the side and only 32 cm above the shoulder, not reaching to the ceiling. The touch tolerance was a loose 14 cm, aimed at the toes.
+- **Fix:** top arm `shF -50, shAbd 45`. The hand is now 68 cm above the shoulder and only 21 cm to the side, so the arms form one near-vertical line. A grid search showed that a forward-bent trunk needs shoulder extension to point the arm up. The touch goal is now `hand → opposite foot-top ≤ 8 cm` (measured: 8 cm).
+
+##### diamond-pushups
+- **Wrong:** the hands slid about 24 cm along the floor during each rep. Wrist z was 38 at the top and 14 at the bottom.
+- **Fix:** top `shF 58` and bottom `shF 20, elbow 89.5, pitch 86`. The hand-to-toe distance is now 143 cm at the top and 144 cm at the bottom, so the hands stay planted, under the chest (chest z 42, hands z 44). Hands touch: 7 cm at the top, 1–2 cm at the bottom. The elbows stay tucked. The view changed from side to sidefront so the diamond is visible.
+
+##### db-rows
+- **Wrong:** a shallow 45° hinge. Sources say 45° up to near parallel.
+- **Fix:** pitch 60 with `hipF 71.5, knee 18, ankle -11`, balanced by the fitter. Bottom: arms vertical (`shF = pitch`). Top: `shF -20, elbow 80`. The elbow is at z 12 behind the shoulder (z 40) and level with the torso, and the hand is directly below the elbow (z 13 vs 12), so the forearm is vertical. Neutral grip: the bar runs front to back. Tips updated.
+
+##### front-raises
+- **Wrong:** neutral grip with the bar vertical at the top. Sources describe the weights in front of the thighs, palms facing you.
+- **Fix:** `shRot -80, shAbd 2` in both frames. The bar now runs left to right (direction −0.98 x), so the palms face down at shoulder height. At the start the weights are in front of the thighs (hand z 12 vs hips-front 10). The view changed to sidefront. Tips updated.
+
+##### knee-touch
+- **Wrong:** at the start the hands floated out to the sides (x ±33, 30 cm above the thighs). At the top the fingertips stopped about 11 cm short, above the knees. There was a touch goal on the left hand only, at 20 cm.
+- **Fix:** start `shF 22, shAbd -8`: the hands rest on the thighs, within 20 cm of the knees. Top `spineF 39.4, shF 52, shAbd -4`, with touch goals of 6 cm on **both** hands to the knees (measured 6 cm each). Arms stay straight. The shoulder blades lift and the lower back stays on the mat.
+
+##### russian-twists
+- **Wrong:** the clasped hands were up in front of the face, with the forearms pointing up along the torso. There was no contact goal.
+- **Fix:** `shF 25, shAbd -22, elbow 60`. In body coordinates the hands are now at chest/belly height (y 20 vs chest 25), about 25–35 cm in front of the body, and they turn with the chest (twist ±40). New exercise-level touch goal: `hand_L ↔ hand_R ≤ 6 cm`. Lean −42° and feet on the floor are unchanged.
+
+##### plank-knee-elbow
+- **Wrong:** the leg was jammed into a full tuck (hipF 130, knee 155) with the foot tucked under the body. The knee was 32 cm from the elbow, and the touch tolerance was 32 cm.
+- **Fix:** working leg `hipF 120, hipAbd 50, hipRot -8, knee 135, ankle 45`, so the knee comes out to the side and the toes stay off the mat. A side crunch toward that knee (`spineSide ±17`) was added, the hands are slightly wider on the knee side (`shAbd 25 / -12`), and `shF 72`, so the hands are almost under the shoulders. The knee is now ≤ 15 cm from the same elbow (`touch knee→elbow ≤ 0.15`, was 32 cm). Both sides are written explicitly. Tips updated ("toward the outside of the same elbow").
+
+##### reverse-lunges
+- Only the hands-on-hips fix. The bottom position was already correct: front shin vertical, back knee 13 cm off the floor, back foot on its toes.
+
+#### Checked, no change needed
+- **squat-hold:** SQUAT_LOW with arms forward matches the sources.
+- **shoulder-press:** the bar runs left to right (palms forward). The forearms are vertical at the start, and the arms are nearly straight overhead at the top.
+- **lateral-raises:** arms reach shoulder height, the bar runs front to back (palms down) and the elbows are soft.
+- **bicep-curls:** the elbows stay fixed at the sides (elbow marker (25, 117, −5) → (25, 117, −4)) and the weight reaches the front of the shoulder.
+- **tricep-kickbacks:** the torso is near parallel (pitch 75), and the upper arm is horizontal and alongside the torso, as ACE describes. Only the elbow moves, 90 → 5.
+
+#### What the 3D body cannot do
+- **No forearm rotation joint.** Turning the hand is only possible by rotating the whole upper arm (shRot), which also changes the direction the elbow bends. So bicep curls show a neutral "hammer" grip instead of palms up. Front raises can only show an overhand grip because their arms stay straight.
+- **Knee cannot reach the elbow in the plank.** Hip abduction tops out at 50° and hip flexion at 130°. Even with a 17° side crunch, the knee gets to about 10–15 cm from the elbow without the hands sliding back. A real touch would need more flexed-hip abduction in the ROM table (about 60–70°, as people manage in a butterfly position).
+- **No hip-side marker.** "Hands on hips" cannot be enforced with a touch goal. A `hip-side_L/R` marker on the pelvis (about ±0.16, +0.02) would allow it.
+- **Shared HANDS_ON_HIPS constant** puts the hands on the belly. Suggested values: `{ shF: -10, shAbd: 35, elbow: 85, shRot: -70 }`.
+
+
+### Group 5 animation audit (js/exercises.js only)
+
+Checker after the changes: `node tools/check-poses.mjs` → **240/240 keyframes pass** (inchworm went from 6 to 10 frames).
+No shared pose constants were edited. Every override is inside my own entries.
+
+#### Changed
+
+##### side-lunges
+- **Wrong:** the hands floated near the face and did not touch each other (`shF 80, shAbd -20, elbow 70`).
+- **Changed:** hands are now clasped in front of the chest in every frame (`shF 40, shAbd -10, elbow 120, shRot -40`). The tip now mentions the clasped hands and toes pointing forward.
+- **Contacts enforced:** exercise-level `touch: hand_L↔hand_R ≤ 5 cm, hand_L↔chest ≤ 22 cm`. Hands went from ≈30 cm apart to 3.6 cm; hand to chest is ≈14 cm.
+- **Sources:** Nike "The Perfect Lateral Lunge" (clasp hands in front, toes forward); MasterClass lateral lunge guide; womensfitness.co.uk (other leg straight).
+
+##### sumo-squats
+- **Wrong:** same as above: the hands were apart, near the face.
+- **Changed:** same clasped-hands angles and touch rules. Tip updated.
+- **Sources:** healthline.com sumo squat ("hold your hands together in front of your chest", toes out about 45°); livestrong.com.
+
+##### step-jacks
+- **Wrong:** the whole body tilted about 10° like a falling stick (the `roll` was not counter-balanced).
+- **Changed:** added `spineSide -12 / +12` against `roll -10 / +10`. Torso tilt went from 10° to 2°.
+- **Sources:** puregym.com step jacks; redefiningstrength.com (step out, arms overhead without arching).
+
+##### skaters
+- **Wrong:** the trailing leg was behind the body but did not cross behind the landing leg (trailing ankle at x −1 cm vs landing foot at −5 cm).
+- **Changed:** trailing `hipAbd -15 → -24`, on both sides. The trailing ankle is now at x −11 cm, behind and past the landing foot (a curtsy-style sweep).
+- **Sources:** builtlean.com speed skaters; motra.com skater hop (trailing leg sweeps behind, arms across); workoutlabs.com.
+
+##### inchworm
+- **Wrong:** the feet slid back 83 cm on the floor between the fold and the plank, and the hands never "walked".
+- **Changed:** now 10 frames: stand, fold, walk step (left hand lifted 11 cm), inverted V, walk step (right hand lifted 12 cm), plank (held), and back the same way. A pelvis `z` shift (0.22 → 0.5 → 0.76 → 1.0 → 1.16) keeps the toes fixed at z ≈ 16 cm in every frame, so only the hands travel (40 → 101/120 → 154 → 171/185 → 169 cm). `cycle` 7 → 9 s. Tip rewritten: feet stay still, walk the hands one at a time.
+- **Sources:** ACE Exercise Library #254 Inchworms (hinge, hands to floor, walk hands out to plank); theprehabguys.com inch-worm walking (walk out and back).
+- **Limit:** the planted hand still slides a little between keyframes, because keyframe blending cannot pin a hand. The ACE version walks the feet in to the hands, which would move the body forward on every repetition, so the app walks the hands back instead (Prehab Guys variant).
+
+##### heel-touches
+- **Wrong:** the reaching hand stopped 15 cm short of the heel; the other arm was held up in the air; the heels were 5 cm off the floor.
+- **Changed:** `pitch -86.8, hipF 64.6, knee 131.2, ankle 19.7, spineF 35.9, spineSide ±25`; reaching arm `shF 9, shAbd 7.1`, other arm long by the side (`shF 9, shAbd 20`). `on` changed from 'back feet' to 'back heels toes' so the feet must be flat. Tip updated.
+- **Contacts enforced:** `hand↔same-side heel ≤ 7 cm` (was ≤ 15). The hand is now 7 cm from the heel (was 15), and both heels are on the floor.
+- **Sources:** fitbod.me alternating heel touch (shoulders off the ground, hand as close to the heel as possible); barbend.com; fitnessvolt.com.
+
+##### hollow-hold
+- **Wrong:** arms 37° and legs 30° above the floor made a V-sit or boat shape, not a hollow.
+- **Changed:** `shF 165 → 178`, `hipF 30 → 18`. Arms are now 24° above the floor, by the ears; legs 18°. The lower back and seat stay on the floor (back marker 2 cm).
+- **Sources:** Tom's Guide and Yahoo Health hollow body hold (limbs a few inches off the floor, lower back pressed down); hingehealth.com.
+
+##### clamshells
+- **Wrong:** knees were 23 cm apart and feet were 22 cm apart when closed. When open the feet separated (23 cm) and the knees opened about 48 cm. The top hand floated in the air.
+- **Changed:** closed frame: top leg `hipAbd_L -10.9, hipRot_L 7.8` (knees stacked). Open frame: `hipAbd_L 20, hipRot_L 39.2, hipF_L 42.4` (the leg pivots about the feet). Body `roll 87.4, pitch 1.2`. Top hand on the floor in front of the chest (`hand_L` added to `on`). Camera view `threeq → front` so the knee opening faces the viewer. Tip updated (head on lower arm, do not roll back).
+- **Contacts enforced:** closed: `knee_L↔knee_R ≤ 12, heel_L↔heel_R ≤ 6, toes_L↔toes_R ≤ 10`. Open: heels ≤ 6, toes ≤ 10. Body-frame knee separation goes 12 → 36 cm while the heels stay 6 cm apart.
+- **Sources:** Merck/MSD Manuals clamshell video (knees about 90°, feet together, top knee to the ceiling); physitrack.com (legs stacked, do not roll back); theprehabguys.com.
+
+##### standing-oblique-crunch
+- **Wrong:** the same-side elbow and knee stayed **63 cm** apart. This is the main defect: the crunch never met.
+- **Changed (fitted with ROM respected):** lifted leg `hipF 82.9, hipAbd 46.1, hipRot 23.3, knee 85.9`; trunk `spineSide ±35.9, spineF 40.7, spineTwist ∓33.7`; working arm `shAbd 107.2, shF 17.8` (elbow drops forward). Mirrored for the right side. Tip now says "crunch down and sideways so the same-side elbow meets the knee".
+- **Contacts enforced:** `elbow↔same-side knee ≤ 10 cm` (now 10 cm, was 63), both `hand↔head-back ≤ 14 cm` in every frame.
+- **Sources:** physitrack.com "Side crunch in standing with knee lifts" (fingers behind the head, knee out to the side, bend the trunk to touch knee to elbow); Tom's Guide (do not pull on the neck).
+- **Limit:** with a pure side-bend inside the normal range (spine side-bend ≤ 40°, hip abduction ≤ 50°) the elbow cannot reach the knee in this rig. The best pure side-bend got 18 cm, so the pose adds forward crunch and twist, as people do in practice.
+
+##### plank-to-dog
+- **Wrong:** going into the dog, the hands slid 26 cm forward and the feet 51 cm forward (span 150 → 125 cm), so the trainer "walked" without stepping.
+- **Changed:** a wider V (`hipF 89 → 67, pitch 124.8, shF 173.6, wrist 35.8, ankle -16.2`) keeps the hand-to-toe span at 150 cm. `z: -0.34` keeps the hands at z ≈ 59 cm in both frames (feet −95 → −99 cm). Tip updated: hands and feet stay where they are, heels reaching down. Heels end 15 cm up (tight-hamstring dog).
+- **Sources:** julielohre.com; motra.com plank to downward dog (press the hips up and back, heels toward the floor).
+
+#### Checked, rules tightened, pose kept
+- **plank-shoulder-taps:** the hand already reaches the opposite shoulder. Touch tightened from 10 to 9 cm (8 cm actual; the fitter cannot get closer without the forearm passing through the head). Sources: redefiningstrength.com, strengthlog.com (hips square, wide feet).
+- **good-mornings:** the pose was already correct (torso 70°, soft knees). Added exercise-level `hand↔head-back ≤ 14 cm` for both hands. Sources: coachweb.com, healthline.com.
+
+#### Checked, no change needed
+- **reverse-crunches:** the upper back, head and arms stay on the floor; the pelvis lifts 6–8 cm and the knees curl 27 cm toward the chest. Matches healthline.com and fitbod.me.
+- **donkey-kicks:** thigh level with the body, knee 90°, sole of the foot to the ceiling. Matches strengthlog.com and theprehabguys.com.
+- **fire-hydrants:** thigh lifted about 50° out to the side, knee 90°, shin level. Matches healthline.com (about 45°).
+
+#### Rig and tool notes for the coordinator
+- `touch` has only a maximum distance. A **minimum distance** (e.g. clam knees ≥ 25 cm apart, skater foot behind) would stop the fitter from dropping the defining motion.
+- The fitter's ROM penalty (`1e-4·deg²`) is much weaker than the touch penalty, so it happily goes 20° past the normal range. I used a scratch copy with ROM weight 0.05; it may be worth adding a CLI flag to the real checker.
+- A frame-level `touch` replaces the exercise-level one, so frames that need both must repeat the shared rules.
+- Keyframe blending cannot pin a supporting hand, so walking moves (inchworm) still slide a little between keyframes.
+- The pose-debug `show()` keeps the old frames when it is called twice for the same exercise (`Stage.play` early-return). Set `stageRef.exercise = null` first.
+
+
+### Group 6 exercise audit notes
+
+Only exercise entries in `js/exercises.js` were edited. No shared pose constants were touched.
+Numbers below come from `tools/pose-data.mjs` (175 cm body) and `tools/check-poses.mjs`.
+
+Sources: web search worked but pages could not be opened, so each note relies on search excerpts.
+New searches this pass covered the seated twist (Mayo Clinic video page and mirror pages, Yoga Journal
+Half Lord of the Fishes, brettlarkin.com) and the supine twist (Yoga International, Yoga Matters,
+yinyoga.com). For the rest, the sources already in `docs/EXERCISE-TECHNIQUE.md` were used.
+
+---
+
+#### Seated Spinal Twist (`seated-twist`): the owner's main complaint
+**Correct form (Mayo Clinic video vid-20453586; Yoga Journal / Brett Larkin half lord of the fishes):** sit with one leg straight.
+Cross the other foot over it and set it flat on the floor outside the straight leg's knee. Put the opposite
+elbow on the outside of the bent knee, keep the other hand on the floor behind you, and turn the chest, head
+and eyes toward the bent knee.
+**What was wrong:**
+- The bent leg was not crossed. In body coordinates the left ankle was at x = +4 (still on its own side)
+  while the straight leg's knee was at x = −11.
+- The elbow did not touch the knee. The touch goal allowed 17 cm and the measured gap was more than 8 cm.
+- The bent foot rested on its heel only.
+**Fix:**
+- Bent hip adducted and externally rotated: `hipAbd_L −13, hipRot_L 29, hipF_L 128, knee_L 101`.
+- Foot flat on the floor: `ankle_L 40`.
+- Pelvis leans back 15°. Twist and head turn 40°.
+**After (proof):**
+- Left ankle x = −18 and left heel x = −16, so the foot sits outside the right knee (x = −11), at the
+  knee's depth (heel z 37, knee z 39).
+- NOTES: "ankles crossed … left foot is across the right leg". Both the left heel and toes are on the floor.
+- TOUCHING: `elbow_R ↔ knee_L 5 cm`. The elbow is at body x +3 against the left knee at −1, so it is on the outside of the knee.
+**Contacts enforced:**
+- `on: 'seat heels foot_L hand_L'`.
+- `touch: [['elbow_R','knee_L',0.06], ['heel_L','knee_R',0.14]]`.
+- The CLIP check stops the foot from sitting on top of the shin. An earlier fitter run did put it there,
+  and only this check catches it.
+
+#### Butterfly Stretch (`butterfly`)
+**Correct form (Healthline, Hinge Health):** the soles of the feet press together, the knees fall open,
+both hands hold the feet, and you lean forward gently.
+**What was wrong:** the two feet passed through each other. The left heel was at x −5 and the right at +5,
+which is 10 cm of overlap. The hands sat together between the feet, and only one hand had a touch goal (10 cm).
+**Fix:** `hipF 112, hipAbd 50, hipRot 50, knee 120, ankle 21.5, pitch −8.6, spineF 22`.
+**After:** heels at x 0 and 0, `heel_L ↔ heel_R 0 cm`, `toes 4 cm`. The tops of the feet face outward, so the
+soles face each other. `hand_L ↔ foot-top_L 5 cm` and `hand_R ↔ foot-top_R 5 cm`.
+**Contacts:** touches for heels ≤ 3 cm, toes ≤ 4 cm and each hand to its own foot ≤ 5 cm.
+
+#### Knees to Chest (`knees-to-chest`)
+**Correct form (Mayo Clinic):** lie on your back, hug both knees in with the hands around the shins, and keep the head and shoulders on the mat.
+**What was wrong:**
+- The hands held nothing. TOUCHING was empty (the old goal allowed 10 cm, left side only).
+- The head was 17 cm above the mat, because a 15° spine curl lifted the head and shoulders.
+**Fix:** `pitch −95, spineF 3, neckF 5, hipF 128, knee 140`. Arms: `shF 10, shAbd −9.6, elbow 46`.
+**After:** the back and the back of the head are on the floor (head-back 1 cm). `hand_L ↔ shin_L 5 cm` and `hand_R ↔ shin_R 5 cm`.
+**Contacts:** each hand to its own shin ≤ 5 cm.
+
+#### Lying Spinal Twist (`supine-twist`)
+**Correct form (Yoga International, Yoga Matters, yinyoga.com):** lie on your back with the arms in a T. Lower
+both bent knees together to one side, top knee over the bottom knee, and turn the head the other way. Keep the
+shoulder blades down, and use a cushion under the knees if needed.
+**What was wrong:** the knees were not together. They were 21 cm apart, with the bottom knee 18 cm and the top
+knee 34 cm above the floor. Both feet floated in the air.
+**Fix:**
+- The pelvis rolls 55° instead of 45° (`pitch −35` with `yaw 90, roll −90`), with `spineTwist −45`.
+- Legs: `hipAbd_L 24, hipAbd_R −25, hipRot_L −18, hipRot_R 28`.
+- Arms reshaped so both hands reach the mat: `shAbd_L 80 / shF_L 15`, `shAbd_R 42 / shF_R −31`.
+**After:** the bottom foot is on the floor (heel 1, toes 3), the top foot rests next to it (6–7 cm), and the
+knees are stacked, about 16 cm apart centre to centre. The bottom knee is about 12 cm above the floor, as if on a cushion. The left forearm and hand lie on the mat, and the right hand is on the mat.
+**Contacts:** `on: 'back arms foot_L'`, `touch: knees ≤ 16 cm, heels ≤ 14 cm`.
+**Limit:** the rig's spine twist stops at 45°. Rolling the pelvis further lifts the whole body (tested), so
+the right shoulder already sits about 7 cm higher than the left and the knees cannot reach the floor.
+A real body gets the extra turn from the thoracic spine and the shoulder blades.
+
+#### Thread the Needle (`thread-needle`)
+**Correct form (Yoga Matters, Liforme):** start on hands and knees. Slide one arm under the chest, palm up,
+between the other hand and the knees, until the shoulder and the side of the head rest on the mat. The other
+hand stays planted under or slightly ahead of its shoulder.
+**What was wrong:** the supporting right hand was placed far out to the side, next to the threading hand
+(`hand_L ↔ hand_R 6 cm`). The threading arm therefore did not pass between that hand and the knee.
+**Fix:** the support arm comes forward and in, with the elbow bent: `shF_R 99, shAbd_R −18, elbow_R 68, wrist_R 90`. Also `spineTwist −45`, `roll 2.3`.
+**After:** the right hand is at x −30, z 55, in front of the threading arm (left wrist x −38, z 29). The hands
+no longer touch each other, and the head, left hand, knees and feet are on the mat.
+**Contacts:** `touch: ['hand_R','head',0.32]` keeps the support hand forward, near the head.
+**Limit:** the threading shoulder stays about 12 cm up because of the 45° twist limit.
+The right forearm comes within 3 cm of the mat.
+
+#### Sphinx Pose (`sphinx`)
+**Correct form (Yoga Journal):** elbows under the shoulders, forearms flat and parallel, palms down, chest lifted.
+**What was wrong:** the forearms pointed 17° upward, so the hands were off the floor, and the upper arms leaned 20° forward.
+**Fix:** `shF 52, elbow 86, wrist −14, spineF −41, neckF −5`.
+**After:** the upper arm is 169° from vertical, almost straight down, and the forearm is level (90°). The elbow
+(z 41) is under the shoulder (z 39). The forearms and hands are on the floor.
+**Contacts:** `on: 'forearms hands front knees'`.
+**Note:** the spine extension is now −41 (was −34.5), which is still a moderate backbend.
+
+#### Boat Pose (`boat-pose`)
+**Correct form (Yoga International, Prana Yoga):** in half boat the shins are parallel to the floor and the arms reach forward, also parallel.
+**What was wrong:** the shins pointed 25° downward (115° from vertical), and the thighs were steep (30° from vertical).
+**Fix:** `hipF 100, knee 50`.
+**After:** thighs 40° from vertical, shins level (90°), arms level (90°).
+
+#### Half Sun Salutation (`sun-salutation-half`)
+**Correct form (Ekhart Yoga, Healthline, Yoga Journal):** fold with soft knees and the hands toward the shins or the floor; in the half lift, the back is flat and the hands rest on the shins.
+**What was wrong:** in the fold the hands hung 44 cm in front of the feet, touching nothing. In the half lift the hands were 14 cm to the side of the knees, and TOUCHING was empty.
+**Fix:**
+- Fold (frames 2 and 4): `pitch 80.6, spineF 45, hipF 95, knee 15, shF 92.6, shAbd −6.2`.
+- Half lift (frame 3): `knee 12, shAbd −6`.
+**After:** in the fold, `hand ↔ shin 7 cm` (hands on the lower shins, 19 cm above the floor). In the half lift, `hand ↔ knee 6 cm` with a flat back (torso 79° from vertical).
+**Contacts:** per-frame touches: fold, hand to its own shin ≤ 7 cm; half lift, hand to its own knee ≤ 7 cm.
+
+#### Standing Chest Opener (`chest-opener`)
+**What was wrong:** the hands were 6 cm apart, which is not a real clasp.
+**Fix:** `shAbd −16`, plus a slight chest lift (`spineF −5`).
+**After:** `hand_L ↔ hand_R 2 cm`. The touch goal was tightened to 4 cm.
+
+#### Wrist & Forearm Stretch (`wrist-stretch`)
+**Correct form (HealthLinkBC, Michigan Medicine, Kaiser Permanente):** hold the arm straight out. For the flexor stretch, the other hand holds the fingers and pulls them back toward you. For the extensor stretch, the hand bends down and the other hand presses on the back of it.
+**What was wrong:**
+- The helping hand never touched the stretched hand. TOUCHING showed only `elbow_R ↔ chest 6 cm`.
+- The helping hand sat between the body and the stretched hand. From there it can't pull the fingers back.
+**Fix:**
+- The stretched arm comes toward the midline (`shAbd_L −25`), which is how people actually do this stretch.
+- The helping arm reaches in front of it: flexor frames `shF_R 100, shAbd_R −20, elbow_R 0`; extensor frames `shF_R 85`.
+**After:** `hand_L ↔ hand_R 6 cm` in the flexor frames and 5 cm in the extensor frames. The helping hand is now in front of the fingers or the back of the hand (z 53–63 versus the stretched hand's 50–58).
+**Contacts:** `touch hand_R ↔ hand_L ≤ 7 cm`. It was 9 cm, and it never actually held in the old pose.
+**Limit:** the hands are simple blobs with no fingers, so the "pull" is still only suggested.
+
+#### Standing Hamstring Stretch (`hamstring-stretch`)
+**What was wrong:** the stance was very short, with the front heel only 19 cm ahead of the back heel.
+**Fix:** `hipF_L 68`. The back leg was refitted for balance: `hipF_R 70.4, knee_R 40, ankle_R −16`.
+**After:** the front heel is 32 cm ahead. The hinge is unchanged (pitch 44, flat back), and the body balances.
+
+#### Shadow Boxing (`boxing-punches`)
+**What was wrong:** the guard fists sat about 10 cm below the chin.
+**Fix:** guard `shF 45, elbow 135` (was 35 / 140).
+**After:** the fists are level with the chin (hand 154 cm, chin 158 cm) and in front of the face.
+
+#### Unchanged (checked with pose-data, already correct)
+- **Low Lunge:** the front thigh is level and the shin vertical, the back knee and the top of the back foot are on the mat, and the arms are overhead.
+- **Puppy Pose:** the thighs are near vertical, the forehead and hands are on the mat, and the arms are straight.
+- **Neck Rolls:** ear to shoulder (±32°), then chin down (35°), with no backward roll.
+
+#### Rig and tool limits hit
+- **Spine twist stops at 45°.** This limits the supine twist (the knees can't reach the floor while both shoulders stay down) and thread the needle (the shoulder can't reach the floor).
+- **No ankle inversion and no toe or finger joints.** In the butterfly, the soles face each other only through hip rotation. In the wrist stretch, the finger pull can only be suggested.
+- **The checker cannot say "outside of".** A `touch` is only a distance, so the seated twist foot could just as well sit on top of the shin; only CLIP rules that out. Side-specific goals would help, for example a "left of" rule in body coordinates.
+- **No floor term for one foot's toes.** The `on` vocabulary has no word meaning "this foot is flat on the floor", so a flat foot is checked by eye, using pose-data heights for the heel and toes.
