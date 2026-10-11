@@ -174,7 +174,7 @@ new settings fields must be optional with a default in `DEFAULT_SETTINGS`.
 rebuilds the skin. Invalid files change nothing and show an in-page message.
 
 **Service worker:** on every release that changes any shipped file, **bump `CACHE` in `sw.js`**
-(currently `morning-move-v18`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
+(currently `morning-move-v19`) and **add any new JS/CSS/asset file to `FILES`**, or installed users
 may get a broken mix of old and new files.
 
 ## 4. The movement system

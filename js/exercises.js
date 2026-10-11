@@ -12,7 +12,7 @@
 
 // ---- Reusable poses ----
 const STAND = {};
-const HANDS_ON_HIPS = { shAbd: 35, elbow: 100, shRot: -75 };
+const HANDS_ON_HIPS = { shF: -10, shAbd: 35, elbow: 85, shRot: -70 };   // palms on the sides of the hips
 
 // High plank (push-up top). Arms vertical: shF = pitch.
 const HIGH_PLANK = { pitch: 75, shF: 75, shAbd: 8, elbow: 0, wrist: 90, ankle: 30 };
