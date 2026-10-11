@@ -173,12 +173,12 @@ export const EXERCISES = [
         shAbd: 122, shRot: 90, elbow: 134, shF: 16, shF_R: 111.7, shAbd_R: -21.2, shRot_R: -25.7, elbow_R: 124.7,
         roll: 5.4, hipAbd_R: 1, on: 'foot_R',
         touch: [['elbow_R', 'knee_L', 0.07], ['hand_L', 'head-back', 0.08], ['hand_R', 'head-back', 0.08]] },
-      { shAbd: 122, elbow: 134, shRot: 90, shF: 16, hipAbd: 8, touch: [['hand_L', 'head-back', 0.07], ['hand_R', 'head-back', 0.07]] },
+      { shAbd: 122, elbow: 134, shRot: 90, shF: 16, hipAbd: 2, touch: [['hand_L', 'head-back', 0.07], ['hand_R', 'head-back', 0.07]] },
       { hipF_R: 125, knee_R: 110, hipAbd_R: -2.7, spineTwist: -45, spineF: 50, spineSide: 9, neckF: 10,
         shAbd: 122, shRot: 90, elbow: 134, shF: 16, shF_L: 111.7, shAbd_L: -21.2, shRot_L: -25.7, elbow_L: 124.7,
         roll: -5.4, hipAbd_L: 1, on: 'foot_L',
         touch: [['elbow_L', 'knee_R', 0.07], ['hand_R', 'head-back', 0.08], ['hand_L', 'head-back', 0.08]] },
-      { shAbd: 122, elbow: 134, shRot: 90, shF: 16, hipAbd: 8, touch: [['hand_L', 'head-back', 0.07], ['hand_R', 'head-back', 0.07]] },
+      { shAbd: 122, elbow: 134, shRot: 90, shF: 16, hipAbd: 2, touch: [['hand_L', 'head-back', 0.07], ['hand_R', 'head-back', 0.07]] },
     ],
   },
   {
@@ -202,14 +202,19 @@ export const EXERCISES = [
     ],
   },
   {
-    id: 'burpees', on: 'feet', name: 'Burpees', cat: 'cardio', level: 3, met: 10, cycle: 3.4, view: 'side', mat: true,
+    id: 'burpees', on: 'feet', name: 'Burpees', cat: 'cardio', level: 3, met: 10, cycle: 3.6, view: 'side', mat: true,
     muscles: ['quads', 'chest', 'shoulders', 'abs', 'glutes'],
     tips: 'Squat, hands down, jump back to plank, jump feet in, then jump up. Move with control.',
     frames: [
       { d: 0.6 },
-      { ...SQUAT_HANDS_DOWN, d: 0.7, on: 'feet hands' },
-      { ...HIGH_PLANK, d: 0.9, on: 'hands toes' },
       { ...SQUAT_HANDS_DOWN, d: 0.6, on: 'feet hands' },
+      // Hop the feet back (and later in): weight onto the hands, both feet off the floor mid-jump.
+      { ...SQUAT_HANDS_DOWN, pitch: 55, shF: 83, on: 'hands', d: 0.15 },
+      { ...HIGH_PLANK, hipF: 15, knee: 90, ankle: 20, on: 'hands', d: 0.25 },
+      { ...HIGH_PLANK, d: 0.6, on: 'hands toes' },
+      { ...HIGH_PLANK, hipF: 15, knee: 90, ankle: 20, on: 'hands', d: 0.25 },
+      { ...SQUAT_HANDS_DOWN, pitch: 55, shF: 83, on: 'hands', d: 0.15 },
+      { ...SQUAT_HANDS_DOWN, d: 0.4, on: 'feet hands' },
       { shAbd: 20, shF: 165, ankle: 35, lift: 0.18, d: 0.6 },
     ],
   },
@@ -229,18 +234,23 @@ export const EXERCISES = [
     muscles: ['quads', 'glutes', 'hamstrings', 'adductors'],
     tips: 'Feet shoulder-width, chest up, push hips back. Knees follow your toes.',
     // Feet a little wider than hips with toes turned slightly out (hipRot); knees follow the toes.
-    frames: [{ shF: 15, hipAbd: 8, hipRot: 12, d: 0.8 }, { ...SQUAT_LOW, hipRot: 12, d: 1.2 }],
+    frames: [{ shF: 15, hipAbd: 8, hipRot: 12, d: 0.8 }, { ...SQUAT_LOW, hipAbd: 20.3, hipRot: -2.1, d: 1.2 }],
   },
   {
-    id: 'lunges', on: 'feet', name: 'Alternating Lunges', cat: 'strength', level: 2, met: 5.5, cycle: 4, view: 'side',
+    id: 'lunges', on: 'feet', name: 'Alternating Lunges', cat: 'strength', level: 2, met: 5.5, cycle: 5, view: 'side',
     muscles: ['quads', 'glutes', 'hamstrings', 'calves'],
     tips: 'Hands on hips, chest up. Take a big step forward and lower straight down until both knees are about 90°, front knee over the ankle, back knee just above the floor. Push back to standing and switch legs.',
     frames: [
       { ...HANDS_ON_HIPS, d: 0.6 },
+      // The stepping foot lifts on the way out and back (on: the standing foot), so it never glides.
+      { ...HANDS_ON_HIPS, hipF_L: 50, knee_L: 70, ankle_L: -5, roll: 3.9, hipAbd_R: -0.2, on: 'foot_R', d: 0.4 },
       // Step forward: the back foot stays where it stood (z moves the body forward with the step).
       { ...HANDS_ON_HIPS, hipF_L: 82, knee_L: 84, ankle_L: -6, hipF_R: -9, knee_R: 87, ankle_R: -37, z: 0.642 },
+      { ...HANDS_ON_HIPS, hipF_L: 50, knee_L: 70, ankle_L: -5, roll: 3.9, hipAbd_R: -0.2, on: 'foot_R', d: 0.4 },
       { ...HANDS_ON_HIPS, d: 0.6 },
+      { ...HANDS_ON_HIPS, hipF_R: 50, knee_R: 70, ankle_R: -5, roll: -3.9, hipAbd_L: -0.2, on: 'foot_L', d: 0.4 },
       { ...HANDS_ON_HIPS, hipF_R: 82, knee_R: 84, ankle_R: -6, hipF_L: -9, knee_L: 87, ankle_L: -37, z: 0.642 },
+      { ...HANDS_ON_HIPS, hipF_R: 50, knee_R: 70, ankle_R: -5, roll: -3.9, hipAbd_L: -0.2, on: 'foot_L', d: 0.4 },
     ],
   },
   {
@@ -269,7 +279,7 @@ export const EXERCISES = [
     tips: 'Hands under your shoulders, body in one straight line from head to heels. Lower until your chest is near the floor, elbows about 45° from your sides.',
     // Hands and toes stay planted: the body pivots on the toes (z shifts the pelvis so the hands don't slide).
     frames: [
-      { ...HIGH_PLANK, pitch: 73.8, shF: 62, ankle: 28.2 },
+      { ...HIGH_PLANK, pitch: 74, shF: 57.2, ankle: 15.8 },
       { ...PUSHUP_DOWN, pitch: 88, shF: -4.7, shAbd: 24, elbow: 105, ankle: 4.4, z: 0.059 },
     ],
   },
@@ -639,25 +649,36 @@ export const EXERCISES = [
 
   // ---------------- Added: bodyweight strength, cardio & core ----------------
   {
-    id: 'reverse-lunges', on: 'feet', name: 'Reverse Lunges', cat: 'strength', level: 1, met: 5, cycle: 4, view: 'side',
+    id: 'reverse-lunges', on: 'feet', name: 'Reverse Lunges', cat: 'strength', level: 1, met: 5, cycle: 5, view: 'side',
     muscles: ['quads', 'glutes', 'hamstrings', 'calves'],
     tips: 'Step one foot back and lower your back knee toward the floor, chest up. Push through the front heel to stand. Hold a chair for balance if needed.',
     frames: [
+      // The stepping foot lifts on the way back and on the way in (on: the standing foot), so it never glides.
       { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, d: 0.6 },
-      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, pitch: 8, hipF_L: 90, knee_L: 87.8, ankle_L: -4.7, hipF_R: 1.8, knee_R: 90, ankle_R: -33.1 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, hipF_R: 25, knee_R: 90, ankle_R: -10, hipF_L: 10, knee_L: 12, ankle_L: -6, roll: -3.9, hipAbd_L: -0.2, on: 'foot_L', d: 0.4 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, pitch: 8, hipF_L: 90, knee_L: 87.8, ankle_L: -4.7, hipF_R: 1.8, knee_R: 90, ankle_R: -33.1, z: -0.37 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, hipF_R: 25, knee_R: 90, ankle_R: -10, hipF_L: 10, knee_L: 12, ankle_L: -6, roll: -3.9, hipAbd_L: -0.2, on: 'foot_L', d: 0.4 },
       { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, d: 0.6 },
-      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, pitch: 8, hipF_R: 90, knee_R: 87.8, ankle_R: -4.7, hipF_L: 1.8, knee_L: 90, ankle_L: -33.1 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, hipF_L: 25, knee_L: 90, ankle_L: -10, hipF_R: 10, knee_R: 12, ankle_R: -6, roll: 3.9, hipAbd_R: -0.2, on: 'foot_R', d: 0.4 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, pitch: 8, hipF_R: 90, knee_R: 87.8, ankle_R: -4.7, hipF_L: 1.8, knee_L: 90, ankle_L: -33.1, z: -0.37 },
+      { ...HANDS_ON_HIPS, shF: -10, shAbd: 35, elbow: 85, shRot: -70, hipF_L: 25, knee_L: 90, ankle_L: -10, hipF_R: 10, knee_R: 12, ankle_R: -6, roll: 3.9, hipAbd_R: -0.2, on: 'foot_R', d: 0.4 },
     ],
   },
   {
-    id: 'side-lunges', on: 'feet', touch: [['hand_L', 'hand_R', 0.05], ['hand_L', 'chest', 0.22]], name: 'Side Lunges', cat: 'strength', level: 2, met: 5, cycle: 4, view: 'threeq',
+    id: 'side-lunges', on: 'feet', touch: [['hand_L', 'hand_R', 0.05], ['hand_L', 'chest', 0.22]], name: 'Side Lunges', cat: 'strength', level: 2, met: 5, cycle: 5, view: 'threeq',
     muscles: ['adductors', 'glutes', 'quads', 'hamstrings'],
     tips: 'Hands clasped at your chest. Take a wide step to the side, sit your hips back over that foot and keep the other leg straight. Both feet stay flat, toes forward. Push back to the middle and switch.',
     frames: [
+      // The stepping foot lifts on the way out and back (on: the standing foot), so it never glides;
+      // x shifts the hips over the bent leg so the straight leg's foot stays where it stood.
       { shF: 40, shAbd: -10, elbow: 120, shRot: -40, hipAbd: 6, d: 0.6 },
-      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, pitch: 30.4, hipF_L: 80, knee_L: 85, ankle_L: -29.1, hipAbd_L: 20, hipRot_L: 10, hipF_R: 25.6, hipAbd_R: 41.3, ankle_R: -0.4 },
+      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, hipF_L: 30, knee_L: 60, ankle_L: -10, hipAbd_L: 20, roll: 4, hipAbd_R: -1.1, on: 'foot_R', d: 0.4 },
+      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, pitch: 30.4, hipF_L: 80, knee_L: 85, ankle_L: -29.1, hipAbd_L: 20, hipRot_L: 10, hipF_R: 25.6, hipAbd_R: 41.3, ankle_R: -0.4, x: 0.4 },
+      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, hipF_L: 30, knee_L: 60, ankle_L: -10, hipAbd_L: 20, roll: 4, hipAbd_R: -1.1, on: 'foot_R', d: 0.4 },
       { shF: 40, shAbd: -10, elbow: 120, shRot: -40, hipAbd: 6, d: 0.6 },
-      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, pitch: 30.4, hipF_R: 80, knee_R: 85, ankle_R: -29.1, hipAbd_R: 20, hipRot_R: 10, hipF_L: 25.6, hipAbd_L: 41.3, ankle_L: -0.4 },
+      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, hipF_R: 30, knee_R: 60, ankle_R: -10, hipAbd_R: 20, roll: -4, hipAbd_L: -1.1, on: 'foot_L', d: 0.4 },
+      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, pitch: 30.4, hipF_R: 80, knee_R: 85, ankle_R: -29.1, hipAbd_R: 20, hipRot_R: 10, hipF_L: 25.6, hipAbd_L: 41.3, ankle_L: -0.4, x: -0.4 },
+      { shF: 40, shAbd: -10, elbow: 120, shRot: -40, hipF_R: 30, knee_R: 60, ankle_R: -10, hipAbd_R: 20, roll: -4, hipAbd_L: -1.1, on: 'foot_L', d: 0.4 },
     ],
   },
   {
@@ -665,19 +686,24 @@ export const EXERCISES = [
     muscles: ['adductors', 'glutes', 'quads', 'hamstrings'],
     tips: 'Feet wide, toes turned out, hands together at your chest. Sit straight down with your chest up and knees pushing out over your toes, then squeeze your glutes to stand.',
     frames: [
-      { hipAbd: 25, hipRot: 35, ankle: 3.9, pitch: 3.5, shF: 40, shAbd: -10, elbow: 120, shRot: -40, d: 0.8 },
-      { hipAbd: 40, hipRot: 0, hipF: 82.6, knee: 95, ankle: -26, pitch: 24.2, shF: 40, shAbd: -10, elbow: 120, shRot: -40, d: 1.2 },
+      { hipAbd: 9, hipRot: 52.7, ankle: 4, pitch: 3.4, shF: 40, shAbd: -10, elbow: 120, shRot: -40, d: 0.8 },
+      { hipAbd: 48, hipRot: 24.9, hipF: 78.4, knee: 100, ankle: -28.3, pitch: 20.6, shF: 40, shAbd: -10, elbow: 120, shRot: -40, d: 1.2 },
     ],
   },
   {
-    id: 'step-jacks', on: 'feet', name: 'Step Jacks', cat: 'cardio', level: 1, met: 4.5, cycle: 1.8, view: 'front',
+    id: 'step-jacks', on: 'feet', name: 'Step Jacks', cat: 'cardio', level: 1, met: 4.5, cycle: 2.4, view: 'front',
     muscles: ['shoulders', 'glutes', 'adductors', 'calves'],
     tips: 'A quiet jumping jack: step one foot out to the side as both arms sweep overhead, chest staying tall, step back in, switch. No jumping, so it is kind to knees and neighbours.',
     frames: [
-      { shAbd: 165, elbow: 5, hipAbd_L: 25, hipAbd_R: -8.6, roll: -10, spineSide: -12 },
-      { shAbd: 12, hipAbd: 3, d: 0.8 },
-      { shAbd: 165, elbow: 5, hipAbd_R: 25, hipAbd_L: -8.6, roll: 10, spineSide: 12 },
-      { shAbd: 12, hipAbd: 3, d: 0.8 },
+      // The stepping foot lifts on the way out and back in (on: the standing foot), so it never glides.
+      { shAbd: 165, elbow: 5, hipAbd_L: 25, hipAbd_R: -8.6, roll: -10, spineSide: -12, d: 0.7 },
+      { shAbd: 90, elbow: 5, hipF_L: 40, knee_L: 60, ankle_L: -15, hipAbd_L: 12, roll: 6.3, hipAbd_R: 2.3, on: 'foot_R', d: 0.4 },
+      { shAbd: 12, hipAbd: 3, d: 0.6 },
+      { shAbd: 90, elbow: 5, hipF_R: 40, knee_R: 60, ankle_R: -15, hipAbd_R: 12, roll: -6.3, hipAbd_L: 2.3, on: 'foot_L', d: 0.4 },
+      { shAbd: 165, elbow: 5, hipAbd_R: 25, hipAbd_L: -8.6, roll: 10, spineSide: 12, d: 0.7 },
+      { shAbd: 90, elbow: 5, hipF_R: 40, knee_R: 60, ankle_R: -15, hipAbd_R: 12, roll: -6.3, hipAbd_L: 2.3, on: 'foot_L', d: 0.4 },
+      { shAbd: 12, hipAbd: 3, d: 0.6 },
+      { shAbd: 90, elbow: 5, hipF_L: 40, knee_L: 60, ankle_L: -15, hipAbd_L: 12, roll: 6.3, hipAbd_R: 2.3, on: 'foot_R', d: 0.4 },
     ],
   },
   {
@@ -692,20 +718,43 @@ export const EXERCISES = [
     ],
   },
   {
-    id: 'inchworm', on: 'feet', name: 'Inchworm', cat: 'strength', level: 2, met: 4.5, cycle: 9, view: 'side', mat: true,
+    id: 'inchworm', on: 'feet', name: 'Inchworm', cat: 'strength', level: 2, met: 4.5, cycle: 13, view: 'side', mat: true,
     muscles: ['abs', 'shoulders', 'hamstrings', 'chest'],
     tips: 'Bend forward and put your hands on the floor (bend your knees as much as you need). Keep your feet still and walk your hands out, one hand at a time, to a plank. Walk them back and roll up to stand.',
     frames: [
       { d: 0.6 },
       { pitch: 113.7, spineF: 35, hipF: 118.7, knee: 33.5, ankle: -20, shF: 117.7, wrist: 80, neckF: 10, z: 0.22, on: 'feet hands' },
-      { pitch: 118, spineF: 17, hipF: 97, knee: 19, ankle: -20, shF: 136, wrist: 75, neckF: 5, shF_L: 140, elbow_L: 50, wrist_L: 30, z: 0.5, on: 'feet hand_R', d: 0.6 },
-      { pitch: 122.8, shF: 155, wrist: 70, hipF: 75.2, knee: 5, ankle: -20, z: 0.76, on: 'hands feet', d: 0.6 },
-      { pitch: 99, shF: 115, wrist: 80, hipF: 37, knee: 2, ankle: 5, shF_R: 118, elbow_R: 45, wrist_R: 30, z: 1.0, on: 'hand_L feet', d: 0.6 },
+      // L hand steps forward
+      { pitch: 109.8, spineF: 37, hipF: 117.6, knee: 31.9, ankle: -20, wrist: 79, neckF: 9, roll: -3.8, shF_L: 140.5, shF_R: 119.2, elbow_L: 44.7, z: 0.171, on: 'hand_R feet', d: 0.3 },
+      { pitch: 117.9, spineF: 31.6, hipF: 113.8, knee: 30.3, ankle: -20, wrist: 78, neckF: 8, shF_L: 154.1, shF_R: 108.4, z: 0.342, on: 'hands feet', d: 0.35 },
+      // R hand steps forward
+      { pitch: 115, spineF: 34.6, hipF: 110.4, knee: 30.8, ankle: -20, wrist: 76.5, neckF: 6.5, roll: -2.1, shF_L: 153.4, shF_R: 107, elbow_R: 72.9, z: 0.355, on: 'hand_L feet', d: 0.3 },
+      { pitch: 113.9, spineF: 25.6, hipF: 107, knee: 31.3, ankle: -20, shF: 134.3, wrist: 75, neckF: 5, z: 0.395, on: 'hands feet', d: 0.35 },
+      // L hand steps forward
+      { pitch: 110.5, spineF: 20.1, hipF: 98.9, knee: 33.8, ankle: -20, wrist: 73.5, neckF: 2.5, roll: -1, spineTwist: -0.6, shF_L: 138.2, shF_R: 112.5, elbow_L: 29.5, z: 0.488, on: 'hand_R feet', d: 0.3 },
+      { pitch: 117.5, spineF: -1.9, hipF: 90.5, knee: 36.3, ankle: -20, wrist: 72, shF_L: 128.6, shF_R: 70.8, spineTwist: -1.1, roll: -0.7, z: 0.721, on: 'hands feet', d: 0.35 },
+      // R hand steps forward
+      { pitch: 115, spineF: 10.9, hipF: 82.9, knee: 23.1, ankle: -20, wrist: 71, roll: -0.9, spineTwist: -0.6, shF_L: 143.6, shF_R: 81.1, elbow_R: 84.6, z: 0.701, on: 'hand_L feet', d: 0.3 },
+      { pitch: 121.8, shF: 140.4, wrist: 70, hipF: 83.2, knee: 10, ankle: -20, z: 0.689, on: 'hands feet', d: 0.35 },
+      // L hand steps forward
+      { pitch: 100.1, spineF: 15.1, hipF: 51.3, knee: 5, ankle: -2.5, wrist: 80, shAbd: 4, roll: -0.1, spineTwist: 1.2, shF_L: 126.5, shF_R: 112.8, elbow_L: 32.1, wrist_R: 84.1, z: 0.841, on: 'hand_R feet', d: 0.3 },
+      { pitch: 85, spineF: 9, shF_L: 100, shF_R: 68.6, shAbd: 8, wrist: 85, ankle: 14.1, hipF: 20, roll: -0.1, spineTwist: 0.5, wrist_R: 88.8, wrist_L: 69.1, z: 1.04, on: 'hands feet', d: 0.35 },
+      // R hand steps forward
+      { pitch: 78.5, spineF: 19.6, hipF: 12.8, knee: 0, ankle: 22.5, wrist: 90, shAbd: 8, roll: 1.6, spineTwist: 1.2, shF_L: 100.7, shF_R: 62.4, elbow_R: 72.5, wrist_L: 77.1, z: 1.071, on: 'hand_L feet', d: 0.3 },
       { ...HIGH_PLANK, z: 1.16, d: 1.2, on: 'hands toes' },
-      { pitch: 99, shF: 115, wrist: 80, hipF: 37, knee: 2, ankle: 5, shF_L: 118, elbow_L: 45, wrist_L: 30, z: 1.0, on: 'hand_R feet', d: 0.6 },
-      { pitch: 122.8, shF: 155, wrist: 70, hipF: 75.2, knee: 5, ankle: -20, z: 0.76, on: 'hands feet', d: 0.6 },
-      { pitch: 118, spineF: 17, hipF: 97, knee: 19, ankle: -20, shF: 136, wrist: 75, neckF: 5, shF_R: 140, elbow_R: 50, wrist_R: 30, z: 0.5, on: 'feet hand_L', d: 0.6 },
-      { pitch: 113.7, spineF: 35, hipF: 118.7, knee: 33.5, ankle: -20, shF: 117.7, wrist: 80, neckF: 10, z: 0.22, on: 'feet hands' },
+      // walk the hands back the same way
+      { pitch: 78.5, spineF: 19.6, hipF: 12.8, knee: 0, ankle: 22.5, wrist: 90, shAbd: 8, roll: 1.6, spineTwist: 1.2, shF_L: 100.7, shF_R: 62.4, elbow_R: 72.5, wrist_L: 77.1, z: 1.071, on: 'hand_L feet', d: 0.3 },
+      { pitch: 85, spineF: 9, shF_L: 100, shF_R: 68.6, shAbd: 8, wrist: 85, ankle: 14.1, hipF: 20, roll: -0.1, spineTwist: 0.5, wrist_R: 88.8, wrist_L: 69.1, z: 1.04, on: 'hands feet', d: 0.35 },
+      { pitch: 100.1, spineF: 15.1, hipF: 51.3, knee: 5, ankle: -2.5, wrist: 80, shAbd: 4, roll: -0.1, spineTwist: 1.2, shF_L: 126.5, shF_R: 112.8, elbow_L: 32.1, wrist_R: 84.1, z: 0.841, on: 'hand_R feet', d: 0.3 },
+      { pitch: 121.8, shF: 140.4, wrist: 70, hipF: 83.2, knee: 10, ankle: -20, z: 0.689, on: 'hands feet', d: 0.35 },
+      { pitch: 115, spineF: 10.9, hipF: 82.9, knee: 23.1, ankle: -20, wrist: 71, roll: -0.9, spineTwist: -0.6, shF_L: 143.6, shF_R: 81.1, elbow_R: 84.6, z: 0.701, on: 'hand_L feet', d: 0.3 },
+      { pitch: 117.5, spineF: -1.9, hipF: 90.5, knee: 36.3, ankle: -20, wrist: 72, shF_L: 128.6, shF_R: 70.8, spineTwist: -1.1, roll: -0.7, z: 0.721, on: 'hands feet', d: 0.35 },
+      { pitch: 110.5, spineF: 20.1, hipF: 98.9, knee: 33.8, ankle: -20, wrist: 73.5, neckF: 2.5, roll: -1, spineTwist: -0.6, shF_L: 138.2, shF_R: 112.5, elbow_L: 29.5, z: 0.488, on: 'hand_R feet', d: 0.3 },
+      { pitch: 113.9, spineF: 25.6, hipF: 107, knee: 31.3, ankle: -20, shF: 134.3, wrist: 75, neckF: 5, z: 0.395, on: 'hands feet', d: 0.35 },
+      { pitch: 115, spineF: 34.6, hipF: 110.4, knee: 30.8, ankle: -20, wrist: 76.5, neckF: 6.5, roll: -2.1, shF_L: 153.4, shF_R: 107, elbow_R: 72.9, z: 0.355, on: 'hand_L feet', d: 0.3 },
+      { pitch: 117.9, spineF: 31.6, hipF: 113.8, knee: 30.3, ankle: -20, wrist: 78, neckF: 8, shF_L: 154.1, shF_R: 108.4, z: 0.342, on: 'hands feet', d: 0.35 },
+      { pitch: 109.8, spineF: 37, hipF: 117.6, knee: 31.9, ankle: -20, wrist: 79, neckF: 9, roll: -3.8, shF_L: 140.5, shF_R: 119.2, elbow_L: 44.7, z: 0.171, on: 'hand_R feet', d: 0.3 },
+      { pitch: 113.7, spineF: 35, hipF: 118.7, knee: 33.5, ankle: -20, shF: 117.7, wrist: 80, neckF: 10, z: 0.22, on: 'feet hands', d: 1 },
     ],
   },
   {
@@ -789,9 +838,9 @@ export const EXERCISES = [
     tips: 'Hands behind your head, elbows wide. Lift one knee up and out to the side and crunch down and sideways so the same-side elbow meets the knee. Do not pull on your neck. Stand tall and switch.',
     frames: [
       { shAbd: 120, elbow: 132, shRot: 90, shAbd_L: 107.2, shF_L: 17.8, hipF_L: 82.9, hipAbd_L: 46.1, hipRot_L: 23.3, knee_L: 85.9, spineSide: 35.9, spineF: 40.7, spineTwist: -33.7, roll: 9.6, hipAbd_R: 0.9, on: 'foot_R', touch: [['elbow_L', 'knee_L', 0.1], ['hand_L', 'head-back', 0.14], ['hand_R', 'head-back', 0.14]] },
-      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 8, d: 0.6 },
+      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 0, d: 0.6 },
       { shAbd: 120, elbow: 132, shRot: 90, shAbd_R: 107.2, shF_R: 17.8, hipF_R: 82.9, hipAbd_R: 46.1, hipRot_R: 23.3, knee_R: 85.9, spineSide: -35.9, spineF: 40.7, spineTwist: 33.7, roll: -9.6, hipAbd_L: 0.9, on: 'foot_L', touch: [['elbow_R', 'knee_R', 0.1], ['hand_L', 'head-back', 0.14], ['hand_R', 'head-back', 0.14]] },
-      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 8, d: 0.6 },
+      { shAbd: 120, elbow: 132, shRot: 90, hipAbd: 0, d: 0.6 },
     ],
   },
   {
